@@ -6,7 +6,7 @@ import SectionHeader from '../ui/SectionHeader.astro';
 
 /**
  * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente products and the customer's
- * own systems feed Aldo (built on large language models), and Aldo answers in Slack with Q&A and
+ * own systems feed Aldo, and Aldo answers in Slack with Q&A and
  * Playbooks. Wide screens draw the wires; the geometry is fixed (row heights below), so the SVG paths
  * meet each row at its centre without measuring anything in the browser.
  */
@@ -125,7 +125,6 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
           <b>Aldo</b>
           <small>AI Chief of Staff</small>
         </div>
-        <p class="hub__note">Large language models (LLMs)</p>
       </div>
 
       <div class="map__wires map__wires--out" aria-hidden="true">
@@ -319,12 +318,6 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
     color: var(--ink-2);
   }
 
-  .hub__note {
-    font-size: var(--step-small);
-    color: var(--ink-3);
-    text-align: center;
-  }
-
   .map__cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -455,14 +448,6 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
 
     .hub small {
       font-size: var(--step-small);
-    }
-
-    .hub__note {
-      position: absolute;
-      top: calc(50% + 104px + 20px);
-      left: 50%;
-      translate: -50% 0;
-      white-space: nowrap;
     }
 
     .map__out {

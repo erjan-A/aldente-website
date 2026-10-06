@@ -125,7 +125,7 @@ test.describe('home page', () => {
       /Other customer systems/,
     ]);
     await expect(map.locator('.hub')).toContainText('AI Chief of Staff');
-    await expect(map.locator('.hub__note')).toHaveText('Large language models (LLMs)');
+    await expect(map.locator('.hub__note')).toHaveCount(0);
     await expect(map.locator('.out b').filter({ hasText: /^(Q&A|Playbooks)$/ })).toHaveText(['Q&A', 'Playbooks']);
   });
 
