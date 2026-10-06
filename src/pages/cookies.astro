@@ -1,0 +1,84 @@
+---
+import LegalPage, { type LegalSection } from '../components/site/LegalPage.astro';
+import { SITE } from '../data/site';
+import { CONSENT_KEY } from '../lib/consent';
+
+const necessary = {
+  what: `“${CONSENT_KEY}” in your browser’s local storage.`,
+  why: 'Remembers your cookie choice, so we don’t ask on every page.',
+  keep: '12 months, then we ask again.',
+};
+
+// Cookieless, so not a consent category: the banner offers only marketing (see src/lib/consent.ts).
+const counting = {
+  what: 'Plausible Analytics counts visits. It sets no cookies, stores nothing in your browser and collects no personal data, so the cookie banner does not ask about it.',
+  why: 'Shows us, as aggregated totals only, which pages are read and which lead to a booked demo, so we can improve the site.',
+  keep: 'Nothing is kept in your browser. Plausible keeps only the aggregated totals.',
+};
+
+const marketing = {
+  what: 'None of our own. With this on, Calendly’s booking calendar on the demo page sets its cookies without asking you again.',
+  why: 'Saves a step when you book a demo.',
+  keep: 'Calendly’s cookies follow Calendly’s own policy.',
+};
+
+const sections: LegalSection[] = [
+  { id: 'necessary', title: 'Necessary' },
+  { id: 'marketing', title: 'Marketing' },
+  { id: 'visit-counting', title: 'Visit counting' },
+  { id: 'other-sites', title: 'Other sites' },
+  { id: 'change-your-mind', title: 'Change your mind' },
+  { id: 'questions', title: 'Questions' },
+];
+---
+
+<LegalPage
+  title="Cookie policy"
+  muted="Kept short."
+  description="What Aldente AI stores in your browser, why, and how to change your choice."
+  lead="We store very little in your browser. Here is what, why, and how to change your choice."
+  updated="2026-10-06"
+  sections={sections}
+>
+  <Fragment slot="necessary">
+    <dl>
+      <div><dt>What</dt><dd>{necessary.what}</dd></div>
+      <div><dt>Why</dt><dd>{necessary.why}</dd></div>
+      <div><dt>How long</dt><dd>{necessary.keep}</dd></div>
+    </dl>
+  </Fragment>
+
+  <Fragment slot="marketing">
+    <dl>
+      <div><dt>What</dt><dd>{marketing.what}</dd></div>
+      <div><dt>Why</dt><dd>{marketing.why}</dd></div>
+      <div><dt>How long</dt><dd>{marketing.keep}</dd></div>
+    </dl>
+  </Fragment>
+
+  <Fragment slot="visit-counting">
+    <dl>
+      <div><dt>What</dt><dd>{counting.what}</dd></div>
+      <div><dt>Why</dt><dd>{counting.why}</dd></div>
+      <div><dt>How long</dt><dd>{counting.keep}</dd></div>
+    </dl>
+  </Fragment>
+
+  <Fragment slot="other-sites">
+    <p>
+      The demo page shows Calendly’s booking calendar. Calendly asks for its own cookie consent there, unless you have accepted
+      marketing cookies here. Calendly and LinkedIn, which our LinkedIn link opens, set their own cookies under their own policies.
+    </p>
+  </Fragment>
+
+  <Fragment slot="change-your-mind">
+    <p>
+      Open{' '}<button type="button" data-cookie-settings>cookie settings</button>{' '}at any time, or use the link in the footer. You can
+      also clear this site’s data in your browser.
+    </p>
+  </Fragment>
+
+  <Fragment slot="questions">
+    <p>Write to{' '}<a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+  </Fragment>
+</LegalPage>

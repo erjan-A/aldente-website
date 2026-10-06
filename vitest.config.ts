@@ -1,0 +1,12 @@
+/// <reference types="vitest/config" />
+import { getViteConfig } from 'astro/config';
+
+export default getViteConfig({
+  test: {
+    include: ['src/**/*.test.ts', 'tests/unit/**/*.test.ts'],
+    environment: 'node',
+    restoreMocks: true,
+    // Each test starts with the real globals (location, fetch, matchMedia…).
+    unstubGlobals: true,
+  },
+});

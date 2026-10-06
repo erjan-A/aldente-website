@@ -1,0 +1,223 @@
+---
+import { COMPARE, PLANS, type Cell } from '../../data/pricing';
+import Icon from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+const label = (cell: Cell) => (cell === true ? 'Included' : cell === false ? 'Not included' : cell);
+---
+
+<!--
+  One source (COMPARE), two layouts. From 720px: a fluid table with a column per plan.
+  Below 720px: one row per feature with the three plan values under a sticky plan legend,
+  so nothing scrolls sideways. CSS shows one layout at a time; the hidden one is display:none,
+  so screen readers meet the data once.
+-->
+<section class="compare tone-paper" aria-labelledby="compare-title">
+  <div class="container compare__inner">
+    <SectionHeader id="compare-title" title="Compare plans," muted="side by side." layout="stack" />
+
+    <div class="compare__frame compare__frame--table">
+      <table aria-labelledby="compare-title">
+        <colgroup>
+          <col class="compare__feature-col" />
+          {PLANS.map(() => <col />)}
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            {PLANS.map((plan) => <th scope="col">{plan.name}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            COMPARE.map((row) => (
+              <tr>
+                <th scope="row">{row.feature}</th>
+                {row.cells.map((cell) => (
+                  <td class:list={{ yes: cell === true, no: cell === false }}>
+                    {typeof cell === 'string' ? (
+                      cell
+                    ) : cell ? (
+                      <Icon name="check" size={18} strokeWidth={2.5} label={label(cell)} />
+                    ) : (
+                      <Icon name="x" size={16} strokeWidth={2} label={label(cell)} />
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="compare__frame compare__frame--stack">
+      <div class="compare__legend" aria-hidden="true">
+        {PLANS.map((plan) => <span>{plan.name}</span>)}
+      </div>
+      <ul class="compare__rows" role="list" aria-labelledby="compare-title">
+        {
+          COMPARE.map((row) => (
+            <li class="compare__row">
+              <p class="compare__feature">{row.feature}</p>
+              <dl class="compare__values">
+                {row.cells.map((cell, i) => (
+                  <div class:list={['compare__value', { yes: cell === true, no: cell === false }]}>
+                    <dt class="visually-hidden">{PLANS[i]!.name}</dt>
+                    <dd>
+                      {typeof cell === 'string' ? (
+                        cell
+                      ) : cell ? (
+                        <Icon name="check" size={18} strokeWidth={2.5} label={label(cell)} />
+                      ) : (
+                        <Icon name="x" size={16} strokeWidth={2} label={label(cell)} />
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .compare {
+    padding-block: 0;
+  }
+
+  .compare__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .compare__frame {
+    border-radius: var(--radius-l);
+    border: 1px solid var(--card-line);
+    background: var(--card);
+  }
+
+  /* ---- Table, 720px and up: fluid, so every plan column fits (no sideways scroll on tablets). ---- */
+  .compare__frame--table {
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: var(--step-small);
+  }
+
+  .compare__feature-col {
+    width: 40%;
+  }
+
+  th,
+  td {
+    padding: 16px;
+    text-align: left;
+    overflow-wrap: anywhere;
+    border-bottom: 1px solid var(--card-2);
+  }
+
+  thead th {
+    font-weight: 700;
+  }
+
+  thead th:first-child,
+  tbody th {
+    padding-left: 24px;
+    font-weight: 400;
+  }
+
+  thead th:first-child {
+    color: var(--fg-3);
+    font-weight: 600;
+  }
+
+  td {
+    font-weight: 600;
+  }
+
+  .yes {
+    color: var(--fg-accent);
+  }
+
+  .no {
+    color: var(--fg-3);
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  /* ---- Stacked, below 720px: feature name, then the three plan values in the legend's columns. ---- */
+  .compare__frame--stack {
+    display: none;
+  }
+
+  .compare__legend,
+  .compare__values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* Sticks under the site header while the rows scroll, so each value keeps its plan. */
+  .compare__legend {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 1;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--card-line);
+    border-radius: var(--radius-l) var(--radius-l) 0 0;
+    background: var(--card);
+    font-size: var(--step-label);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .compare__row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--card-2);
+  }
+
+  .compare__row:last-child {
+    border-bottom: 0;
+  }
+
+  .compare__feature {
+    font-size: var(--step-small);
+    line-height: 1.35;
+  }
+
+  .compare__value {
+    display: flex;
+    align-items: center;
+    min-height: 22px;
+    font-size: var(--step-small);
+    font-weight: 600;
+  }
+
+  .compare__value dd {
+    margin: 0;
+  }
+
+  @media (max-width: 719px) {
+    .compare__frame--table {
+      display: none;
+    }
+
+    .compare__frame--stack {
+      display: block;
+    }
+  }
+</style>

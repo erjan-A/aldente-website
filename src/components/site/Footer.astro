@@ -1,0 +1,217 @@
+---
+import wordmark from '../../assets/logos/aldente-wordmark.svg';
+import { FOOTER, SITE } from '../../data/site';
+import Icon from '../ui/Icon.astro';
+
+const year = 2026;
+---
+
+<footer class="footer">
+  <div class="container footer__top">
+    <div class="footer__brand">
+      <p class="footer__tagline">{SITE.tagline}</p>
+      <a class="footer__contact" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      <a class="footer__contact" href={SITE.phoneHref}>{SITE.phone}</a>
+      <a class="footer__social" href={SITE.linkedin} target="_blank" rel="noopener">
+        <Icon name="linkedin" size={16} strokeWidth={2} />
+        LinkedIn
+      </a>
+    </div>
+    <nav class="footer__cols" aria-label="Footer">
+      {
+        FOOTER.map((col) => (
+          <div>
+            <h2 class="footer__title">{col.title}</h2>
+            <ul role="list">
+              {col.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+  </div>
+  <div class="container">
+    <div class="footer__legal">
+      <span>© {year} {SITE.name}</span>
+      <button type="button" data-cookie-settings>Cookie settings</button>
+      <span class="footer__trust">SOC 2 Type II · GDPR</span>
+    </div>
+  </div>
+  <div class="footer__mark" aria-hidden="true">
+    <img src={wordmark.src} width={wordmark.width} height={wordmark.height} alt="" loading="lazy" decoding="async" />
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-top: 80px;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  .footer__brand {
+    flex: 1 1 280px;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .footer__tagline {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .footer__contact {
+    align-self: flex-start;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+    transition: color 0.2s ease;
+  }
+
+  .footer__contact:hover,
+  .footer__social:hover,
+  .footer__legal button:hover {
+    color: var(--ink);
+  }
+
+  .footer__social {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-card);
+    color: var(--ink-2);
+    font-size: var(--step-small);
+    font-weight: 500;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .footer__social:hover {
+    border-color: var(--line-strong);
+  }
+
+  .footer__cols {
+    flex: 2 1 480px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 32px;
+  }
+
+  .footer__title {
+    margin-bottom: 8px;
+    font-size: var(--step-label);
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+
+  .footer__cols ul {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Each link is a 32px row (44px on touch screens), so the hit area is the whole row, not the glyphs. */
+  .footer__cols a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    color: var(--ink-2);
+    font-size: var(--step-small);
+    transition: color 0.2s ease;
+  }
+
+  .footer__cols a:hover {
+    color: var(--ink);
+  }
+
+  /* Inside the container's padding, so the divider spans the text column and no further. */
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: var(--step-label);
+    color: var(--ink-3);
+  }
+
+  .footer__legal button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .footer__trust {
+    margin-left: auto;
+  }
+
+  .footer__mark {
+    max-width: 1440px;
+    margin: 48px auto 0;
+    padding-inline: clamp(12px, 2vw, 24px);
+    height: min(15vw, 216px);
+    overflow: hidden;
+  }
+
+  .footer__mark img {
+    width: 100%;
+  }
+
+  /* Touch screens: 44px targets. Negative margins keep the email and the cookie button's rows visually as they were. */
+  @media (pointer: coarse) {
+    .footer__cols ul {
+      gap: 0;
+    }
+
+    .footer__cols a {
+      min-height: 44px;
+    }
+
+    .footer__contact,
+    .footer__legal button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .footer__contact {
+      margin-block: -9px;
+    }
+
+    .footer__legal button {
+      margin-block: -12px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .footer__trust {
+      margin-left: 0;
+    }
+  }
+</style>

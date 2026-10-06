@@ -1,0 +1,147 @@
+---
+import { Image } from 'astro:assets';
+import { CUSTOMER_LOGOS } from '../../data/logos';
+import { retina } from '../../lib/images';
+import { COUNTER } from '../../data/site';
+import { valueAt } from '../../lib/counter';
+import { formatNumber } from '../../lib/format';
+
+// A static figure until a stats endpoint exists; then a live counter, rendered at build time and kept current in the browser.
+const live = Boolean(COUNTER.endpoint);
+const initial = formatNumber(valueAt({ ...COUNTER, baseTime: Date.parse(COUNTER.baseTime) }, Date.now()));
+
+// The strip loops by sliding exactly half its length, so it holds two identical halves,
+// each long enough to fill the widest row. Only the first set is announced.
+const COPIES = 4;
+const strip = Array.from({ length: COPIES }, () => CUSTOMER_LOGOS).flat();
+---
+
+<div class="proof" data-loop>
+  <p class="proof__line">
+    {
+      live ? (
+        <live-counter
+          class="proof__count"
+          data-base={COUNTER.base}
+          data-base-time={COUNTER.baseTime}
+          data-per-day={COUNTER.perDay}
+          data-endpoint={COUNTER.endpoint}>
+          {initial}
+        </live-counter>
+      ) : (
+        <b class="proof__count">{COUNTER.label}</b>
+      )
+    }{' '}
+    orders verified across 200+ restaurant locations.{' '}
+    <span class="proof__by">Used by franchise operators&nbsp;of</span>
+  </p>
+  <div class="marquee">
+    <ul class="marquee__track" role="list">
+      {
+        strip.map((logo, i) => {
+          const repeat = i >= CUSTOMER_LOGOS.length;
+          const height = Math.round(logo.height * 0.66);
+          return (
+            <li class:list={{ marquee__repeat: repeat }} aria-hidden={repeat ? 'true' : undefined}>
+              <Image src={logo.mono ?? logo.src} alt={repeat ? '' : logo.name} height={height} densities={retina(logo.mono ?? logo.src)} style={`height:${height}px`} />
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</div>
+
+<script>
+  import '../../scripts/live-counter';
+</script>
+
+<style>
+  .proof {
+    display: grid;
+    gap: 28px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .proof__line {
+    max-width: 22ch;
+    font-size: var(--step-h4);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .proof__count {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .proof__by {
+    color: var(--ink-3);
+  }
+
+  .marquee {
+    overflow: hidden;
+  }
+
+  .marquee__track {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px 48px;
+  }
+
+  .marquee__track img {
+    width: auto;
+    max-width: none;
+    /* One light tone for every brand on the dark ground. */
+    filter: brightness(0) invert(1);
+    opacity: 0.55;
+  }
+
+  .marquee__repeat {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .proof {
+      grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+      align-items: center;
+      gap: 48px;
+    }
+  }
+
+  /* With motion allowed, the logos drift by in a loop that fades out at both edges. */
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee {
+      mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    }
+
+    .marquee__track {
+      flex-wrap: nowrap;
+      gap: 0;
+      width: max-content;
+      animation: marquee 48s linear infinite;
+    }
+
+    .marquee__track li {
+      padding-inline: clamp(28px, 3.5vw, 52px);
+    }
+
+    .marquee__repeat {
+      display: block;
+    }
+
+    .marquee:hover .marquee__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

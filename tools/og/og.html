@@ -1,0 +1,311 @@
+<!doctype html>
+<!-- Share image template (1200x630). Rendered to public/og.jpg by make-og.mjs in this folder. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Aldente AI share image</title>
+    <style>
+      @font-face {
+        font-family: 'Onest';
+        src: url('../../node_modules/@fontsource-variable/onest/files/onest-latin-wght-normal.woff2') format('woff2');
+        font-weight: 100 900;
+        font-display: block;
+      }
+
+      :root {
+        --bg: #0b0b0b;
+        --surface: #181818;
+        --line-card: #363636;
+        --ink: #f1f1f1;
+        --ink-2: #b3b3b3;
+        --ink-3: #939393;
+        --accent: #e05634;
+        --on-accent: #0b0b0b;
+        --safe: 64px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+      }
+
+      body {
+        position: relative;
+        overflow: hidden;
+        font-family: 'Onest', sans-serif;
+        color: var(--ink);
+        /* The site's warm glow, kept low on the dark ground: lit from the top right, behind the camera. */
+        background:
+          radial-gradient(48% 70% at 88% 4%, rgb(224 86 52 / 0.2) 0%, rgb(224 86 52 / 0) 70%),
+          radial-gradient(40% 55% at 0% 100%, rgb(224 86 52 / 0.07) 0%, rgb(224 86 52 / 0) 70%), var(--bg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Copy column, inside the 64px safe area */
+      .copy {
+        position: absolute;
+        inset: var(--safe) auto var(--safe) var(--safe);
+        width: 540px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .logo {
+        display: block;
+        width: 200px;
+        height: auto;
+      }
+
+      h1 {
+        margin-block: auto;
+        font-size: 92px;
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        font-weight: 700;
+      }
+
+      h1 span {
+        color: var(--accent);
+        white-space: nowrap;
+      }
+
+      .sub {
+        font-size: 26px;
+        line-height: 1.3;
+        font-weight: 500;
+        color: var(--ink-2);
+      }
+
+      /* Two lines on the card: the separator gives way to the line break. */
+      .sub .sep {
+        display: none;
+      }
+
+      /* Camera console, cropped by the right edge */
+      .console {
+        position: absolute;
+        left: 640px;
+        top: var(--safe);
+        width: 640px;
+        padding: 10px;
+        border-radius: 28px;
+        background: var(--surface);
+        border: 1px solid var(--line-card);
+        box-shadow: 0 30px 60px rgb(0 0 0 / 0.45);
+      }
+
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 4px 10px 12px;
+        font-size: 17px;
+        font-weight: 500;
+        color: var(--ink-3);
+      }
+
+      .live {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      .live i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      .feed {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #242424;
+      }
+
+      .feed img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.55) contrast(1.05) brightness(0.82);
+      }
+
+      /* Detection boxes use the same positions as the home hero console */
+      .det {
+        position: absolute;
+        border: 3px solid;
+        border-radius: 12px;
+      }
+
+      .det--alert {
+        border-color: var(--accent);
+        background: rgb(224 86 52 / 0.14);
+      }
+
+      .det--neutral {
+        border-color: var(--ink);
+      }
+
+      .det__label {
+        position: absolute;
+        left: -3px;
+        bottom: calc(100% + 8px);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px 5px 5px;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      /* Label hangs from the box's right edge, so the right crop cannot cut it */
+      .det__label--end {
+        left: auto;
+        right: -3px;
+      }
+
+      .det--alert .det__label {
+        background: var(--accent);
+        color: var(--on-accent);
+      }
+
+      .det--neutral .det__label {
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      .pin {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgb(0 0 0 / 0.85);
+        color: #fff;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+      }
+
+      /* Slack-style post from Aldo, overlapping the camera */
+      .slack {
+        position: absolute;
+        left: 592px;
+        top: 446px;
+        width: 448px;
+        display: flex;
+        gap: 12px;
+        padding: 16px 18px 18px;
+        border-radius: 16px;
+        background: #fff;
+        color: #1d1c1d;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        box-shadow:
+          0 24px 48px rgb(0 0 0 / 0.5),
+          0 2px 6px rgb(0 0 0 / 0.3);
+      }
+
+      .avatar {
+        flex: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .avatar img {
+        width: 24px;
+        height: auto;
+      }
+
+      .meta {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-size: 19px;
+      }
+
+      .meta b {
+        font-weight: 800;
+      }
+
+      .app {
+        padding: 1px 4px;
+        border-radius: 3px;
+        background: rgb(29 28 29 / 0.13);
+        color: rgb(29 28 29 / 0.7);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .meta time {
+        color: #616061;
+        font-size: 15px;
+      }
+
+      .text {
+        margin-top: 4px;
+        font-size: 19px;
+        line-height: 1.4;
+      }
+
+      .mention {
+        color: #1264a3;
+        background: rgb(29 155 209 / 0.1);
+        border-radius: 3px;
+        padding: 0 2px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="console">
+      <div class="bar">
+        <span class="live"><i></i>Live</span>
+        <span>Location 03 · Dining room · Cam 04</span>
+      </div>
+      <div class="feed">
+        <img src="../../src/assets/images/dining-room-overhead.jpg" alt="" />
+        <span class="det det--neutral" style="left: 61.5%; top: 30%; width: 16%; height: 40%">
+          <span class="det__label det__label--end"><i class="pin">2</i>Table 9 · seated 41 min</span>
+        </span>
+        <span class="det det--alert" style="left: 26%; top: 64%; width: 34%; height: 28%">
+          <span class="det__label"><i class="pin">1</i>Table 6 · waiting to be cleared</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="slack">
+      <span class="avatar"><img src="../../src/assets/logos/aldente-mark.svg" alt="" /></span>
+      <div>
+        <p class="meta"><b>Aldo</b><span class="app">APP</span><time>12:38</time></p>
+        <p class="text">Table 6 has been waiting to be cleared for 3 minutes. <span class="mention">@Maya</span>, can you reset it?</p>
+      </div>
+    </div>
+
+    <div class="copy">
+      <img class="logo" src="../../src/assets/logos/aldente-wordmark.svg" alt="Aldente AI" />
+      <h1>Your AI Chief of Staff <span>with eyes.</span></h1>
+      <p class="sub">For restaurant chains<span class="sep"> · </span><br />Aldo, Aldente Verify, Aldente Vision</p>
+    </div>
+  </body>
+</html>

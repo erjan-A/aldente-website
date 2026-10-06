@@ -1,0 +1,52 @@
+---
+/**
+ * A short audience line shown above a heading, e.g. "For restaurant chains and franchise operators"
+ * above the home H1. Sentence case, --step-small, medium weight, --fg-2 ink with a small orange dot
+ * (white on orange sections). Use it to say who a page is for, not as a decorative kicker on every section.
+ *
+ *   text   the line (or pass it as the default slot)
+ *   as     'p' (default) | 'span'
+ */
+interface Props {
+  text?: string;
+  as?: 'p' | 'span';
+  class?: string;
+}
+
+const { text, as: Tag = 'p', class: className } = Astro.props;
+---
+
+<Tag class:list={['eyebrow', className]}>{text ? text : <slot />}</Tag>
+
+<style>
+  .eyebrow {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 100%;
+    font-size: var(--step-small);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--fg-2, var(--ink-2));
+    text-wrap: balance;
+  }
+
+  span.eyebrow {
+    display: inline-flex;
+  }
+
+  .eyebrow::before {
+    content: '';
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin-top: calc((1.4em - 6px) / 2);
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  :global(.tone-orange) .eyebrow::before {
+    background: var(--fg);
+  }
+</style>

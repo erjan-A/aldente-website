@@ -1,0 +1,175 @@
+---
+import type { ProductId } from '../../data/products';
+import ProductPill from '../ui/ProductPill.astro';
+
+/**
+ * Page hero for every page except home. Title uses --step-h1, lead --step-lead.
+ * Slots:
+ *   default  the CTA row (Buttons), shown under the lead
+ *   media    optional visual. With it, >=1024px becomes a split: copy left (6/12), media right (6/12),
+ *            vertically centred. Below 1024px it stacks: copy first, then media at full width.
+ *            Use align="left" with media. With mediaLayout="below" the media runs full width under the copy
+ *            instead (for wide explainers such as the Aldente Vision pipeline), and the title may run wider.
+ */
+interface Props {
+  /** Which product the page is about, shown as a pill above the title. */
+  product?: ProductId;
+  title: string;
+  muted?: string;
+  lead?: string;
+  align?: 'left' | 'center';
+  tone?: 'dark' | 'paper';
+  /** Where the media slot goes: beside the copy (split, default) or full width below it. */
+  mediaLayout?: 'split' | 'below';
+}
+
+const { product, title, muted, lead, align = 'left', tone = 'dark', mediaLayout = 'split' } = Astro.props;
+const hasMedia = Astro.slots.has('media');
+const below = hasMedia && mediaLayout === 'below';
+---
+
+<section class:list={['page-hero', `tone-${tone}`, `page-hero--${align}`, { 'page-hero--split': hasMedia && !below, 'page-hero--below': below }]}>
+  <div class="container page-hero__inner">
+    <div class="page-hero__copy">
+      {product && <ProductPill product={product} />}
+      <h1>{title}{muted && <> <span>{muted}</span></>}</h1>
+      {lead && <p class="page-hero__lead">{lead}</p>}
+      {Astro.slots.has('default') && <div class="page-hero__extra"><slot /></div>}
+    </div>
+    {
+      hasMedia && (
+        <div class="page-hero__media">
+          <slot name="media" />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    padding-block: clamp(64px, 9vw, 128px) clamp(48px, 6vw, 80px);
+  }
+
+  .page-hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(40px, 6vw, 64px);
+  }
+
+  .page-hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-width: 0;
+  }
+
+  .page-hero--center .page-hero__copy {
+    align-items: center;
+    text-align: center;
+  }
+
+  h1 {
+    max-width: 16ch;
+    font-size: var(--step-h1);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  h1 span {
+    color: var(--fg-3);
+  }
+
+  /* Media below: a wider title (two lines at desktop) and a little less air above, so the visual starts
+     inside the first screen. */
+  .page-hero--below {
+    padding-top: clamp(48px, 7vw, 104px);
+  }
+
+  .page-hero--below h1 {
+    max-width: 22ch;
+  }
+
+  .page-hero--below .page-hero__lead {
+    max-width: 58ch;
+  }
+
+  /* Wide screens: the title runs full width in two lines; the lead and the buttons share the row under it,
+     so the visual starts inside the first screen. */
+  @media (min-width: 1100px) {
+    .page-hero--below .page-hero__copy {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: clamp(40px, 5vw, 80px);
+      row-gap: 28px;
+      align-items: end;
+    }
+
+    .page-hero--below .page-hero__copy > :global(*) {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+
+    .page-hero--below .page-hero__copy > .page-hero__lead {
+      grid-column: 1;
+    }
+
+    .page-hero--below .page-hero__copy > .page-hero__extra {
+      grid-column: 2;
+      flex-wrap: nowrap;
+    }
+  }
+
+  .page-hero__lead {
+    max-width: 44ch;
+    font-size: var(--step-lead);
+    line-height: 1.5;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .page-hero__extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .page-hero--center .page-hero__extra {
+    justify-content: center;
+  }
+
+  .page-hero__media {
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .page-hero--split .page-hero__inner {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: center;
+      column-gap: clamp(32px, 4vw, 64px);
+    }
+
+    .page-hero--split .page-hero__copy {
+      grid-column: 1 / span 6;
+    }
+
+    /* The title shares the row with media, so it scales with the half column (49px at 1024, 68px at 1440). */
+    .page-hero--split h1 {
+      font-size: var(--step-h1-split);
+    }
+
+    .page-hero--split .page-hero__media {
+      grid-column: 7 / span 6;
+    }
+  }
+
+  /* Phones: stacked buttons share one width. */
+  @media (max-width: 479px) {
+    .page-hero__extra > :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

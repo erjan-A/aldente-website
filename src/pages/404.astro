@@ -1,0 +1,55 @@
+---
+import Button from '../components/ui/Button.astro';
+import { LINKS } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" description="This page doesn’t exist.">
+  <section class="missing tone-dark">
+    <div class="container missing__inner">
+      <h1>Aldo looked everywhere. <span>This page isn’t here.</span></h1>
+      <div class="missing__actions">
+        <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
+        <Button href="/" variant="secondary" size="lg">Back to the home page</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .missing {
+    padding-block: clamp(96px, 14vw, 200px);
+  }
+
+  .missing__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* Same title as every page hero (PageHero). */
+  h1 {
+    max-width: 16ch;
+    font-size: var(--step-h1);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  h1 span {
+    color: var(--fg-3);
+  }
+
+  .missing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Phones: stacked buttons share one width. */
+  @media (max-width: 479px) {
+    .missing__actions > :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

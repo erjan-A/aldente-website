@@ -1,0 +1,114 @@
+---
+import mark from '../../assets/logos/aldente-mark.svg';
+import { LINKS } from '../../data/site';
+import { pagePath } from '../../lib/paths';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  title?: string;
+  text?: string;
+  /** The demo page's ?plan=, so the booking page and the funnel know which product page the visitor came from. */
+  plan?: string;
+}
+
+const {
+  title = 'Give every location a Chief of Staff.',
+  text = 'See Aldo work on your own restaurants in a 30-minute demo.',
+  plan,
+} = Astro.props;
+const demoHref = plan ? `${LINKS.demo}?plan=${plan}` : LINKS.demo;
+// "30-minute" never breaks at its hyphen.
+const textParts = text.split(/(\d+-minute)/);
+// No "Compare plans" on the pricing page itself.
+const comparePlans = pagePath(Astro.url.pathname) !== LINKS.pricing;
+---
+
+<section class="cta tone-orange" aria-labelledby="cta-title">
+  <img class="cta__mark" src={mark.src} alt="" aria-hidden="true" width="347" height="424" loading="lazy" />
+  <div class="container cta__inner">
+    <h2 id="cta-title" class="cta__title">{title}</h2>
+    <p class="cta__text">{textParts.map((part, i) => (i % 2 ? <span class="cta__nowrap">{part}</span> : part))}</p>
+    <div class="cta__actions">
+      <Button href={demoHref} variant="dark" size="lg" arrow>Book a demo</Button>
+      {
+        comparePlans && (
+          <Button href={LINKS.pricing} variant="outline" size="lg">Compare plans</Button>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(96px, 12vw, 176px);
+  }
+
+  /* The whole mark, never clipped top and bottom. */
+  .cta__mark {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    translate: 0 -50%;
+    height: 84%;
+    width: auto;
+    opacity: 0.1;
+    filter: brightness(0) invert(1);
+  }
+
+  /* Phones: the mark drops to the bottom corner, below the text, so it never lightens what you read. */
+  @media (max-width: 720px) {
+    .cta__mark {
+      top: auto;
+      bottom: -6%;
+      right: -12%;
+      translate: none;
+      height: 46%;
+      opacity: 0.08;
+    }
+  }
+
+  .cta__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* Same step as every section H2, so the closing band reads as part of the page. */
+  .cta__title {
+    max-width: 15ch;
+    font-size: var(--step-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  /* One measure for every page's lead, so the band reads the same everywhere. */
+  .cta__text {
+    max-width: 36ch;
+    font-size: var(--step-lead);
+    font-weight: 500;
+    text-wrap: pretty;
+  }
+
+  .cta__nowrap {
+    white-space: nowrap;
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Phones: stacked buttons share one width. */
+  @media (max-width: 479px) {
+    .cta__actions > :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

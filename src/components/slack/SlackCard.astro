@@ -1,0 +1,32 @@
+---
+/** A Block Kit-style attachment: content beside a coloured bar. */
+interface Props {
+  tone?: 'accent' | 'ok' | 'neutral';
+  class?: string;
+}
+
+const { tone = 'neutral', class: className } = Astro.props;
+---
+
+<div class:list={['slack-card', `slack-card--${tone}`, className]}>
+  <slot />
+</div>
+
+<style>
+  .slack-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2px 0 2px 14px;
+    border-left: 4px solid #dddddd;
+    border-radius: var(--radius-xs);
+  }
+
+  .slack-card--accent {
+    border-left-color: var(--accent);
+  }
+
+  .slack-card--ok {
+    border-left-color: #2eb67d;
+  }
+</style>

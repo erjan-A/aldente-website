@@ -1,0 +1,568 @@
+---
+import { Image } from 'astro:assets';
+import Card from '../components/ui/Card.astro';
+import Icon from '../components/ui/Icon.astro';
+import { CUSTOMER_LOGOS } from '../data/logos';
+import { retina } from '../lib/images';
+import { COUNTER, SITE } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { demoIntent, titleParts } from '../lib/demo';
+
+// The server renders the general demo; <demo-intent> swaps the copy for ?plan=… in the browser.
+const intent = demoIntent('');
+const heading = titleParts(intent);
+
+// The calendar skeleton: a month of day cells, a quiet hint of the scheduler until it loads.
+const days = Array.from({ length: 35 }, (_, i) => i);
+const weekdays = Array.from({ length: 7 }, (_, i) => i);
+---
+
+<BaseLayout title="Book a demo" description="See Aldo on your restaurants in 30 minutes. Pick a time that suits you, and we’ll show the workflows that matter to your team.">
+  <section class="demo tone-dark" aria-labelledby="demo-title">
+    <demo-intent class="container demo__grid">
+      <div class="demo__head">
+        <h1 id="demo-title" data-intent="title">{heading.claim}{' '}<span>{heading.muted}</span></h1>
+        <p class="demo__lead" data-intent="lead">{intent.lead}</p>
+      </div>
+
+      <Card as="section" pad="none" radius="xl" class="demo__card" id="schedule" aria-labelledby="schedule-title">
+        <calendly-embed class="cal" data-url={SITE.calendly}>
+          <div class="cal__head">
+            <h2 id="schedule-title" class="cal__title">Pick a time</h2>
+            <p class="cal__meta">A 30-minute demo with our team</p>
+          </div>
+          <p class="cal__alt" data-cal-alt>
+            You can also <a href={SITE.calendly} target="_blank" rel="noopener">open it on Calendly</a>, write to{' '}
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a> or call <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a>.
+          </p>
+
+          <div class="cal__stage" data-cal-stage data-artifact-calendar>
+            <div class="cal__skeleton" data-cal-skeleton aria-hidden="true">
+              <div class="sk__title"></div>
+              <div class="sk__month"><div></div><div></div><div></div></div>
+              <div class="sk__grid">
+                {weekdays.map(() => <div class="sk__weekday" />)}
+                {days.map(() => <div class="sk__day" />)}
+              </div>
+              <div class="sk__zone"><div></div><div></div></div>
+            </div>
+            <div class="cal__overlay">
+              <p class="cal__status" role="status" aria-live="polite" data-cal-status></p>
+              <p class="cal__slow" data-cal-slow hidden>
+                Taking longer than usual? <a href={SITE.calendly} target="_blank" rel="noopener">Open the scheduler on Calendly</a>.
+              </p>
+            </div>
+          </div>
+
+          <div class="cal__booked" data-cal-booked hidden>
+            <span class="cal__booked-mark"><Icon name="check" size={22} strokeWidth={2.25} /></span>
+            <h3 class="cal__booked-title" tabindex="-1">You’re booked.</h3>
+            <ul class="cal__next" role="list">
+              <li>Calendly emails you the invite.</li>
+              <li>Before the call, our team looks at your locations and the questions you shared.</li>
+              <li>Questions before then? Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a> or call <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a>.</li>
+            </ul>
+          </div>
+        </calendly-embed>
+      </Card>
+
+      <div class="demo__details">
+        <figure class="demo__quote">
+          <blockquote>“So if I go into Slack, I can ask it to look up camera footage in a restaurant? That changes everything.”</blockquote>
+          <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
+        </figure>
+
+        <div class="demo__proof">
+          <p class="demo__proof-line">
+            <b>{COUNTER.label}</b> orders verified across 200+ restaurant locations.{' '}
+            <span>Used by franchise operators of</span>
+          </p>
+          <ul class="demo__logos" role="list">
+            {
+              CUSTOMER_LOGOS.map((logo) => {
+                const height = Math.round(logo.height * 0.5);
+                return (
+                  <li>
+                    <Image src={logo.mono ?? logo.src} alt={logo.name} height={height} densities={retina(logo.mono ?? logo.src)} style={`height:${height}px`} />
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+      </div>
+    </demo-intent>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../scripts/demo-intent';
+  import '../scripts/calendly-embed';
+</script>
+
+<style>
+  .demo {
+    padding-block: clamp(32px, 4vw, 56px) var(--section-y);
+  }
+
+  /* Phones: heading and lead, then the calendar, then the details. */
+  .demo__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'head'
+      'card'
+      'details';
+    gap: 28px;
+  }
+
+  .demo__head {
+    grid-area: head;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* The same title as every page hero; from 1024px it shares the row with the calendar, like a split PageHero. */
+  h1 {
+    max-width: 16ch;
+    font-size: var(--step-h1);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  /* The span is rebuilt per plan by <demo-intent>, so it is styled through :global(). */
+  h1 :global(span) {
+    color: var(--fg-3);
+  }
+
+  /* Phones: a step smaller, so "See Aldente Vision" (no-break space in the name) holds the first line
+     instead of leaving "See" alone above it. 41px at 390, 38px at 360. */
+  @media (max-width: 639px) {
+    h1 {
+      font-size: min(var(--step-h1), 10.6vw);
+    }
+  }
+
+  .demo__lead {
+    max-width: 44ch;
+    font-size: var(--step-lead);
+    line-height: 1.5;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  /* ---------- Calendar card ---------- */
+
+  .demo__card {
+    grid-area: card;
+  }
+
+  .cal {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cal__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+    padding: var(--card-pad-m) var(--card-pad-m) 16px;
+  }
+
+  .cal__title {
+    font-size: var(--step-h3);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .cal__meta {
+    font-size: var(--step-small);
+    color: var(--fg-2);
+  }
+
+  .cal__alt {
+    margin-top: -10px;
+    padding: 0 var(--card-pad-m) 12px;
+    font-size: var(--step-label);
+    line-height: 1.5;
+    color: var(--fg-3);
+  }
+
+  .cal__alt a,
+  .cal__slow a,
+  .cal__next a {
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .cal__alt a:hover,
+  .cal__slow a:hover,
+  .cal__next a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* The stage holds the skeleton, then Calendly's iframe, which runs edge to edge in the card. */
+  .cal__stage {
+    position: relative;
+    min-height: 440px;
+    border-top: 1px solid var(--line);
+  }
+
+  .cal__skeleton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    padding: 32px 16px;
+  }
+
+  .sk__title {
+    width: 112px;
+    height: 12px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-2);
+  }
+
+  .sk__month {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(100%, 220px);
+  }
+
+  .sk__month > div {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface-2);
+  }
+
+  .sk__month > div:nth-child(2) {
+    width: 104px;
+    height: 10px;
+    border-radius: var(--radius-xs);
+  }
+
+  .sk__grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 40px));
+    justify-content: center;
+    gap: 8px 6px;
+    width: 100%;
+  }
+
+  .sk__zone {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(100%, 304px);
+  }
+
+  .sk__zone > div {
+    width: 72px;
+    height: 8px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-2);
+  }
+
+  .sk__zone > div + div {
+    width: 160px;
+    opacity: 0.6;
+  }
+
+  .sk__weekday {
+    justify-self: center;
+    width: 22px;
+    height: 6px;
+    margin-bottom: 6px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-2);
+  }
+
+  .sk__day {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+  }
+
+  /* Weekends sit quieter, as in the scheduler. */
+  .sk__day:nth-child(7n + 6),
+  .sk__day:nth-child(7n + 7) {
+    border-color: transparent;
+    background: radial-gradient(circle, var(--line) 0 2px, transparent 2.5px);
+  }
+
+  .cal__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    text-align: center;
+    /* A soft pool of the card colour behind the status line, so the month grid stays visible around it. */
+    background: radial-gradient(ellipse 50% 28% at 50% 50%, var(--card) 45%, color-mix(in srgb, var(--card) 0%, transparent));
+  }
+
+  .cal__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--fg-2);
+  }
+
+  .cal__status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Empty until loading starts, but kept in the accessibility tree so the change is announced. */
+  .cal__status:empty {
+    position: absolute;
+  }
+
+  .cal__status:empty::before {
+    content: none;
+  }
+
+  .cal__slow {
+    max-width: 32ch;
+    font-size: var(--step-label);
+    line-height: 1.5;
+    color: var(--fg-3);
+  }
+
+  /* Calendly's iframe (added by <calendly-embed>): hidden behind the skeleton until Calendly answers. */
+  .cal__stage :global(.cal__frame) {
+    display: block;
+    width: 100%;
+    height: 640px;
+    border: 0;
+    background: transparent;
+    /* Calendly's page is light-scheme: matching it keeps the frame transparent below Calendly's content
+       instead of the white backdrop browsers paint when the schemes differ. */
+    color-scheme: light;
+  }
+
+  .cal[data-state='loading'] :global(.cal__frame) {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cal[data-state='ready'] .cal__overlay {
+    display: none;
+  }
+
+  /* After a booking: what happens next. */
+  .cal__booked {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    min-height: 360px;
+    padding: 32px var(--card-pad-m) 40px;
+    border-top: 1px solid var(--line);
+  }
+
+  .cal__booked-mark {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+
+  .cal__booked-title {
+    font-size: var(--step-h3);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .cal__booked-title:focus {
+    outline: none;
+  }
+
+  .cal__next {
+    display: flex;
+    flex-direction: column;
+    max-width: 46ch;
+    color: var(--fg-2);
+  }
+
+  .cal__next li {
+    padding-block: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ---------- Details: a voice and the proof ---------- */
+
+  .demo__details {
+    grid-area: details;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 12px;
+  }
+
+  .demo__quote {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 46ch;
+  }
+
+  .demo__quote blockquote {
+    font-size: var(--step-h4);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+
+  .demo__quote figcaption {
+    font-size: var(--step-small);
+    color: var(--fg-3);
+  }
+
+  .demo__quote figcaption b {
+    font-weight: 600;
+    color: var(--fg-2);
+  }
+
+  .demo__proof {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .demo__proof-line {
+    max-width: 40ch;
+    font-size: var(--step-small);
+    color: var(--fg-2);
+  }
+
+  .demo__proof-line b {
+    color: var(--fg);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo__proof-line span {
+    color: var(--fg-3);
+  }
+
+  .demo__logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 36px;
+  }
+
+  /* One light tone for every brand, as in the home proof bar. */
+  .demo__logos img {
+    width: auto;
+    max-width: none;
+    filter: brightness(0) invert(1);
+    opacity: 0.55;
+  }
+
+  /* ---------- Desktop: intro and details left, the calendar card right and in view. ---------- */
+
+  @media (min-width: 1024px) {
+    .demo__grid {
+      /* The card stays under 640px wide: wider, Calendly switches to a layout with its own bordered card. */
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        'head card'
+        'details card';
+      column-gap: clamp(48px, 5vw, 88px);
+      row-gap: 48px;
+      align-items: start;
+    }
+
+    .demo__head {
+      padding-top: 16px;
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: var(--step-h1-split);
+    }
+
+    .demo__card {
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+    }
+
+    .demo__details {
+      margin-top: 0;
+    }
+
+    .cal__stage {
+      min-height: 600px;
+    }
+
+    .cal__skeleton {
+      gap: 28px;
+      padding-top: 48px;
+    }
+
+    .sk__grid {
+      grid-template-columns: repeat(7, minmax(0, 44px));
+      gap: 10px 8px;
+    }
+
+    .sk__zone {
+      width: min(100%, 356px);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cal[data-state='loading'] .sk__day {
+      animation: sk-breathe 1.4s ease-in-out infinite alternate;
+    }
+
+    .cal[data-state='loading'] .cal__status::before {
+      animation: sk-breathe 0.8s ease-in-out infinite alternate;
+    }
+
+    .cal[data-state='ready'] :global(.cal__frame) {
+      animation: cal-in 0.4s var(--ease-out);
+    }
+  }
+
+  @keyframes sk-breathe {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes cal-in {
+    from {
+      opacity: 0;
+    }
+  }
+</style>

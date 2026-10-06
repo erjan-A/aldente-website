@@ -1,0 +1,143 @@
+---
+import LegalPage, { type LegalSection } from '../components/site/LegalPage.astro';
+import { LINKS, SITE } from '../data/site';
+
+const mailto = `mailto:${SITE.email}`;
+
+const sections: LegalSection[] = [
+  { id: 'acceptance', title: 'Accepting these terms', toc: 'Acceptance' },
+  { id: 'website-and-services', title: 'The website and our services', toc: 'Website and services' },
+  { id: 'acceptable-use', title: 'Using the website', toc: 'Acceptable use' },
+  { id: 'intellectual-property', title: 'Intellectual property' },
+  { id: 'third-parties', title: 'Third-party links and services', toc: 'Third parties' },
+  { id: 'no-warranties', title: 'No warranties' },
+  { id: 'liability', title: 'Limitation of liability', toc: 'Liability' },
+  { id: 'changes', title: 'Changes to these terms', toc: 'Changes' },
+  { id: 'governing-law', title: 'Governing law' },
+  { id: 'contact', title: 'Contact us', toc: 'Contact' },
+];
+---
+
+<LegalPage
+  title="Terms of use"
+  muted="For this website."
+  description="The terms for using aldenteai.com. Use of Aldo, Aldente Verify and Aldente Vision is governed by your agreement with Aldente AI."
+  lead="The rules for using aldenteai.com. Aldo, Aldente Verify and Aldente Vision are covered by your agreement with us."
+  updated="2026-10-06"
+  sections={sections}
+>
+  <Fragment slot="summary">
+    <ul>
+      <li>These terms cover this website, aldenteai.com.</li>
+      <li>Your use of Aldo, Aldente Verify and Aldente Vision is governed by your agreement with us. Where the two differ, your agreement wins.</li>
+      <li>Use the website lawfully, and don’t try to break, overload or copy it.</li>
+      <li>We provide the website as it is. As far as the law allows, we are not liable for losses from using it.</li>
+    </ul>
+  </Fragment>
+
+  <Fragment slot="acceptance">
+    <p>
+      These terms apply to aldenteai.com (the “website”), run by Aldente AI (“Aldente”, “we”, “us”). By using the website, you accept
+      them. If you do not accept them, please do not use the website.
+    </p>
+    <p>If you use the website on behalf of a company, you accept these terms for it and confirm that you are allowed to do so.</p>
+  </Fragment>
+
+  <Fragment slot="website-and-services">
+    <p>The website explains what Aldente does and lets you book a call or contact us.</p>
+    <p>
+      Aldo, Aldente Verify and Aldente Vision (the “services”) are provided under a separate agreement or order form between your
+      business and Aldente. That agreement governs your use of the services. If it conflicts with these terms, the agreement prevails.
+    </p>
+    <p>
+      Product descriptions on the website are general information, not an offer or a commitment. What we provide is set out in your
+      agreement.
+    </p>
+    <p>Our <a href={LINKS.privacy}>privacy policy</a> explains how we handle personal information.</p>
+  </Fragment>
+
+  <Fragment slot="acceptable-use">
+    <p>You may browse the website, share links to it and use its content to learn about Aldente. When you use it, do not:</p>
+    <ul>
+      <li>break the law or infringe anyone’s rights</li>
+      <li>try to get unauthorised access to the website, our systems or anyone’s data</li>
+      <li>disrupt or overload the website, or upload malicious code</li>
+      <li>copy or scrape the website in bulk, except for search engines indexing it</li>
+      <li>pretend to be Aldente, or use our content to mislead people</li>
+      <li>send us information you have no right to share</li>
+    </ul>
+    <p>We may block access to the website for anyone who breaks these rules.</p>
+  </Fragment>
+
+  <Fragment slot="intellectual-property">
+    <p>
+      Aldente owns or licenses the website and everything on it, including its text, design, images, video and code. Except as these
+      terms allow, you may not copy, change or reuse it without our written permission.
+    </p>
+    <p>
+      “Aldente”, “Aldente AI”, “Aldo”, “Aldente Verify”, “Aldente Vision” and our logos are our names and marks. Do not use them in a way
+      that suggests we endorse you, or that could confuse people.
+    </p>
+    <p>Other companies’ names and logos on the website, such as those of customers and integrations, belong to their owners.</p>
+  </Fragment>
+
+  <Fragment slot="third-parties">
+    <p>
+      The website uses or links to services run by others. The demo page uses Calendly to book calls, and our LinkedIn link opens
+      LinkedIn.
+    </p>
+    <p>
+      These services have their own terms and privacy policies. We do not control them, and we are not responsible for their content or
+      for how they handle your information.
+    </p>
+  </Fragment>
+
+  <Fragment slot="no-warranties">
+    <p>
+      We work to keep the website accurate and available, but we provide it “as is” and “as available”. To the extent the law allows,
+      we make no promises about the website, including that it will be uninterrupted, error-free, complete or fit for a particular
+      purpose.
+    </p>
+    <p>
+      We may change or remove content, or stop running parts of the website, at any time. Any warranties for the services are set out
+      in your agreement.
+    </p>
+  </Fragment>
+
+  <Fragment slot="liability">
+    <p>
+      To the extent permitted by law, Aldente is not liable for any loss or damage arising from your use of the website, or from being
+      unable to use it. This includes indirect or consequential loss, and loss of profit, revenue, data or goodwill.
+    </p>
+    <p>
+      Nothing in these terms limits liability that cannot be limited by law, such as liability for fraud, or for death or personal
+      injury caused by negligence.
+    </p>
+    <p>Liability for the services is set out in your agreement.</p>
+  </Fragment>
+
+  <Fragment slot="changes">
+    <p>
+      We may update these terms from time to time. The date at the top of this page shows when they last changed. If you keep using the
+      website after a change, the updated terms apply.
+    </p>
+  </Fragment>
+
+  <Fragment slot="governing-law">
+    <p>
+      These terms are governed by the law, and disputes are decided by the courts, named in your agreement with us. If there is no
+      agreement, the law and courts of the place where Aldente AI is established apply.
+    </p>
+    <p>
+      This does not take away any rights you have under the mandatory law of the country where you live. If a court finds part of these
+      terms unenforceable, the rest still applies.
+    </p>
+  </Fragment>
+
+  <Fragment slot="contact">
+    <p>
+      For questions about these terms, write to Aldente AI at <a href={mailto}>{SITE.email}</a> or call{' '}
+      <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a>.
+    </p>
+  </Fragment>
+</LegalPage>

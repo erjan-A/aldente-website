@@ -1,0 +1,530 @@
+---
+import mark from '../../assets/logos/aldente-mark.svg';
+import type { ProductId } from '../../data/products';
+import Icon, { type IconName } from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+/**
+ * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente products and the customer's
+ * own systems feed Aldo (built on large language models), and Aldo answers in Slack with Q&A and
+ * Playbooks. Wide screens draw the wires; the geometry is fixed (row heights below), so the SVG paths
+ * meet each row at its centre without measuring anything in the browser.
+ */
+interface Props {
+  /** Add top spacing when the section follows a different tone. */
+  padTop?: boolean;
+  /** The product pill over the heading; null on Aldo's own page. */
+  product?: ProductId | null;
+}
+
+const { padTop = false, product = 'aldo' } = Astro.props;
+
+interface Source {
+  name: string;
+  detail?: string;
+  icon: IconName;
+}
+
+const products: Source[] = [
+  { name: 'Aldente Verify', detail: 'Orders and evidence', icon: 'check-check' },
+  { name: 'Aldente Vision', detail: 'Camera events and metrics', icon: 'eye' },
+];
+
+const systems: Source[] = [
+  { name: 'POS', detail: 'Sales and orders', icon: 'receipt' },
+  { name: 'HR and time clock', detail: 'Shifts and clock-outs', icon: 'clock' },
+  { name: 'Delivery', detail: 'Delivery orders and refunds', icon: 'truck' },
+  { name: 'Other customer systems', icon: 'database' },
+];
+
+const outputs: { name: string; detail: string; icon: IconName; ask: string; answer: string }[] = [
+  { name: 'Q&A', detail: 'Ask for what you need', icon: 'message-square', ask: 'How many visitors yesterday?', answer: '3,499, up 4%.' },
+  {
+    name: 'Playbooks',
+    detail: 'Repeat a task in the background',
+    icon: 'repeat',
+    ask: 'Check clock-outs after closing.',
+    answer: '1 missing clock-out, with the clip.',
+  },
+];
+
+// Fixed geometry for the wired layout (px). Left column: a group label, the products, a gap, a label, the
+// systems. Right column: a label and two cards, centred in the same height. Must match the CSS below.
+const LABEL = 32;
+const NODE = 56;
+const GAP = 8;
+const GROUP_GAP = 20;
+const CARD = 196;
+const CARD_GAP = 16;
+const block = (n: number) => n * NODE + (n - 1) * GAP;
+const HEIGHT = LABEL + block(products.length) + GROUP_GAP + LABEL + block(systems.length);
+const MID = HEIGHT / 2;
+const RIGHT_TOP = (HEIGHT - (LABEL + 2 * CARD + CARD_GAP)) / 2;
+
+const productY = products.map((_, i) => LABEL + i * (NODE + GAP) + NODE / 2);
+const systemsTop = LABEL + block(products.length) + GROUP_GAP + LABEL;
+const systemY = systems.map((_, i) => systemsTop + i * (NODE + GAP) + NODE / 2);
+const outputY = outputs.map((_, i) => RIGHT_TOP + LABEL + i * (CARD + CARD_GAP) + CARD / 2);
+
+const wireIn = (y: number) => `M0 ${y} C55 ${y} 45 ${MID} 100 ${MID}`;
+const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
+---
+
+<section class:list={['connections', 'tone-dark', { 'connections--pad': padTop }]} aria-labelledby="connections-title">
+  <div class="container connections__inner">
+    <SectionHeader
+      product={product ?? undefined}
+      id="connections-title"
+      title="Aldo, your AI Chief of Staff,"
+      muted="connected to your restaurant data."
+      lead="Aldente Verify and Aldente Vision give Aldo eyes in every location. Connect your POS, HR and delivery systems, and it answers with the whole picture."
+    />
+
+    <div class="map" style={`--map-h:${HEIGHT}px;--right-top:${RIGHT_TOP}px`}>
+      <div class="map__in">
+        {/* Group labels, not headings: they name the lists under them. */}
+        <p class="map__label" id="map-products">Aldente products</p>
+        <ul class="map__list" role="list" aria-labelledby="map-products">
+          {
+            products.map((s) => (
+              <li class="node node--product">
+                <Icon name={s.icon} size={20} />
+                <span>
+                  <b>{s.name}</b>
+                  {s.detail && <small>{s.detail}</small>}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="map__label map__label--gap" id="map-systems">Your systems</p>
+        <ul class="map__list" role="list" aria-labelledby="map-systems">
+          {
+            systems.map((s) => (
+              <li class="node">
+                <Icon name={s.icon} size={20} />
+                <span>
+                  <b>{s.name}</b>
+                  {s.detail && <small>{s.detail}</small>}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="map__wires map__wires--in" aria-hidden="true">
+        <svg viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" focusable="false">
+          {[...productY, ...systemY].map((y) => <path class="wire wire--in" d={wireIn(y)} />)}
+        </svg>
+      </div>
+
+      <div class="map__hub">
+        <div class="hub">
+          <img src={mark.src} alt="" width="40" height="49" />
+          <b>Aldo</b>
+          <small>AI Chief of Staff</small>
+        </div>
+        <p class="hub__note">Large language models (LLMs)</p>
+      </div>
+
+      <div class="map__wires map__wires--out" aria-hidden="true">
+        <svg viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" focusable="false">
+          {outputY.map((y) => <path class="wire wire--out" d={wireOut(y)} />)}
+        </svg>
+      </div>
+
+      <div class="map__out">
+        <p class="map__label map__label--slack" id="map-slack"><Icon name="hash" size={18} strokeWidth={2} />In Slack</p>
+        <ul class="map__cards" role="list" aria-labelledby="map-slack">
+          {
+            outputs.map((o) => (
+              <li class="out">
+                <div class="out__head">
+                  <Icon name={o.icon} size={22} />
+                  <span>
+                    <b>{o.name}</b>
+                    <small>{o.detail}</small>
+                  </span>
+                </div>
+                <p class="out__bubble">
+                  <span class="out__ask">“{o.ask}”</span>
+                  <span class="out__answer">
+                    <b>Aldo:</b> {o.answer}
+                  </span>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .connections {
+    padding-bottom: var(--section-y);
+  }
+
+  .connections--pad {
+    padding-top: var(--section-y);
+  }
+
+  .connections__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(40px, 5vw, 64px);
+  }
+
+  /* ---------- Stacked (phones, tablets): sources, Aldo, then Slack ---------- */
+
+  .map {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .map__in,
+  .map__out {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .map__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding-bottom: 8px;
+    font-size: var(--step-small);
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+
+  .map__label--gap {
+    margin-top: 20px;
+  }
+
+  .map__label--slack {
+    color: var(--ink);
+  }
+
+  .map__label--slack :global(svg) {
+    color: var(--accent);
+  }
+
+  .map__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+  }
+
+  .node {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 56px;
+    padding: 8px 16px;
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    border: 1px solid var(--line-card);
+    color: var(--ink-2);
+  }
+
+  .node--product {
+    border-color: rgb(224 86 52 / 0.6);
+    color: var(--accent);
+  }
+
+  .node > span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .node b {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+
+  .node small {
+    font-size: var(--step-small);
+    line-height: 1.3;
+    color: var(--ink-3);
+  }
+
+  .map__wires {
+    display: none;
+  }
+
+  .map__hub {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-block: 20px 12px;
+  }
+
+  /* The stacked layout joins the blocks with short wires: dashed in, solid out. */
+  .map__hub::before,
+  .map__hub::after {
+    content: '';
+    width: 0;
+    height: 24px;
+  }
+
+  .map__hub::before {
+    order: -1;
+    border-left: 1.5px dashed var(--accent);
+  }
+
+  .map__hub::after {
+    border-left: 1.5px solid var(--accent);
+  }
+
+  .hub {
+    position: relative;
+    width: 152px;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #1c1410 0%, var(--bg) 70%);
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 0 80px 10px rgb(224 86 52 / 0.18);
+  }
+
+  .hub img {
+    width: 34px;
+    height: auto;
+    margin-bottom: 4px;
+  }
+
+  .hub b {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .hub small {
+    font-size: var(--step-label);
+    color: var(--ink-2);
+  }
+
+  .hub__note {
+    font-size: var(--step-small);
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  .map__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .out {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px 18px 18px 20px;
+    border-radius: var(--radius-l);
+    background: rgb(224 86 52 / 0.08);
+    border: 1px solid rgb(224 86 52 / 0.6);
+  }
+
+  .out__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    color: var(--accent);
+  }
+
+  .out__head :global(svg) {
+    flex: none;
+    margin-top: 3px;
+  }
+
+  .out__head span {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .out__head b {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .out__head small {
+    font-size: var(--step-small);
+    color: var(--ink-2);
+  }
+
+  /* The exchange, as a white Slack-style bubble. */
+  .out__bubble {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 16px;
+    border-radius: var(--radius-m);
+    background: var(--paper-card);
+    color: var(--paper-ink);
+    font-size: var(--step-small);
+    line-height: 1.4;
+  }
+
+  .out__ask {
+    color: var(--paper-ink-2);
+  }
+
+  .out__answer {
+    font-size: 1.0625rem;
+  }
+
+  /* ---------- Wired (wide screens): sources → Aldo → Slack, like the deck ---------- */
+  @media (min-width: 1080px) {
+    .map {
+      display: grid;
+      grid-template-columns: minmax(300px, 360px) minmax(48px, 1fr) 208px minmax(48px, 1fr) minmax(320px, 400px);
+      height: var(--map-h);
+      gap: 0;
+    }
+
+    .map__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Rows at exactly the heights the wire geometry assumes. */
+    .node {
+      height: 56px;
+      min-height: 0;
+      padding-block: 0;
+    }
+
+    .node small {
+      font-size: var(--step-label);
+    }
+
+    .map__wires {
+      display: block;
+      position: relative;
+    }
+
+    .map__wires svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .map__hub {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .map__hub::before,
+    .map__hub::after {
+      content: none;
+    }
+
+    .hub {
+      width: 208px;
+      gap: 6px;
+    }
+
+    .hub img {
+      width: 40px;
+    }
+
+    .hub b {
+      font-size: 1.5rem;
+    }
+
+    .hub small {
+      font-size: var(--step-small);
+    }
+
+    .hub__note {
+      position: absolute;
+      top: calc(50% + 104px + 20px);
+      left: 50%;
+      translate: -50% 0;
+      white-space: nowrap;
+    }
+
+    .map__out {
+      padding-top: var(--right-top);
+    }
+
+    .map__cards {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .out {
+      height: 196px;
+    }
+
+    /* Ports where the wires meet the rows. */
+    .node::after,
+    .out::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      margin-top: -4px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .node::after {
+      right: -4px;
+    }
+
+    .out::before {
+      left: -4px;
+    }
+  }
+
+  .wire {
+    fill: none;
+    stroke: var(--accent);
+    vector-effect: non-scaling-stroke;
+  }
+
+  .wire--in {
+    stroke-width: 1.5;
+    stroke-dasharray: 3 5;
+    opacity: 0.85;
+  }
+
+  .wire--out {
+    stroke-width: 2;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wire--in {
+      animation: wire-flow 1.2s linear infinite;
+    }
+  }
+
+  @keyframes wire-flow {
+    to {
+      stroke-dashoffset: -16;
+    }
+  }
+</style>

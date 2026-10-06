@@ -1,0 +1,183 @@
+---
+import { Image } from 'astro:assets';
+import { TEAM_LOGOS } from '../../data/logos';
+import { retina } from '../../lib/images';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  /** Add the team line and logos (the company page). */
+  team?: boolean;
+}
+
+const { team = false } = Astro.props;
+---
+
+<section class="voices tone-paper section" aria-labelledby="voices-title">
+  <div class="container voices__inner">
+    <SectionHeader id="voices-title" layout="stack" title="Built with the people" muted="who run restaurants." />
+    <div class="voices__quotes">
+      <figure class="quote quote--feature">
+        <span class="quote__mark" aria-hidden="true">“</span>
+        <blockquote>So if I go into Slack, I can ask it to look up camera footage in a restaurant? That changes everything.</blockquote>
+        <figcaption><b>Director of Operations</b><span>International bakery-café chain, 250+ locations</span></figcaption>
+      </figure>
+      <div class="voices__side">
+        <figure class="quote">
+          <blockquote>“Staff clocking in and out, all that stuff, is going to save so much time. That alone will sell the whole HR department.”</blockquote>
+          <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>“When we mess up a $20 bowl, we refund the $20 and give a gift card. Fix the mistake and it’s like double the amount.”</blockquote>
+          <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
+        </figure>
+      </div>
+    </div>
+    {
+      team && (
+        <div class="team" id="team">
+          <p class="team__line">
+            <b>Restaurant operators and engineers from the best in both.</b>{' '}
+            <span>Our team has run operations at P.F. Chang’s and KFC and built technology at Apple, LinkedIn and NVIDIA.</span>
+          </p>
+          <ul class="team__logos" role="list">
+            {TEAM_LOGOS.map((logo) => (
+              <li>
+                <Image src={logo.src} alt={logo.name} height={logo.height} densities={retina(logo.src)} class={`logo--${logo.treatment}`} style={`height:${logo.height}px`} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .voices__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .voices__quotes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .quote {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    padding: var(--card-pad-m);
+    border-radius: var(--radius-l);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+  }
+
+  .quote blockquote {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .quote figcaption {
+    font-size: 0.875rem;
+    color: var(--fg-3);
+  }
+
+  .quote figcaption b {
+    color: var(--fg);
+  }
+
+  .quote--feature {
+    flex: 1.6 1 460px;
+    gap: 32px;
+    padding: var(--card-pad-l);
+    background: var(--bg);
+    border-color: var(--bg);
+    color: var(--ink);
+  }
+
+  .quote--feature blockquote {
+    font-size: var(--step-h3);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .quote--feature figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: var(--step-small);
+    color: var(--ink-3);
+  }
+
+  .quote--feature figcaption b {
+    color: var(--ink);
+  }
+
+  .quote__mark {
+    font-size: 4.5rem;
+    line-height: 0.6;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .voices__side {
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .team {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 40px;
+    border-top: 1px solid var(--card-line);
+  }
+
+  .team__line {
+    max-width: 56ch;
+    font-size: 1.125rem;
+  }
+
+  .team__line span {
+    color: var(--fg-2);
+  }
+
+  .team__logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 28px 48px;
+  }
+
+  .team__logos img {
+    width: auto;
+    opacity: 0.8;
+  }
+
+  .logo--silhouette {
+    filter: brightness(0);
+  }
+
+  .logo--mono {
+    filter: grayscale(1);
+  }
+
+  @media (max-width: 600px) {
+    .team__logos {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      justify-content: space-between;
+      gap: 24px 16px;
+    }
+  }
+</style>

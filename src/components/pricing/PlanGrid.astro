@@ -1,0 +1,225 @@
+---
+import { ALDO_INCLUDED, PLANS } from '../../data/pricing';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import ProductPill from '../ui/ProductPill.astro';
+---
+
+<section class="plans tone-paper" aria-labelledby="plans-title">
+  {/* Plan names are h3 under this h2, as on the home preview. */}
+  <h2 id="plans-title" class="visually-hidden">Plans</h2>
+  <div class="container plans__inner">
+    <ul class="plans__grid" role="list">
+      {
+        PLANS.map((plan) => (
+          <li class:list={['plan', { 'plan--featured': plan.featured }]}>
+            <div class="plan__head">
+              <h3 class="plan__name">{plan.name}</h3>
+              <p class="plan__summary">{plan.summary}</p>
+            </div>
+            {/* Every plan CTA books a call, so all three share the booking style (orange) and size. */}
+            <Button href={plan.cta.href} variant="primary" size="md" arrow class="plan__cta">
+              {plan.cta.label}
+            </Button>
+            <ul class="plan__features" role="list">
+              {plan.aldo && (
+                <li class="plan__aldo">
+                  <ProductPill product="aldo" />
+                  included
+                </li>
+              )}
+              {plan.features.map((feature) => (
+                <li>
+                  <Icon name="check" size={16} strokeWidth={2.5} class="plan__check" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="aldo-incl">
+      <p class="aldo-incl__head">
+        <ProductPill product="aldo" />
+        <span><b>Included with Aldente Verify or Aldente Vision.</b> Your AI Chief of Staff, working in Slack.</span>
+      </p>
+      <ul class="aldo-incl__list" role="list">
+        {
+          ALDO_INCLUDED.map((item) => (
+            <li>
+              <Icon name="check" size={16} strokeWidth={2.5} />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .plans {
+    padding-bottom: var(--section-y);
+  }
+
+  .plans__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* One column on phones, two on tablets (the third card takes the full row, so none sits alone beside a
+     gap), three from 1024px. */
+  .plans__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .plans__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .plan:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .plans__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .plan:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+  }
+
+  /* Each card shares the grid's rows, so names, buttons and lists line up across plans. */
+  .plan {
+    position: relative;
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    align-content: start;
+    row-gap: 24px;
+    padding: var(--card-pad-l);
+    border-radius: var(--radius-l);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+  }
+
+  .plan--featured {
+    background: var(--bg);
+    border-color: var(--bg);
+    color: var(--ink);
+  }
+
+  .plan__head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .plan :global(.plan__cta) {
+    width: 100%;
+  }
+
+  /* Same step and weight as the plan names on the home preview. */
+  .plan__name {
+    font-size: var(--step-h3);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .plan__summary {
+    font-size: var(--step-small);
+    color: var(--fg-2);
+  }
+
+  .plan--featured .plan__summary {
+    color: var(--ink-2);
+  }
+
+  .plan__features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--card-line);
+    font-size: var(--step-small);
+    line-height: 1.4;
+  }
+
+  .plan--featured .plan__features {
+    border-color: var(--line);
+  }
+
+  .plan__features li {
+    display: flex;
+    gap: 10px;
+  }
+
+  .plan__aldo {
+    align-items: center;
+    font-weight: 600;
+  }
+
+  /* Aldo comes with both products: a strip under the cards says what it brings. */
+  .aldo-incl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 32px;
+    /* Side padding matches the plan cards above, so the strip's content lines up with theirs. */
+    padding: var(--card-pad-m) var(--card-pad-l);
+    border-radius: var(--radius-l);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+  }
+
+  .aldo-incl__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    max-width: 46ch;
+    color: var(--fg-2);
+  }
+
+  .aldo-incl__head b {
+    color: var(--fg);
+  }
+
+  .aldo-incl__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* Checks sit on the first line, as in the plan lists above. */
+  .aldo-incl__list li {
+    display: flex;
+    gap: 8px;
+  }
+
+  .aldo-incl__list :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--accent);
+  }
+
+  /* One check colour on every plan: green is kept for verified states. */
+  .plan :global(.plan__check) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--accent);
+  }
+</style>

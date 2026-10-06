@@ -1,0 +1,78 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+/**
+ * Tone-aware surface card: fill var(--card), 1px edge var(--card-line), so it reads as an object on
+ * dark, paper and orange sections alike. Content is a flex column with a 12px gap (override with
+ * --card-gap). Style children from the parent with :global(). Never nest a Card in a Card.
+ *
+ *   as           'div' (default) | 'li' | 'article' | 'section'
+ *   pad          'none' | 's' 16px | 'm' 20-28px (default) | 'l' 24-40px  (tokens --card-pad-s|m|l)
+ *   radius       'm' 16px | 'l' 24px (default) | 'xl' 32px (large panels)
+ *   interactive  edge brightens on hover; use when the card contains its main link
+ * Extra attributes (id, aria-*, data-*) pass through.
+ */
+interface Props extends HTMLAttributes<'div'> {
+  as?: 'div' | 'li' | 'article' | 'section';
+  pad?: 'none' | 's' | 'm' | 'l';
+  radius?: 'm' | 'l' | 'xl';
+  interactive?: boolean;
+  class?: string;
+}
+
+const { as: Tag = 'div', pad = 'm', radius = 'l', interactive = false, class: className, ...rest } = Astro.props;
+---
+
+<Tag class:list={['card', `card--pad-${pad}`, `card--r-${radius}`, { 'card--interactive': interactive }, className]} {...rest}>
+  <slot />
+</Tag>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-gap, 12px);
+    min-width: 0;
+    background: var(--card, var(--surface));
+    border: 1px solid var(--card-line, var(--line-card));
+    color: var(--fg, var(--ink));
+  }
+
+  .card--pad-none {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .card--pad-s {
+    padding: var(--card-pad-s);
+  }
+
+  .card--pad-m {
+    padding: var(--card-pad-m);
+  }
+
+  .card--pad-l {
+    padding: var(--card-pad-l);
+  }
+
+  .card--r-m {
+    border-radius: var(--radius-m);
+  }
+
+  .card--r-l {
+    border-radius: var(--radius-l);
+  }
+
+  .card--r-xl {
+    border-radius: var(--radius-xl);
+  }
+
+  .card--interactive {
+    transition: border-color 0.2s ease;
+  }
+
+  .card--interactive:hover,
+  .card--interactive:focus-within {
+    border-color: color-mix(in srgb, var(--card-line, var(--line-card)), var(--fg, var(--ink)) 35%);
+  }
+</style>

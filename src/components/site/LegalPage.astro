@@ -1,0 +1,386 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../ui/Card.astro';
+import PageHero from './PageHero.astro';
+
+/**
+ * Layout for the legal pages (/privacy, /terms, /cookies): page hero, then a readable document on the dark tone.
+ *
+ * Each section's body is a named slot whose name is the section id. The h2 (with that id as its anchor)
+ * and the contents link both come from `sections`, so they always match:
+ *
+ *   <LegalPage title="Privacy policy" sections={[{ id: 'sharing', title: 'Who we share information with', toc: 'Sharing' }]} …>
+ *     <Fragment slot="summary"><ul><li>…</li></ul></Fragment>
+ *     <Fragment slot="sharing"><p>…</p></Fragment>
+ *   </LegalPage>
+ *
+ * Inside a section use p, ul, dl, strong, a and h3 (never h2). The optional "summary" slot is shown
+ * first, in a Card under "The short version". Layout: one column of prose (about 70 characters a line); from 1024px the
+ * contents list sits beside the text and stays in view while you scroll. Below that it is a plain list
+ * after the summary.
+ */
+export interface LegalSection {
+  /** Anchor id of the h2, and the name of the slot that holds the section's body. */
+  id: string;
+  /** The h2. */
+  title: string;
+  /** A shorter label for the contents list, when the title is long. */
+  toc?: string;
+}
+
+interface Props {
+  /** Page name, e.g. "Privacy policy". The hero shows it with a full stop; the browser title appends the site name. */
+  title: string;
+  /** Muted second line of the hero title. */
+  muted?: string;
+  /** Meta description. */
+  description: string;
+  /** Hero lead. "Updated <date>." is appended. */
+  lead: string;
+  /** When the document last changed, as YYYY-MM-DD. */
+  updated: string;
+  sections: LegalSection[];
+}
+
+const { title, muted, description, lead, updated, sections } = Astro.props;
+
+const ids = new Set<string>();
+for (const { id } of sections) {
+  if (!/^[a-z][a-z0-9-]*$/.test(id)) throw new Error(`LegalPage: section id "${id}" must be a lowercase slug.`);
+  if (ids.has(id)) throw new Error(`LegalPage: section id "${id}" is used twice.`);
+  if (!Astro.slots.has(id)) throw new Error(`LegalPage: section "${id}" has no slot="${id}" body.`);
+  ids.add(id);
+}
+
+// "6 October 2026", with a no-break space so the day stays with its month.
+const updatedLabel = new Date(`${updated}T00:00:00Z`)
+  .toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+  .replace(' ', '\u00a0');
+const hasSummary = Astro.slots.has('summary');
+const bodies = await Promise.all(sections.map(async (section) => ({ ...section, html: await Astro.slots.render(section.id) })));
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHero title={`${title}.`} muted={muted} lead={`${lead} Updated ${updatedLabel}.`} />
+  <div class="tone-dark legal">
+    <div class:list={['container', 'legal__grid', { 'legal__grid--summary': hasSummary }]}>
+      {
+        hasSummary && (
+          <Card as="section" pad="l" class="legal__summary" aria-labelledby="legal-summary-title">
+            <h2 id="legal-summary-title" class="legal__summary-title">
+              The short version
+            </h2>
+            <slot name="summary" />
+          </Card>
+        )
+      }
+      <nav class="legal__toc" aria-labelledby="legal-toc-title">
+        <p id="legal-toc-title" class="legal__toc-title">On this page</p>
+        <toc-spy>
+          <ol role="list">
+            {
+              bodies.map((section) => (
+                <li>
+                  <a href={`#${section.id}`}>{section.toc ?? section.title}</a>
+                </li>
+              ))
+            }
+          </ol>
+        </toc-spy>
+      </nav>
+      <div class="legal__body">
+        {
+          bodies.map((section) => (
+            <section class="legal__section">
+              <h2 id={section.id}>{section.title}</h2>
+              <div class="legal__prose">
+                <Fragment set:html={section.html} />
+              </div>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/toc-spy';
+</script>
+
+<style>
+  .legal {
+    /* Reading measure: about 72 characters of 17px Onest per line. */
+    --legal-measure: 36em;
+    padding-bottom: var(--section-y);
+  }
+
+  .legal__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+  }
+
+  .legal__grid > *,
+  .legal__grid > :global(.legal__summary) {
+    max-width: var(--legal-measure);
+  }
+
+  /* The short version */
+  .legal__grid > :global(.legal__summary) {
+    --card-gap: 8px;
+  }
+
+  /* The same step as the section h2s below. */
+  .legal__summary-title {
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .legal__grid :global(.legal__summary ul) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .legal__grid :global(.legal__summary li) {
+    padding-block: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--fg);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  .legal__grid :global(.legal__summary li:first-child) {
+    border-top: 0;
+  }
+
+  .legal__grid :global(.legal__summary li:last-child) {
+    padding-bottom: 0;
+  }
+
+  /* Contents */
+  .legal__toc-title {
+    margin-bottom: 12px;
+    font-size: var(--step-label);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--fg-3);
+  }
+
+  .legal__toc ol {
+    margin: 0;
+  }
+
+  .legal__toc li {
+    break-inside: avoid;
+  }
+
+  toc-spy {
+    display: block;
+  }
+
+  /* Each link carries its piece of the rail, so the rail also works when the list runs in two columns. */
+  .legal__toc a {
+    display: block;
+    padding: 8px 0 8px 16px;
+    border-left: 1px solid var(--line);
+    font-size: var(--step-small);
+    line-height: 1.4;
+    color: var(--fg-2);
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .legal__toc a:hover {
+    color: var(--fg);
+    border-left-color: var(--fg-2);
+  }
+
+  /* The section being read (set by <toc-spy>): full ink and the accent on the rail. */
+  .legal__toc a[aria-current] {
+    color: var(--fg);
+    font-weight: 500;
+    border-left-color: var(--accent);
+  }
+
+  /* Touch screens: each contents link is a full 44px target. */
+  @media (pointer: coarse) {
+    .legal__toc a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding-block: 4px;
+    }
+  }
+
+  .legal__toc a:focus-visible {
+    outline-offset: -2px;
+  }
+
+  /* Document */
+  .legal__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .legal__section {
+    padding-block: 40px;
+    border-top: 1px solid var(--line);
+  }
+
+  .legal__section:last-child {
+    padding-bottom: 0;
+  }
+
+  .legal__section h2 {
+    margin-bottom: 20px;
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .legal__prose {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--fg-2);
+    line-height: 1.65;
+  }
+
+  .legal__prose :global(p),
+  .legal__prose :global(li),
+  .legal__prose :global(dd) {
+    text-wrap: pretty;
+  }
+
+  .legal__prose :global(h3) {
+    margin-top: 16px;
+    margin-bottom: -6px;
+    font-size: var(--step-body);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+
+  .legal__prose :global(ul) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding-left: 1.25em;
+  }
+
+  .legal__prose :global(li::marker) {
+    color: var(--fg-3);
+  }
+
+  .legal__prose :global(dl) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+  }
+
+  .legal__prose :global(dt) {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .legal__prose :global(dd) {
+    margin: 2px 0 0;
+  }
+
+  .legal__prose :global(strong) {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .legal :global(.legal__prose a),
+  .legal :global(.legal__prose button),
+  .legal :global(.legal__summary a) {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      text-decoration-color 0.15s ease;
+  }
+
+  .legal :global(.legal__prose a:hover),
+  .legal :global(.legal__prose button:hover),
+  .legal :global(.legal__summary a:hover) {
+    color: var(--fg-accent);
+    text-decoration-color: currentColor;
+  }
+
+  @media (max-width: 1023.98px) {
+    .legal__toc ol {
+      columns: 2;
+      column-gap: 16px;
+    }
+  }
+
+  @media (min-width: 560px) and (max-width: 1023.98px) {
+    .legal__toc ol {
+      column-gap: 32px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* The card or the top of the column already starts the text; no rule above the first section. */
+    .legal__section:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .legal__grid {
+      /* Contents on the hero's left edge, the text beside it. */
+      grid-template-columns: minmax(200px, 240px) minmax(0, var(--legal-measure));
+      grid-template-areas: 'toc body';
+      align-items: start;
+      column-gap: clamp(64px, 8vw, 128px);
+      row-gap: 56px;
+    }
+
+    .legal__grid--summary {
+      grid-template-areas:
+        'toc summary'
+        'toc body';
+    }
+
+    .legal__grid > :global(.legal__summary) {
+      grid-area: summary;
+    }
+
+    .legal__body {
+      grid-area: body;
+    }
+
+    /* Beside the text, in view while reading: under the header, scrolls itself on short screens. */
+    .legal__toc {
+      grid-area: toc;
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      max-height: calc(100vh - var(--header-h) - 64px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .legal__toc a {
+      padding-block: 6px;
+    }
+  }
+</style>

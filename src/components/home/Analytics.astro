@@ -1,0 +1,615 @@
+---
+import Icon, { type IconName } from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+import VisionCameras from '../product/VisionCameras.astro';
+import VisionSteps from '../product/VisionSteps.astro';
+
+interface Props {
+  heading?: boolean;
+}
+
+const { heading = true } = Astro.props;
+
+// Each metric carries a small preview of what it looks like in the product.
+type Viz = 'traffic' | 'occupancy' | 'queue' | 'tables' | 'staff' | 'repeat' | 'heatmap' | 'leaders';
+const metrics: { name: string; detail: string; icon: IconName; viz: Viz }[] = [
+  { name: 'Visitor traffic', detail: 'Street and inside, by hour', icon: 'users', viz: 'traffic' },
+  { name: 'Occupancy', detail: 'How full each room is, all day', icon: 'gauge', viz: 'occupancy' },
+  { name: 'Queues', detail: 'Length and duration, counter and drive-thru', icon: 'timer', viz: 'queue' },
+  { name: 'Tables', detail: 'Seating time and tables to clear', icon: 'utensils', viz: 'tables' },
+  { name: 'Staff presence', detail: 'Arrivals, departures, empty stations', icon: 'user-check', viz: 'staff' },
+  { name: 'Repeat visits', detail: 'New and returning guests', icon: 'repeat', viz: 'repeat' },
+  { name: 'Peak hours', detail: 'Day-by-hour heatmaps', icon: 'flame', viz: 'heatmap' },
+  { name: 'Leaderboards', detail: 'Compare locations, set challenges', icon: 'trophy', viz: 'leaders' },
+];
+
+// Guests per hour, 11:00 to 22:00, as a share of the busiest hour.
+const traffic = [18, 30, 52, 86, 100, 62, 34, 28, 40, 70, 82, 44];
+const tables = ['busy', 'busy', 'clear', 'busy', 'free', 'busy', 'clear', 'busy'];
+// Three stations across a shift: worked spans, and the gap when one stood empty.
+const shifts = [{ spans: [[0, 100]] }, { spans: [[0, 38], [62, 100]], gap: [38, 62] }, { spans: [[8, 100]] }];
+// Four days by twelve hours, busiest at lunch and dinner and on the weekend.
+const byHour = [0.15, 0.3, 0.75, 0.95, 0.55, 0.25, 0.2, 0.35, 0.8, 1, 0.6, 0.3];
+const heat = [0.5, 0.6, 0.85, 1].flatMap((day) => byHour.map((hour) => +(hour * day).toFixed(2)));
+const leaders = [94, 81, 67];
+---
+
+<section class:list={['analytics tone-dark section', { 'analytics--flush': !heading }]} id="analytics" aria-labelledby="analytics-title">
+  <div class="container analytics__inner">
+    {
+      heading && (
+        <SectionHeader
+          product="vision"
+          id="analytics-title"
+          title="AI that turns your cameras"
+          muted="into events, triggers and analytics."
+          lead="Computer vision and a vision-language model read the cameras you already have, recognise behaviours and events, and fire the rules you set. Compare locations, find the peak hours and let Aldo act."
+        />
+      )
+    }
+    {heading && <VisionSteps />}
+    {/* Without the visible heading, a hidden one keeps the card titles (h3) under an h2, as in Playbooks. */}
+    {!heading && <h2 id="analytics-title" class="visually-hidden">Aldente Vision</h2>}
+
+    <VisionCameras />
+
+    {/* Home: the eight metrics as one compact row of chips; the Vision page shows them with their charts. */}
+    {
+      heading ? (
+        <ul class="metric-chips" role="list" aria-label="What Aldente Vision measures">
+          {metrics.map((m) => (
+            <li class="chip">
+              <Icon name={m.icon} size={18} />
+              <span>
+                <b>{m.name}</b>
+                <small>{m.detail}</small>
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <in-view class="metrics" data-threshold="0.15">
+          <ul class="analytics__metrics" role="list">
+            {
+              metrics.map((m) => (
+                <li class="metric">
+                  <div class="metric__head">
+                    <Icon name={m.icon} size={18} />
+                    <h3 class="metric__name">{m.name}</h3>
+                  </div>
+                  <div class:list={['viz', `viz--${m.viz}`]} aria-hidden="true">
+                    {m.viz === 'traffic' && traffic.map((h, i) => <i class:list={{ hot: h === 100 }} style={`--h:${h}%;--i:${i}`} />)}
+                    {m.viz === 'occupancy' && (
+                      <>
+                        <span class="ring" style="--p:72%" />
+                        <span class="viz__stat">
+                          <b>72%</b>
+                          <small>full now</small>
+                        </span>
+                      </>
+                    )}
+                    {m.viz === 'queue' && (
+                      <>
+                        <span class="line">
+                          {Array.from({ length: 6 }, (_, i) => (
+                            <i style={`--i:${i}`} />
+                          ))}
+                        </span>
+                        <span class="timer">4:12</span>
+                      </>
+                    )}
+                    {m.viz === 'tables' && (
+                      <>
+                        <span class="floor">
+                          {tables.map((t) => (
+                            <i class={t} />
+                          ))}
+                        </span>
+                        <span class="viz__stat">
+                          <b>2</b>
+                          <small>to clear</small>
+                        </span>
+                      </>
+                    )}
+                    {m.viz === 'staff' &&
+                      shifts.map((row) => (
+                        <span class="shift">
+                          {row.spans.map(([a, b]) => (
+                            <i style={`left:${a}%;width:${b! - a!}%`} />
+                          ))}
+                          {row.gap && <b style={`left:${row.gap[0]}%;width:${row.gap[1]! - row.gap[0]!}%`} />}
+                        </span>
+                      ))}
+                    {m.viz === 'repeat' && (
+                      <>
+                        <span class="split">
+                          <i style="flex:62" />
+                          <i style="flex:38" />
+                        </span>
+                        <span class="viz__legend">
+                          <span>New 62%</span>
+                          <span>Returning 38%</span>
+                        </span>
+                      </>
+                    )}
+                    {m.viz === 'heatmap' && heat.map((o) => <i style={`--o:${o}`} />)}
+                    {m.viz === 'leaders' &&
+                      leaders.map((w, i) => (
+                        <span class="leader">
+                          <span>{i + 1}</span>
+                          <i style={`--w:${w}%;--i:${i}`} />
+                        </span>
+                      ))}
+                  </div>
+                  <p class="metric__detail">{m.detail}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </in-view>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .analytics__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  /* On the Vision page the hero sits right above, so the section doesn't add its own top space. */
+  .analytics--flush {
+    padding-top: 0;
+  }
+
+  .metric-chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+  }
+
+  .chip {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius-m);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    color: var(--accent);
+  }
+
+  .chip :global(svg) {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .chip span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .chip b {
+    font-size: var(--step-small);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--fg);
+  }
+
+  .chip small {
+    font-size: var(--step-label);
+    line-height: 1.35;
+    color: var(--fg-3);
+  }
+
+  /* Phones: names only, so the eight chips stay a short block. */
+  @media (max-width: 599px) {
+    .chip {
+      align-items: center;
+      padding: 12px 14px;
+    }
+
+    .chip small {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .metric-chips {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+  }
+
+  .metrics {
+    display: block;
+  }
+
+  /* One rounded panel ruled into cells, like the chart cards above and the /aldo abilities grid: the 1px
+     gaps show the edge colour. Two columns, four from 1024px, so every row is full. */
+  .analytics__metrics {
+    --mute: var(--line-card);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    border: 1px solid var(--card-line);
+    border-radius: var(--radius-l);
+    background: var(--card-line);
+    overflow: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .analytics__metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: var(--card-pad-m);
+    background: var(--card);
+    transition: background-color 0.3s ease;
+  }
+
+  .metric:hover {
+    background: var(--card-2);
+  }
+
+  .metric__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .metric__head :global(svg) {
+    flex: none;
+    color: var(--accent);
+  }
+
+  .metric__name {
+    font-size: var(--step-h4);
+    font-weight: 600;
+  }
+
+  .metric__detail {
+    margin-top: auto;
+    font-size: 0.875rem;
+    color: var(--ink-3);
+  }
+
+  /* Previews: one muted tone, one orange signal each. */
+  .viz {
+    height: 64px;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .viz__stat {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .viz__stat b {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .viz__stat small {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  .viz--traffic {
+    gap: 4px;
+  }
+
+  .viz--traffic i {
+    flex: 1;
+    height: var(--h);
+    border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+    background: var(--mute);
+  }
+
+  .viz--traffic i.hot {
+    background: var(--accent);
+  }
+
+  .viz--occupancy,
+  .viz--queue,
+  .viz--tables {
+    align-items: center;
+  }
+
+  .ring {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) 0 var(--p), var(--mute) 0);
+    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  }
+
+  .line {
+    display: flex;
+    gap: 6px;
+  }
+
+  .line i {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ink-3);
+    opacity: calc(1 - var(--i) * 0.12);
+  }
+
+  /* An outlined pill: orange text keeps AA on the card fill (a tinted fill would drop it below 4.5:1). */
+  .timer {
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgb(224 86 52 / 0.6);
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .floor {
+    display: grid;
+    grid-template-columns: repeat(4, 22px);
+    grid-auto-rows: 22px;
+    gap: 6px;
+  }
+
+  .floor i {
+    border-radius: var(--radius-xs);
+    background: var(--mute);
+  }
+
+  .floor .free {
+    background: transparent;
+    border: 1.5px dashed var(--line-strong);
+  }
+
+  .floor .clear {
+    background: transparent;
+    border: 2px solid var(--accent);
+  }
+
+  .viz--staff,
+  .viz--repeat,
+  .viz--leaders {
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    gap: 9px;
+  }
+
+  .shift {
+    position: relative;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+  }
+
+  .shift i,
+  .shift b {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: var(--radius-pill);
+  }
+
+  .shift i {
+    background: var(--line-strong);
+  }
+
+  .shift b {
+    top: -2px;
+    bottom: -2px;
+    border-radius: var(--radius-xs);
+    border: 1.5px dashed var(--accent);
+    background: rgb(224 86 52 / 0.22);
+  }
+
+  .split {
+    display: flex;
+    gap: 3px;
+    height: 12px;
+  }
+
+  .split i {
+    border-radius: var(--radius-pill);
+    background: var(--mute);
+  }
+
+  .split i:last-child {
+    background: var(--accent);
+  }
+
+  .viz__legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  .viz--heatmap {
+    display: grid;
+    grid-template-columns: repeat(12, 12px);
+    grid-auto-rows: 12px;
+    gap: 3px;
+    align-content: end;
+    align-items: stretch;
+  }
+
+  .viz--heatmap i {
+    border-radius: var(--radius-xs);
+    background: rgb(224 86 52 / calc(0.08 + var(--o) * 0.92));
+  }
+
+  .leader {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .leader i {
+    width: var(--w);
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--mute);
+  }
+
+  .leader:first-child {
+    color: var(--ink);
+  }
+
+  .leader:first-child i {
+    background: var(--accent);
+  }
+
+  /* Phones: compact tiles (the icon above the name, a smaller preview, the detail). Names keep the card
+     title step, like every other h3. */
+  @media (max-width: 640px) {
+    .metric {
+      gap: 12px;
+      padding: var(--card-pad-s) 14px;
+    }
+
+    .metric__head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .metric__name {
+      line-height: 1.2;
+    }
+
+    .metric__detail {
+      font-size: var(--step-label);
+      line-height: 1.4;
+    }
+
+    .viz {
+      height: 48px;
+      gap: 8px;
+    }
+
+    .viz--traffic {
+      gap: 3px;
+    }
+
+    .viz__stat b {
+      font-size: 1.125rem;
+    }
+
+    .viz__stat small {
+      font-size: 0.6875rem;
+    }
+
+    .ring {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px));
+    }
+
+    .line {
+      gap: 4px;
+    }
+
+    .line i {
+      width: 9px;
+      height: 9px;
+    }
+
+    .timer {
+      padding: 3px 7px;
+      font-size: var(--step-label);
+    }
+
+    .floor {
+      grid-template-columns: repeat(4, 15px);
+      grid-auto-rows: 15px;
+      gap: 4px;
+    }
+
+    .viz--staff,
+    .viz--repeat {
+      gap: 7px;
+    }
+
+    .viz--leaders {
+      gap: 4px;
+    }
+
+    .viz__legend {
+      font-size: 0.6875rem;
+    }
+
+    /* Fluid squares, so twelve hours fit any tile. */
+    .viz--heatmap {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-auto-rows: auto;
+      gap: 2px;
+    }
+
+    .viz--heatmap i {
+      aspect-ratio: 1;
+    }
+
+    .leader {
+      gap: 6px;
+      font-size: 0.6875rem;
+    }
+  }
+
+  /* With motion allowed, the bars grow in once the grid scrolls into view. */
+  @media (prefers-reduced-motion: no-preference) {
+    .viz--traffic i,
+    .leader i,
+    .split i,
+    .shift i,
+    .shift b {
+      transition: transform 0.8s var(--ease-out) calc(var(--i, 0) * 40ms);
+    }
+
+    .viz--traffic i {
+      transform-origin: bottom;
+    }
+
+    .leader i,
+    .split i,
+    .shift i,
+    .shift b {
+      transform-origin: left;
+    }
+
+    .metrics:not([data-inview]) .viz--traffic i {
+      transform: scaleY(0.06);
+    }
+
+    .metrics:not([data-inview]) :is(.leader i, .split i, .shift i, .shift b) {
+      transform: scaleX(0);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/in-view';
+</script>

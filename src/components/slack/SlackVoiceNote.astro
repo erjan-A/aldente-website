@@ -1,0 +1,92 @@
+---
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  duration: string;
+  transcript?: string;
+}
+
+const { duration, transcript } = Astro.props;
+const bars = [8, 14, 20, 12, 22, 16, 9, 18, 24, 13, 7, 15, 21, 11, 17, 10, 19, 12, 8, 14];
+---
+
+<div class="voice">
+  <div class="voice__clip">
+    <span class="voice__play" aria-hidden="true"><Icon name="play" size={12} /></span>
+    <span class="voice__wave" aria-hidden="true">
+      {bars.map((h, i) => <i style={`--h:${h}px;--d:${(i % 5) * 0.12}s`} />)}
+    </span>
+    <span class="voice__time">{duration}</span>
+  </div>
+  {transcript && <p class="voice__transcript">“{transcript}”</p>}
+</div>
+
+<style>
+  .voice {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .voice__clip {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px 8px 8px;
+    border: 1px solid #dddddd;
+    border-radius: var(--radius-pill);
+    background: #ffffff;
+  }
+
+  .voice__play {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .voice__wave {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 26px;
+  }
+
+  .voice__wave i {
+    width: 3px;
+    height: var(--h);
+    border-radius: var(--radius-xs);
+    background: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .voice__wave i {
+      animation: voice-pulse 1.2s ease-in-out infinite;
+      animation-delay: var(--d);
+    }
+  }
+
+  @keyframes voice-pulse {
+    50% {
+      transform: scaleY(0.45);
+    }
+  }
+
+  .voice__time {
+    font-size: 12px;
+    color: #616061;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .voice__transcript {
+    font-size: 14px;
+    line-height: 1.45;
+    color: #616061;
+    font-style: italic;
+  }
+</style>

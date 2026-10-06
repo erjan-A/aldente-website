@@ -1,0 +1,16 @@
+export const ROUTES = [
+  '/',
+  '/aldo',
+  '/order-verification',
+  '/analytics',
+  '/pricing',
+  '/solutions/operations',
+  '/solutions/hr',
+  '/solutions/delivery',
+  '/security',
+  '/company',
+  '/demo',
+  '/cookies',
+  '/privacy',
+  '/terms',
+] as const;

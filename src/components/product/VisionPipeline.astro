@@ -1,0 +1,353 @@
+---
+import { Image } from 'astro:assets';
+import dining from '../../assets/images/dining-room-overhead.jpg';
+import Detection from './Detection.astro';
+import VisionSteps from './VisionSteps.astro';
+
+/**
+ * How Aldente Vision works, shown on one moment (the deck's product slide, made compact): the five steps,
+ * then a camera frame where computer vision has boxed what it found (2), what the VLM reads in the scene
+ * (3), the event and the rule it trips (4), and where it lands in the week's analytics (5). The panel
+ * numbers match the steps. Readings match the home console: Location 03, Cam 04, Table 6 at 3:12.
+ */
+interface Props {
+  /** The first frame on the page loads eagerly; elsewhere it waits for the scroll. */
+  eager?: boolean;
+}
+
+const { eager = false } = Astro.props;
+
+// Tables cleared late this week, 11:00 to 22:00 in two-hour buckets; lunch peak highlighted.
+const late = [
+  { hour: '11', value: 18 },
+  { hour: '13', value: 100, peak: true },
+  { hour: '15', value: 36 },
+  { hour: '17', value: 28 },
+  { hour: '19', value: 74 },
+  { hour: '21', value: 30 },
+];
+---
+
+<figure class="vp">
+  <VisionSteps />
+
+  <div class="vp__body">
+    <div class="vp__feed">
+      <Image
+        src={dining}
+        alt="Overhead camera view of a restaurant dining room. Computer vision has boxed a server on the floor, the staffed counter, and Table 6 with plates left and no guests."
+        widths={[640, 960, 1280, 1600]}
+        sizes="(min-width: 1280px) 760px, (min-width: 900px) 58vw, 92vw"
+        loading={eager ? 'eager' : 'lazy'}
+        fetchpriority={eager ? 'high' : undefined}
+      />
+      <span class="vp__live"><i aria-hidden="true"></i>Live<span class="vp__where">· Location 03 · Cam 04</span></span>
+      <Detection tone="ok" label="Server · on the floor" box={[45.2, 9, 6, 26]} place="bottom-start" class="vp__det" />
+      <Detection tone="ok" label="Counter · staffed" box={[70, 4, 8, 13]} place="bottom-start" class="vp__det" />
+      <Detection tone="alert" label="Table 6 · plates, no guests" box={[26, 64, 34, 28]} place="top-start" class="vp__det" />
+      <span class="vp__tag"><span class="vp__n">2</span>Computer vision · 3 detections</span>
+    </div>
+
+    <div class="vp__side">
+      <div class="vp__card">
+        <p class="vp__label"><span class="vp__n">3</span>VLM reads the scene</p>
+        <blockquote class="vp__quote">“Guests left Table 6 three minutes ago. Plates and glasses are still there, and no staff are near.”</blockquote>
+      </div>
+
+      <div class="vp__card vp__card--event">
+        <p class="vp__label"><span class="vp__n">4</span>Event and trigger</p>
+        <p class="vp__event">Table waiting to be&nbsp;cleared <span class="vp__time">· 3:12</span></p>
+        <p class="vp__rule">Rule: over 3 minutes, alert #floor-team</p>
+      </div>
+
+      <div class="vp__card vp__card--chart">
+        <div class="vp__chart-head">
+          <p class="vp__label"><span class="vp__n">5</span>Analytics</p>
+          <span class="vp__when">This week, by hour</span>
+        </div>
+        <div class="vp__chart-row">
+          <p class="vp__metric">Tables cleared late</p>
+          <ol class="vp__bars" role="list" aria-label="Tables cleared late by hour, highest at 13:00">
+            {late.map((b) => <li class:list={{ peak: b.peak }} style={`--h:${b.value}%`} title={`${b.hour}:00`} />)}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .vp {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .vp__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .vp__feed {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--line-card);
+    container-type: inline-size;
+  }
+
+  .vp__feed img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.6) contrast(1.05) brightness(0.85);
+  }
+
+  .vp__live,
+  .vp__tag {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: rgb(11 11 11 / 0.78);
+    color: var(--ink);
+    font-size: var(--step-label);
+    font-weight: 500;
+    white-space: nowrap;
+    backdrop-filter: blur(6px);
+  }
+
+  .vp__live {
+    top: 12px;
+    left: 12px;
+  }
+
+  .vp__live i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .vp__tag {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .vp__n {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vp__side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .vp__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 20px;
+    border-radius: var(--radius-l);
+    background: var(--surface);
+    border: 1px solid var(--line-card);
+  }
+
+  .vp__card--event {
+    background: rgb(224 86 52 / 0.12);
+    border-color: rgb(224 86 52 / 0.55);
+  }
+
+  .vp__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--step-small);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .vp__quote {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .vp__event {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .vp__time {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vp__rule {
+    font-size: var(--step-small);
+    color: var(--ink-2);
+  }
+
+  .vp__chart-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 12px;
+  }
+
+  .vp__card--chart .vp__label {
+    color: var(--ink-2);
+  }
+
+  .vp__card--chart .vp__n {
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--line-card);
+  }
+
+  .vp__when {
+    font-size: var(--step-label);
+    color: var(--ink-3);
+  }
+
+  .vp__chart-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .vp__metric {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+
+  .vp__bars {
+    flex: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 48px;
+    margin: 0;
+  }
+
+  .vp__bars li {
+    width: 12px;
+    height: max(6px, var(--h));
+    border-radius: var(--radius-xs);
+    background: var(--line-strong);
+  }
+
+  .vp__bars li.peak {
+    background: var(--accent);
+  }
+
+  /* Tablets: the frame full width, the three readings in a row under it. */
+  @media (min-width: 720px) {
+    .vp__side {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Wide screens: the frame on the left, the three readings stacked beside it, like the slide. */
+  @media (min-width: 1200px) {
+    .vp {
+      gap: 16px;
+    }
+
+    .vp__body {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    /* The frame keeps 16:9 (the boxes are placed on that crop); the readings stretch to its height. */
+    .vp__side {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+    }
+
+    .vp__bars {
+      height: 72px;
+      gap: 8px;
+    }
+
+    .vp__bars li {
+      width: 14px;
+    }
+
+    .vp__card {
+      padding: 14px 18px;
+      gap: 6px;
+    }
+
+    .vp__quote {
+      font-size: 1rem;
+    }
+
+    .vp__card--chart {
+      justify-content: space-between;
+    }
+  }
+
+  /* Narrow frames: smaller box labels so the three detections stay clear of each other. */
+  @container (max-width: 520px) {
+    .vp :global(.vp__det .det__label) {
+      padding: 2px 6px;
+      font-size: 0.6875rem;
+    }
+
+    .vp__tag,
+    .vp__where {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .vp :global(.vp__det) {
+      animation: vp-in 0.5s var(--ease-out) both;
+    }
+
+    .vp :global(.vp__det:nth-of-type(2)) {
+      animation-delay: 0.12s;
+    }
+
+    .vp :global(.vp__det:nth-of-type(3)) {
+      animation-delay: 0.24s;
+    }
+  }
+
+  @keyframes vp-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+</style>

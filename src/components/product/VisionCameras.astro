@@ -1,0 +1,233 @@
+---
+import { Image } from 'astro:assets';
+import counter from '../../assets/images/cams/cam-counter.jpg';
+import dining from '../../assets/images/cams/cam-dining.jpg';
+import entrance from '../../assets/images/cams/cam-entrance.jpg';
+import exit from '../../assets/images/cams/cam-exit.jpg';
+import Detection from './Detection.astro';
+
+/**
+ * Four cameras at one location, each reading a different part of the restaurant: what Aldente Vision
+ * finds on the frame (boxes) and the one number it turns it into. Readings match the rest of the site
+ * (Location 03, Cam 04, Table 6 at 3:12). One row of four on wide screens, two by two below.
+ */
+type Tone = 'ok' | 'alert' | 'neutral';
+
+const cams: {
+  id: string;
+  where: string;
+  src: ImageMetadata;
+  alt: string;
+  boxes: { tone: Tone; label: string; box: [number, number, number, number]; place?: 'top-start' | 'top-end' | 'bottom-start' | 'inside' }[];
+  value: string;
+  metric: string;
+  tone: Tone;
+}[] = [
+  {
+    id: 'Cam 01',
+    where: 'Entrance',
+    src: entrance,
+    alt: 'Entrance camera: the front windows and door, with people passing on the street',
+    boxes: [{ tone: 'neutral', label: 'Passer-by', box: [53, 21, 8.5, 28], place: 'bottom-start' }],
+    value: '212',
+    metric: 'passers-by an hour, 38% walk in',
+    tone: 'neutral',
+  },
+  {
+    id: 'Cam 02',
+    where: 'Counter',
+    src: counter,
+    alt: 'Counter camera: two staff behind the pastry counter',
+    boxes: [{ tone: 'ok', label: 'Staff · 2', box: [35.5, 7, 14.5, 22], place: 'bottom-start' }],
+    value: '2/2',
+    metric: 'staff at the counter, no queue',
+    tone: 'ok',
+  },
+  {
+    id: 'Cam 04',
+    where: 'Dining room',
+    src: dining,
+    alt: 'Dining room camera: seated tables, and Table 6 with plates left and no guests',
+    boxes: [
+      { tone: 'neutral', label: 'Table 9 · 41 min', box: [36.5, 11.5, 32, 41], place: 'bottom-start' },
+      { tone: 'alert', label: 'Table 6 · to clear', box: [16.5, 62, 55, 33], place: 'inside' },
+    ],
+    value: '3:12',
+    metric: 'Table 6 waiting to be cleared',
+    tone: 'alert',
+  },
+  {
+    id: 'Cam 07',
+    where: 'Back door',
+    src: exit,
+    alt: 'Back-door camera: a staff member leaving through the kitchen door at the end of a shift',
+    boxes: [{ tone: 'alert', label: 'Left 22:41', box: [66, 14, 23, 84], place: 'inside' }],
+    value: '1',
+    metric: 'departure without a clock-out',
+    tone: 'alert',
+  },
+];
+---
+
+<ul class="cams" role="list" aria-label="Four cameras at Location 03, read by Aldente Vision">
+  {
+    cams.map((cam) => (
+      <li class="cam">
+        <figure class="cam__frame">
+          <div class="cam__media">
+            <Image src={cam.src} alt={cam.alt} widths={[360, 540, 720]} sizes="(min-width: 1280px) 308px, (min-width: 1024px) 24vw, 46vw" loading="lazy" />
+            {cam.boxes.map((b) => (
+              <Detection tone={b.tone} label={b.label} box={b.box} place={b.place} class="cam__det" />
+            ))}
+          </div>
+          <figcaption class="cam__caption">
+            <span class="cam__id">
+              <i aria-hidden="true" />
+              {cam.id} · {cam.where}
+            </span>
+            <span class:list={['cam__reading', `cam__reading--${cam.tone}`]}>
+              <b>{cam.value}</b>
+              <span>{cam.metric}</span>
+            </span>
+          </figcaption>
+        </figure>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .cams {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+  }
+
+  .cam__frame {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    padding: 6px;
+    border-radius: var(--radius-l);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    container-type: inline-size;
+  }
+
+  /* The frame: 6px inset, so its corners run parallel to the card's (l 24 - 6 ≈ m 16). */
+  .cam__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+
+  .cam__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.6) contrast(1.05) brightness(0.82);
+  }
+
+  /* Under the frame: which camera, then the one number it turns into. Nothing covers what was found. */
+  .cam__caption {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 8px 6px;
+  }
+
+  .cam__id {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: var(--step-label);
+    font-weight: 500;
+    color: var(--fg-3);
+    white-space: nowrap;
+  }
+
+  .cam__id i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .cam :global(.cam__det .det__label) {
+    padding: 2px 6px;
+    font-size: 0.6875rem;
+  }
+
+  .cam__reading {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .cam__reading b {
+    flex: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .cam__reading span {
+    min-width: 0;
+    font-size: var(--step-label);
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+
+  .cam__reading--alert b {
+    color: var(--accent);
+  }
+
+  .cam__reading--ok b {
+    color: var(--ok);
+  }
+
+  @media (min-width: 1024px) {
+    .cams {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+  }
+
+  /* Small frames (phones): the frame keeps its boxes; the box labels give way to the reading. */
+  @container (max-width: 240px) {
+    .cam__caption {
+      padding: 10px 6px 4px;
+    }
+
+    .cam__id {
+      font-size: 0.6875rem;
+    }
+
+    .cam :global(.cam__det .det__label) {
+      display: none;
+    }
+
+    .cam__reading {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cam__reading b {
+      font-size: 1.25rem;
+    }
+
+    .cam__reading span {
+      font-size: 0.6875rem;
+    }
+  }
+</style>

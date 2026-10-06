@@ -1,0 +1,67 @@
+---
+import mark from '../../assets/logos/aldente-mark.svg';
+import { PRODUCTS, type ProductId } from '../../data/products';
+import Icon from './Icon.astro';
+
+interface Props {
+  product: ProductId;
+}
+
+const { product } = Astro.props;
+const { name, icon } = PRODUCTS[product];
+---
+
+<span class:list={['pill', `pill--${product}`]}>
+  {
+    icon ? (
+      <Icon name={icon} size={14} strokeWidth={2.25} />
+    ) : (
+      <span class="pill__avatar" aria-hidden="true">
+        <img src={mark.src} alt="" width="9" height="11" />
+      </span>
+    )
+  }
+  {name}
+</span>
+
+<style>
+  /* Product label: names the product a section belongs to. Neutral pill, one orange cue. Tone-aware. */
+  .pill {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 0 13px 0 9px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--card-line, var(--line-card));
+    background: var(--card, var(--surface));
+    color: var(--fg, var(--ink));
+    font-size: var(--step-label);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .pill :global(svg) {
+    flex: none;
+    color: var(--accent);
+  }
+
+  /* Aldo shows its Slack avatar. */
+  .pill__avatar {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-xs);
+    background: #0b0b0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pill__avatar img {
+    width: 9px;
+    height: auto;
+  }
+</style>

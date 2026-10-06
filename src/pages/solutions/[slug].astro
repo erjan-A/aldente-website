@@ -1,0 +1,90 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Cta from '../../components/home/Cta.astro';
+import OrderStory from '../../components/home/OrderStory.astro';
+import Playbooks from '../../components/home/Playbooks.astro';
+import PlaybookHeroMedia from '../../components/product/PlaybookHeroMedia.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import Button from '../../components/ui/Button.astro';
+import Card from '../../components/ui/Card.astro';
+import { PLAYBOOKS } from '../../data/playbooks';
+import { SOLUTIONS, solutionPlaybook, type Solution } from '../../data/solutions';
+import { LINKS } from '../../data/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { filterByTeam } from '../../lib/playbooks';
+
+export const getStaticPaths = (() => SOLUTIONS.map((solution) => ({ params: { slug: solution.slug }, props: { solution } }))) satisfies GetStaticPaths;
+
+interface Props {
+  solution: Solution;
+}
+
+const { solution } = Astro.props;
+const playbook = solutionPlaybook(solution);
+// The hero already shows this team's main Playbook; the section below shows only the others, if any.
+const morePlaybooks = filterByTeam(PLAYBOOKS, solution.team).filter((p) => p.id !== playbook.id).length > 0;
+const pointsId = `points-${solution.slug}`;
+---
+
+<BaseLayout title={`Aldente for ${solution.name}`} description={solution.description}>
+  <PageHero title={solution.title} muted={solution.muted} lead={solution.lead}>
+    <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
+    <Button href={LINKS.seeAldo} variant="secondary" size="lg">See Aldo in action</Button>
+    <PlaybookHeroMedia slot="media" playbook={playbook} asker={solution.asker} />
+  </PageHero>
+  <section class:list={['tone-dark points', { 'points--flush': solution.slug === 'delivery' }]} aria-labelledby={pointsId}>
+    <h2 id={pointsId} class="visually-hidden">What {solution.name} teams get</h2>
+    <ul class="container points__grid" role="list">
+      {
+        solution.points.map((point) => (
+          <Card as="li">
+            <h3>{point.title}</h3>
+            <p>{point.text}</p>
+          </Card>
+        ))
+      }
+    </ul>
+  </section>
+  {solution.slug === 'delivery' && <OrderStory title="How an order" muted="is verified." product={null} />}
+  {
+    morePlaybooks && (
+      <Playbooks
+        team={solution.team}
+        exclude={[playbook.id]}
+        asker={solution.asker}
+        title="More Playbooks"
+        muted={`for ${solution.name.toLowerCase()} teams.`}
+        lead="Each one is a saved task: what to check, when to run, and where to send the result. Aldo confirms the details and starts working."
+        band={false}
+      />
+    )
+  }
+  <Cta />
+</BaseLayout>
+
+<style>
+  .points {
+    padding-bottom: var(--section-y);
+  }
+
+  /* Delivery: the same-tone Order Story follows and brings its own top space. */
+  .points--flush {
+    padding-bottom: 0;
+  }
+
+  .points__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  .points__grid h3 {
+    font-size: var(--step-h4);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  .points__grid p {
+    color: var(--fg-2);
+  }
+</style>

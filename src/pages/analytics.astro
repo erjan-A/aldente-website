@@ -1,0 +1,131 @@
+---
+import Analytics from '../components/home/Analytics.astro';
+import Cta from '../components/home/Cta.astro';
+import VisionPipeline from '../components/product/VisionPipeline.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Icon from '../components/ui/Icon.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import { LINKS } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const rules = [
+  { when: 'Queue over 6 people for 5 minutes', who: 'District manager' },
+  { when: 'Station unattended for 3 minutes', who: 'Shift lead' },
+  { when: 'Table uncleared for 3 minutes', who: 'Floor team' },
+];
+---
+
+<BaseLayout
+  title="Aldente Vision, camera AI for restaurants"
+  description="Computer vision and vision-language models turn the cameras you already have into events, triggers and analytics for every restaurant location."
+>
+  <PageHero
+    product="vision"
+    title="AI that turns your cameras"
+    muted="into events, triggers and analytics."
+    lead="Computer vision finds the people, tables and queues on the cameras you already have. A vision-language model describes what is happening, your rules turn it into alerts, and every event adds up to analytics that Aldo acts on."
+    mediaLayout="below"
+  >
+    <Button href={`${LINKS.demo}?plan=vision`} size="lg" arrow>Book a demo</Button>
+    <Button href={LINKS.pricing} variant="secondary" size="lg">Compare plans</Button>
+    <VisionPipeline slot="media" eager />
+  </PageHero>
+  <Analytics heading={false} />
+  <section class="tone-paper section" aria-labelledby="rules-title">
+    <div class="container rules">
+      <SectionHeader
+        id="rules-title"
+        title="Set the rule once."
+        muted="Aldo watches for it."
+        lead="Choose an event, a threshold and a person. When a queue runs long or a station sits empty, the alert goes out with the camera view."
+      />
+      <ul class="rules__list" role="list">
+        {
+          rules.map((r) => (
+            <li>
+              <span class="rules__when">{r.when}</span>
+              <span class="rules__arrow" aria-hidden="true"><Icon name="arrow-right" size={20} strokeWidth={2} /></span>
+              <span class="rules__who">{r.who}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="rules__more">
+        <Card>
+          <h3>Compare every location on the same terms</h3>
+          <p>Peak-hour heatmaps, leaderboards and week-over-week trends show which locations need help and which ones to learn from.</p>
+        </Card>
+        <Card>
+          <h3>Know your regulars</h3>
+          <p>Count new and returning guests and see how often they come back, without names attached.</p>
+        </Card>
+      </div>
+    </div>
+  </section>
+  <Cta title="Put the cameras you already have to work." text="See Aldente Vision in a 30-minute demo." plan="vision" />
+</BaseLayout>
+
+<style>
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .rules__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* One row per rule: the event, then who hears about it. Card surface and edge from the tone. */
+  .rules__list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20px 11rem;
+    align-items: center;
+    gap: 12px 20px;
+    padding: var(--card-pad-m);
+    border-radius: var(--radius-l);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+  }
+
+  .rules__when {
+    flex: 1 1 280px;
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  .rules__arrow {
+    color: var(--fg-accent);
+  }
+
+  .rules__who {
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: var(--step-small);
+    font-weight: 600;
+  }
+
+  .rules__more {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .rules__more h3 {
+    font-size: var(--step-h4);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  .rules__more p {
+    color: var(--fg-2);
+  }
+</style>

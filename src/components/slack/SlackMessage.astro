@@ -1,0 +1,113 @@
+---
+import mark from '../../assets/logos/aldente-mark.svg';
+
+interface Props {
+  author: string;
+  time: string;
+  /** "aldo" shows the Aldo app avatar; anything else is used as initials. */
+  avatar?: string;
+  avatarColor?: string;
+  app?: boolean;
+  class?: string;
+}
+
+const { author, time, avatar = 'aldo', avatarColor = '#4a5568', app = false, class: className } = Astro.props;
+const isAldo = avatar === 'aldo';
+---
+
+<article class:list={['slack-message', className]}>
+  {
+    isAldo ? (
+      <span class="slack-message__avatar slack-message__avatar--aldo" aria-hidden="true">
+        <img src={mark.src} alt="" width="20" height="24" />
+      </span>
+    ) : (
+      <span class="slack-message__avatar" style={`background:${avatarColor}`} aria-hidden="true">
+        {avatar}
+      </span>
+    )
+  }
+  <div class="slack-message__body">
+    <p class="slack-message__meta">
+      <b>{author}</b>
+      {app && <span class="slack-message__app">APP</span>}
+      <time>{time}</time>
+    </p>
+    <div class="slack-message__content">
+      <slot />
+    </div>
+  </div>
+</article>
+
+<style>
+  .slack-message {
+    display: flex;
+    gap: 8px;
+    padding: 8px 20px;
+  }
+
+  .slack-message:hover {
+    background: #f8f8f8;
+  }
+
+  .slack-message__avatar {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-s);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .slack-message__avatar--aldo {
+    background: #0b0b0b;
+  }
+
+  .slack-message__avatar--aldo img {
+    width: 20px;
+    height: 24px;
+  }
+
+  .slack-message__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .slack-message__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 0 0 2px;
+    font-size: 15px;
+    color: #1d1c1d;
+  }
+
+  .slack-message__meta b {
+    font-weight: 900;
+  }
+
+  .slack-message__app {
+    padding: 1px 3px;
+    border-radius: var(--radius-xs);
+    background: rgb(29 28 29 / 0.13);
+    color: rgb(29 28 29 / 0.7);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .slack-message__meta time {
+    color: #616061;
+    font-size: 12px;
+  }
+
+  .slack-message__content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>

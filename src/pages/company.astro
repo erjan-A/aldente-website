@@ -1,0 +1,81 @@
+---
+import Cta from '../components/home/Cta.astro';
+import Voices from '../components/home/Voices.astro';
+import PageHero from '../components/site/PageHero.astro';
+import { SITE } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Company" description="Aldente AI builds the AI Chief of Staff for restaurant chains: camera evidence joined with restaurant records, working in Slack.">
+  <PageHero
+    title="We’re building the Chief of Staff"
+    muted="every restaurant deserves."
+    lead="Restaurant teams run on what managers can see. Aldente gives every location a colleague that sees everything, remembers it and turns it into finished work, so people can spend their time on guests and their team."
+  />
+  <section class="tone-dark stats-wrap" aria-label="Aldente so far">
+    <div class="container">
+      <p class="stats">
+        Today Aldente runs in <b>200+ restaurant locations</b> and has verified <b>more than 2 million orders</b>. At one location it cut order errors by <b>87%</b>.
+      </p>
+    </div>
+  </section>
+  <Voices team />
+  <section class="tone-dark section careers" aria-labelledby="careers-title">
+    <div class="container careers__inner">
+      <h2 id="careers-title">Join us.</h2>
+      <p>We’re hiring engineers and operators who want to change how restaurants run. Write to <a href={`mailto:${SITE.email}?subject=Careers`}>{SITE.email}</a>.</p>
+    </div>
+  </section>
+  <Cta />
+</BaseLayout>
+
+<style>
+  .stats-wrap {
+    padding-bottom: var(--section-y);
+  }
+
+  /* The rule sits on the text column, inside the container's gutter. */
+  .stats {
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .stats b {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .careers__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+  }
+
+  /* Same title and lead as SectionHeader; the lead holds a link, so it is written out here. */
+  .careers h2 {
+    font-size: var(--step-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .careers p {
+    max-width: 48ch;
+    font-size: var(--step-lead);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .careers a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

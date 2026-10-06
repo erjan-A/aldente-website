@@ -1,0 +1,105 @@
+---
+/**
+ * One detection box drawn over a camera frame or a packing photo, in the home console's language:
+ * a 2px box in the tone colour and a solid label.
+ *   tone   alert (orange, needs a person) | ok (green, checked or staffed) | neutral (white, information)
+ *   box    position and size in % of the frame: [left, top, width, height]
+ *   place  where the label sits: inside the box (top left), or outside it above / below, at its start or end,
+ *          or to its left ("side")
+ *   dashed a dashed edge, for an item that is expected but not seen
+ * Decorative: the frame's own alt text or caption carries the meaning.
+ */
+interface Props {
+  tone?: 'alert' | 'ok' | 'neutral';
+  label: string;
+  box: readonly [number, number, number, number];
+  place?: 'inside' | 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end' | 'side';
+  dashed?: boolean;
+  class?: string;
+}
+
+const { tone = 'ok', label, box, place = 'top-start', dashed = false, class: className } = Astro.props;
+const [left, top, width, height] = box;
+---
+
+<span
+  class:list={['det', `det--${tone}`, `det--${place}`, { 'det--dashed': dashed }, className]}
+  style={`left:${left}%;top:${top}%;width:${width}%;height:${height}%`}
+  aria-hidden="true"
+>
+  <span class="det__label">{label}</span>
+</span>
+
+<style>
+  .det {
+    position: absolute;
+    border: 2px solid var(--det);
+    border-radius: var(--radius-s);
+  }
+
+  .det--alert {
+    --det: var(--accent);
+    --det-ink: var(--on-accent);
+    background: rgb(224 86 52 / 0.14);
+  }
+
+  .det--ok {
+    --det: var(--ok);
+    --det-ink: var(--on-accent);
+  }
+
+  .det--neutral {
+    --det: var(--ink);
+    --det-ink: var(--bg);
+  }
+
+  .det--dashed {
+    border-style: dashed;
+  }
+
+  .det__label {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 7px;
+    border-radius: var(--radius-xs);
+    background: var(--det);
+    color: var(--det-ink);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .det--inside .det__label {
+    left: 6px;
+    top: 6px;
+  }
+
+  .det--top-start .det__label,
+  .det--top-end .det__label {
+    bottom: calc(100% + 4px);
+  }
+
+  .det--bottom-start .det__label,
+  .det--bottom-end .det__label {
+    top: calc(100% + 4px);
+  }
+
+  .det--top-start .det__label,
+  .det--bottom-start .det__label {
+    left: -2px;
+  }
+
+  .det--top-end .det__label,
+  .det--bottom-end .det__label {
+    right: -2px;
+  }
+
+  .det--side .det__label {
+    right: calc(100% + 6px);
+    top: 50%;
+    translate: 0 -50%;
+  }
+</style>

@@ -1,0 +1,509 @@
+---
+import { Image } from 'astro:assets';
+import dining from '../../assets/images/dining-room-overhead.jpg';
+import departure from '../../assets/images/staff-departure.jpg';
+import SlackCard from '../slack/SlackCard.astro';
+import SlackMessage from '../slack/SlackMessage.astro';
+import SlackVoiceNote from '../slack/SlackVoiceNote.astro';
+import SlackWindow from '../slack/SlackWindow.astro';
+import type { ProductId } from '../../data/products';
+import Icon, { type IconName } from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  /** Render the section heading (off when a page supplies its own). */
+  heading?: boolean;
+  /** The heading text. Override where the page hero already says "Meet Aldo." (/aldo). */
+  title?: string;
+  muted?: string;
+  lead?: string;
+  /** Product pill above the title; omit on Aldo's own page. */
+  product?: ProductId | null;
+  /** Top padding for pages where a page hero, not another section, comes before it (/aldo). */
+  padTop?: boolean;
+}
+
+const {
+  heading = true,
+  title = 'Meet Aldo.',
+  muted = 'Your 24/7 Chief of Staff in Slack.',
+  lead = 'Aldo watches every location through your cameras, joins what it sees with orders, staff and your other systems, and works with your team in Slack. Ask it anything. Give it the work you repeat.',
+  product = 'aldo',
+  padTop = false,
+} = Astro.props;
+
+const tabs: { id: string; label: string; desc: string; channel: string; icon: IconName }[] = [
+  { id: 'ask', label: 'Ask', desc: 'Answers with the source attached.', channel: 'ops-leads', icon: 'message-square' },
+  { id: 'assign', label: 'Assign', desc: 'Say a task once; it becomes a Playbook.', channel: 'hr-ops', icon: 'mic' },
+  { id: 'alert', label: 'Alert', desc: 'The right person hears first.', channel: 'district-west', icon: 'bell' },
+  { id: 'result', label: 'Result', desc: 'Finished work, with the evidence.', channel: 'hr-ops', icon: 'check' },
+];
+const channels = ['ops-leads', 'hr-ops', 'district-west', 'floor-team'];
+---
+
+<section class:list={['aldo', 'tone-dark', { 'aldo--pad': padTop }]} id="aldo" aria-labelledby={heading ? 'aldo-title' : undefined} aria-label={heading ? undefined : 'Aldo in Slack'}>
+  <div class="container">
+    <aldo-demo class="aldo__box" data-autoplay="5000">
+      <div class="aldo__copy">
+        {
+          heading && (
+            <SectionHeader product={product ?? undefined} id="aldo-title" layout="stack" title={title} muted={muted} lead={lead} />
+          )
+        }
+        <div class="aldo__tabs" role="tablist" aria-label="What Aldo does in Slack" aria-orientation="vertical">
+          {
+            tabs.map((tab, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`aldo-tab-${tab.id}`}
+                aria-controls={`aldo-panel-${tab.id}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                data-channel={tab.channel}
+                class="aldo__tab"
+              >
+                <span class="aldo__icon"><Icon name={tab.icon} size={18} /></span>
+                <span class="aldo__tab-text">
+                  <span class="aldo__tab-label">{tab.label}</span>
+                  <span class="aldo__tab-desc">{tab.desc}</span>
+                </span>
+              </button>
+            ))
+          }
+        </div>
+        <p class="aldo__channels">
+          <span class="aldo__channels-label">Works in</span> <span>Slack</span><span>Telegram</span><span>WhatsApp</span><span>Voice</span>
+        </p>
+      </div>
+
+      <SlackWindow active="ops-leads" channels={channels} members="Aldo + 8" class="aldo__slack">
+        <div role="tabpanel" id="aldo-panel-ask" aria-labelledby="aldo-tab-ask" tabindex="0">
+          <SlackMessage author="Area manager" avatar="AM" avatarColor="#2b6cb0" time="9:02 AM">
+            <p class="slack-text">Hey <span class="slack-mention">@Aldo</span>, how many visitors did each location have yesterday, and when was each busiest?</p>
+          </SlackMessage>
+          <SlackMessage author="Aldo" app time="9:02 AM">
+            <p class="slack-text">Visitors on <b>September 30</b>:</p>
+            <SlackCard>
+              <table class="slack-table">
+                <tbody>
+                  <tr><td>Location 01 · <b>1,248</b></td><td>busiest 12:00–13:00</td></tr>
+                  <tr><td>Location 02 · <b>986</b></td><td>busiest 13:00–14:00</td></tr>
+                  <tr><td>Location 03 · <b>1,412</b></td><td>busiest 12:00–13:00</td></tr>
+                </tbody>
+              </table>
+            </SlackCard>
+            <p class="slack-text">3,646 visitors in total. Location 03 had the busiest hour.</p>
+            <p class="slack-muted">Source: Aldente Vision, visitor counts</p>
+            <div class="slack-actions"><span class="slack-btn">Open records</span><button type="button" class="slack-btn slack-btn--primary" data-goto="assign">Send this every Monday</button></div>
+          </SlackMessage>
+        </div>
+
+        <div role="tabpanel" id="aldo-panel-assign" aria-labelledby="aldo-tab-assign" tabindex="0" hidden>
+          <SlackMessage author="HR manager" avatar="HR" avatarColor="#805ad5" time="4:20 PM">
+            <SlackVoiceNote
+              duration="0:09"
+              transcript="Hey Aldo, after each location’s closing shift, check for missing clock-outs. Find the departure clips, prepare an HR case summary, and post it here."
+            />
+          </SlackMessage>
+          <SlackMessage author="Aldo" app time="4:20 PM">
+            <p class="slack-text">Here’s the Playbook I’ll run. Confirm and I’ll start tonight.</p>
+            <SlackCard tone="ok">
+              <p class="slack-text"><b>New Playbook · Missing clock-outs</b></p>
+              <dl class="slack-fields">
+                <div><dt>When</dt><dd>After each closing shift</dd></div>
+                <div><dt>Locations</dt><dd>All 24</dd></div>
+                <div><dt>Check</dt><dd>Clock-outs against departures</dd></div>
+                <div><dt>Send to</dt><dd>#hr-ops</dd></div>
+              </dl>
+              <p class="slack-muted">Skips anyone still working.</p>
+              <div class="slack-actions"><button type="button" class="slack-btn slack-btn--primary" data-goto="result">Confirm</button><span class="slack-btn">Edit</span></div>
+            </SlackCard>
+          </SlackMessage>
+        </div>
+
+        <div role="tabpanel" id="aldo-panel-alert" aria-labelledby="aldo-tab-alert" tabindex="0" hidden>
+          <SlackMessage author="Aldo" app time="12:18 PM">
+            <p class="slack-text">The queue at <b>Location 03</b> has been over 6 people for 6 minutes. <span class="slack-mention">@Dana</span>, you’re the closest district manager.</p>
+            <div class="slack-media aldo__frame">
+              <Image src={dining} alt="Camera frame of the counter queue at Location 03" widths={[480, 720]} sizes="(min-width: 960px) 420px, 90vw" />
+              <span class="slack-media__box" style="left:32%;top:18%;width:44%;height:56%"></span>
+              <span class="slack-media__label">Cam 02 · Queue · 6:02</span>
+            </div>
+            <div class="slack-actions"><span class="slack-btn slack-btn--primary">On my way</span><span class="slack-btn">Call the store</span></div>
+          </SlackMessage>
+        </div>
+
+        <div role="tabpanel" id="aldo-panel-result" aria-labelledby="aldo-tab-result" tabindex="0" hidden>
+          <SlackMessage author="Aldo" app time="10:30 PM">
+            <p class="slack-text"><b>1 missing clock-out needs review</b></p>
+            <p class="slack-muted">October 1 · Location 01 · 24 shifts checked · 23 matched</p>
+            <SlackCard tone="accent">
+              <div class="aldo__result">
+                <div class="slack-media aldo__clip">
+                  <Image src={departure} alt="Camera clip of an employee leaving through the back door" widths={[400, 640]} sizes="240px" />
+                  <span class="slack-media__label">Back door · 21:14</span>
+                </div>
+                <dl class="slack-fields aldo__fields">
+                  <div><dt>Employee</dt><dd>EMP-07</dd></div>
+                  <div><dt>Departure</dt><dd>21:14</dd></div>
+                  <div><dt>Clock-out</dt><dd class="aldo__missing">Missing</dd></div>
+                </dl>
+              </div>
+            </SlackCard>
+            <p class="slack-text">HR case summary prepared with the departure clip.</p>
+            <div class="slack-actions"><span class="slack-btn slack-btn--primary">View clip</span><span class="slack-btn">Open case</span></div>
+          </SlackMessage>
+        </div>
+      </SlackWindow>
+    </aldo-demo>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/aldo-demo';
+</script>
+
+<style>
+  .aldo {
+    padding-bottom: var(--section-y);
+  }
+
+  .aldo--pad {
+    padding-top: var(--section-y);
+  }
+
+  /* No panel around the section: the heading lines up with every other section's (quick win: alignment). */
+  .aldo__box {
+    container: aldo / inline-size;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px clamp(48px, 6vw, 96px);
+  }
+
+  .aldo__copy {
+    flex: 1 1 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .aldo__tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .aldo__tab {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--card-line);
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .aldo__tab:hover {
+    border-color: var(--line-strong);
+  }
+
+  .aldo__tab[aria-selected='true'] {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .aldo__icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-s);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    color: var(--ink-2);
+  }
+
+  /* Autoplay progress: fills along the active tab, pauses with the timer, gone once the visitor takes over. */
+  .aldo__tab::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    aldo-demo[data-autoplay-state] .aldo__tab[aria-selected='true']::after {
+      opacity: 1;
+      animation: tab-progress var(--autoplay, 5s) linear forwards;
+    }
+
+    aldo-demo[data-autoplay-state='paused'] .aldo__tab[aria-selected='true']::after {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes tab-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .aldo__tab[aria-selected='true'] .aldo__icon {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .aldo__tab-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .aldo__tab-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .aldo__tab-desc {
+    font-size: 0.875rem;
+    opacity: 0.75;
+  }
+
+  .aldo__channels {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--step-small);
+    color: var(--ink-3);
+  }
+
+  .aldo__channels span:not(.aldo__channels-label) {
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* The window's size never depends on the panel inside (contain: size), so stepping through the
+     tabs cannot move the page. Side by side it stretches to the copy column, at least 760px. */
+  .aldo__box :global(.aldo__slack) {
+    flex: 1.25 1 480px;
+    min-height: 760px;
+    contain: size;
+  }
+
+  [role='tabpanel']:focus-visible {
+    outline-offset: -4px;
+  }
+
+  /* Each panel sits at the bottom of the Slack window, like the newest messages. When a panel is
+     taller than the window (fixed heights below), the oldest lines slide out under a soft top fade. */
+  .aldo__box [role='tabpanel']:not([hidden]) {
+    margin-top: auto;
+  }
+
+  .aldo__box :global(.slack-window__messages) {
+    min-height: 0;
+    overflow: hidden;
+    justify-content: flex-end;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+  }
+
+  /* Stacked (copy above Slack): one fixed window height, so autoplay never moves the page. */
+  @container aldo (max-width: 887px) {
+    .aldo__box :global(.aldo__slack) {
+      flex: 1 1 100%;
+      height: 720px;
+      min-height: 0;
+    }
+  }
+
+  /* Phones: the tabs become a four-part segmented bar that always fits, sticky right above a
+     fixed-height Slack window that gets the full width. */
+  @media (max-width: 720px) {
+    .aldo__box {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      gap: 16px;
+    }
+
+    .aldo__copy {
+      display: contents;
+    }
+
+    .aldo__copy :global(.head) {
+      margin-bottom: 16px;
+    }
+
+    .aldo__tabs {
+      order: 1;
+      position: sticky;
+      top: calc(var(--header-h) + 8px);
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--card-line);
+      background: var(--card);
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+    }
+
+    /* Fills the 8px between the header and the stuck bar, so no sliver of the Slack window shows there.
+       In the normal flow it sits in the gap above the bar, on the same ground. */
+    .aldo__tabs::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--gutter));
+      right: calc(-1 * var(--gutter));
+      bottom: 100%;
+      height: 9px;
+      background: var(--bg);
+      pointer-events: none;
+    }
+
+    .aldo__box :global(.aldo__slack) {
+      order: 2;
+      flex: none;
+      height: 620px;
+      min-height: 0;
+    }
+
+    .aldo__box :global(.slack-message) {
+      padding-inline: 12px;
+    }
+
+    .aldo__channels {
+      order: 3;
+    }
+
+    .aldo__tab {
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 6px;
+      border: 0;
+      border-radius: var(--radius-pill);
+    }
+
+    .aldo__tab::after {
+      left: 22%;
+      right: 22%;
+      bottom: 5px;
+      height: 2px;
+      border-radius: var(--radius-xs);
+    }
+
+    .aldo__icon,
+    .aldo__tab-desc {
+      display: none;
+    }
+
+    .aldo__tab-label {
+      font-size: var(--step-small);
+    }
+  }
+
+  .aldo__frame {
+    max-width: 440px;
+    aspect-ratio: 16 / 9;
+  }
+
+  .aldo__frame :global(img) {
+    object-position: 74% 12%;
+    transform: scale(1.7);
+    transform-origin: 74% 12%;
+  }
+
+  .aldo__result {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .aldo__clip {
+    flex: 1 1 220px;
+    max-width: 360px;
+    aspect-ratio: 16 / 10;
+  }
+
+  .aldo__fields {
+    flex: 1 1 160px;
+    grid-template-columns: 1fr;
+  }
+
+  /* Phones: the clip sits beside its fields instead of above them. */
+  @media (max-width: 720px) {
+    .aldo__result {
+      flex-wrap: nowrap;
+    }
+
+    .aldo__clip {
+      flex: 1 1 0;
+      min-width: 0;
+      aspect-ratio: auto;
+    }
+
+    .aldo__fields {
+      flex: 1 1 0;
+    }
+  }
+
+  .aldo__missing {
+    color: #b8401f !important;
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [role='tabpanel']:not([hidden]) :global(.slack-message) {
+      animation: arrive 0.45s var(--ease-out) both;
+    }
+
+    [role='tabpanel']:not([hidden]) :global(.slack-message + .slack-message) {
+      animation-delay: 0.35s;
+    }
+  }
+
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+
+  /* Touch screens: the Slack buttons that move the demo along are full 44px targets. */
+  @media (pointer: coarse) {
+    .aldo__box :global(.slack-btn[data-goto]) {
+      min-height: 44px;
+    }
+  }
+
+  /* Phones: "Works in" on its own line, the four channels together on the next. */
+  @media (max-width: 720px) {
+    .aldo__channels-label {
+      flex-basis: 100%;
+    }
+  }
+</style>

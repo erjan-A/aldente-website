@@ -1,0 +1,57 @@
+---
+import Cta from '../components/home/Cta.astro';
+import CompareTable from '../components/pricing/CompareTable.astro';
+import PlanGrid from '../components/pricing/PlanGrid.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Faq from '../components/ui/Faq.astro';
+import Icon from '../components/ui/Icon.astro';
+import { PRICING_FAQ } from '../data/pricing';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Pricing" description="Plans for Aldente Verify and Aldente Vision, both with Aldo included, priced per location. Book a demo for a quote for your chain.">
+  <PageHero
+    tone="paper"
+    align="center"
+    title="Priced per location."
+    muted="Start with one, grow from there."
+    lead="Aldente Verify and Aldente Vision are priced per location, month to month, and both come with Aldo. Book a demo for a quote for your chain."
+  >
+    <ul class="assure" role="list">
+      {
+        ['Start with one location', 'Monthly per location', 'Live in 30 days'].map((item) => (
+          <li>
+            <Icon name="check" size={14} strokeWidth={3} />
+            {item}
+          </li>
+        ))
+      }
+    </ul>
+  </PageHero>
+  <PlanGrid />
+  <CompareTable />
+  <Faq items={PRICING_FAQ} />
+  <Cta />
+</BaseLayout>
+
+<style>
+  .assure {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 28px;
+    color: var(--fg-2);
+    font-size: var(--step-small);
+  }
+
+  .assure li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .assure :global(svg) {
+    flex: none;
+    color: var(--accent);
+  }
+</style>

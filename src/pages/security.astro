@@ -1,0 +1,80 @@
+---
+import Cta from '../components/home/Cta.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import { SITE } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pillars = [
+  { title: 'SOC 2 Type II certified', text: 'Independently audited controls for security, availability and confidentiality.' },
+  { title: 'Encrypted at rest and in transit', text: 'Footage, records and credentials are encrypted end to end.' },
+  { title: 'Role-based access', text: 'Access follows roles, locations and regions. Every alert shows only what the recipient needs.' },
+  { title: 'Retention you control', text: 'Set how long footage and records are kept, per location.' },
+  { title: 'Your footage stays yours', text: 'Camera footage and records stay in your account and are used to run your workspace.' },
+  { title: 'GDPR compliant', text: 'Processing agreements and data-subject requests handled to GDPR standards.' },
+];
+---
+
+<BaseLayout title="Security" description="SOC 2 Type II certified and GDPR compliant. Encryption at rest and in transit, role-based access and retention you control.">
+  <PageHero
+    title="Security built for"
+    muted="enterprise restaurant groups."
+    lead="Camera footage and records stay in your account. Access follows your roles, and every alert shows only what the recipient needs."
+  >
+    <Button href={`mailto:${SITE.email}?subject=Security%20package%20request`} variant="secondary" size="lg">Request our security package</Button>
+  </PageHero>
+  <section class="tone-dark section pillars-wrap" aria-labelledby="pillars-title">
+    <h2 id="pillars-title" class="visually-hidden">Security controls</h2>
+    {/* The same bordered cards as the trust row on home. */}
+    <ul class="container pillars" role="list">
+      {
+        pillars.map((p) => (
+          <Card as="li">
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </Card>
+        ))
+      }
+    </ul>
+  </section>
+  <Cta />
+</BaseLayout>
+
+<style>
+  .pillars-wrap {
+    padding-top: 0;
+  }
+
+  /* margin-block only: the .container keeps its auto side margins, so the grid lines up with the hero.
+     One column on phones, two on tablets, three from 1024px: six cards, every row full. */
+  .pillars {
+    margin-block: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  @media (min-width: 640px) {
+    .pillars {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .pillars {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .pillars h3 {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  .pillars p {
+    color: var(--fg-2);
+  }
+</style>

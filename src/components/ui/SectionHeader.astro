@@ -1,0 +1,102 @@
+---
+import type { ProductId } from '../../data/products';
+import ProductPill from './ProductPill.astro';
+
+/**
+ * Section heading block. Title uses --step-h2 (or --step-h1 with as="h1"), lead uses --step-lead.
+ * Layouts: split (title left, lead right, bottom-aligned; wraps on narrow screens), stack, center.
+ */
+interface Props {
+  /** Which product the section belongs to, shown as a pill above the title. */
+  product?: ProductId;
+  /** The claim, in full ink. */
+  title: string;
+  /** The continuation, in muted ink. */
+  muted?: string;
+  lead?: string;
+  layout?: 'split' | 'stack' | 'center';
+  as?: 'h1' | 'h2';
+  id?: string;
+}
+
+const { product, title, muted, lead, layout = 'split', as: Heading = 'h2', id } = Astro.props;
+---
+
+<header class:list={['head', `head--${layout}`]}>
+  <div class="head__titles">
+    {product && <ProductPill product={product} />}
+    <Heading class:list={['head__title', { 'head__title--page': Heading === 'h1' }]} id={id}>
+      {title}{muted && <> <span class="head__muted">{muted}</span></>}
+    </Heading>
+  </div>
+  {lead && <p class="head__lead">{lead}</p>}
+</header>
+
+<style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 64px;
+  }
+
+  .head--split {
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .head--stack {
+    flex-direction: column;
+  }
+
+  .head--center {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .head__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .head--center .head__titles {
+    align-items: center;
+  }
+
+  .head__title {
+    max-width: 15ch;
+    font-size: var(--step-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+
+  .head--center .head__title {
+    max-width: 16ch;
+  }
+
+  .head__title--page {
+    font-size: var(--step-h1);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .head__muted {
+    color: var(--fg-3);
+  }
+
+  .head__lead {
+    max-width: 42ch;
+    font-size: var(--step-lead);
+    line-height: 1.5;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .head--center .head__lead {
+    max-width: 46ch;
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+
+const facts = [
+  { value: '7–8%', text: 'of delivery orders leave a typical location with a mistake.' },
+  { value: '2×', text: 'the loss on every wrong order: the refund, then the gift card to win the guest back.' },
+  { value: 'Hours', text: 'of footage reviewed by staff for a single missing clock-out or incident.' },
+];
+---
+
+<section class="problem tone-orange section" aria-labelledby="problem-title">
+  <div class="container problem__inner">
+    <SectionHeader id="problem-title" layout="stack" title="Every restaurant already has cameras. Nobody has time to watch them." />
+    <dl class="problem__facts">
+      {
+        facts.map((fact) => (
+          <div>
+            <dt>{fact.value}</dt>
+            <dd>{fact.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="problem__turn">Aldente gives your cameras a brain, and gives your team a colleague who never blinks.</p>
+  </div>
+</section>
+
+<style>
+  .problem__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(48px, 6vw, 88px);
+  }
+
+  .problem__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin: 0;
+    border-top: 2px solid var(--card-line);
+  }
+
+  .problem__facts div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px 32px 0 0;
+  }
+
+  /* The figures sit on the heading's step, never above it. */
+  .problem__facts dt {
+    font-size: var(--step-h2);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .problem__facts dd {
+    margin: 0;
+    max-width: 30ch;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .problem__turn {
+    max-width: 34ch;
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+</style>

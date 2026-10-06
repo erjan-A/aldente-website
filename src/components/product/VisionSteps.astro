@@ -1,0 +1,156 @@
+---
+import Icon, { type IconName } from '../ui/Icon.astro';
+
+/**
+ * How Aldente Vision works, in five steps: cameras → computer vision → VLM → events and triggers → analytics
+ * and Aldo. A row with chevrons on wide screens, a compact numbered list on phones. The numbers match the
+ * panels in VisionPipeline, so a reader can follow one table from the frame to the chart.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const steps: { icon: IconName; label: string; note: string }[] = [
+  { icon: 'video', label: 'Your cameras', note: 'The IP cameras you already have' },
+  { icon: 'scan-box', label: 'Computer vision', note: 'Finds people, tables and queues' },
+  { icon: 'eye', label: 'VLM', note: 'Describes the scene in words' },
+  { icon: 'bell', label: 'Events and triggers', note: 'Your rules decide who hears' },
+  { icon: 'chart', label: 'Analytics and Aldo', note: 'Trends, and action in Slack' },
+];
+---
+
+<ol class:list={['steps', className]} role="list" aria-label="How Aldente Vision works">
+  {
+    steps.map((step, i) => (
+      <li class:list={['step', { 'step--ai': i === 1 || i === 2 }]}>
+        <span class="step__icon">
+          <Icon name={step.icon} size={18} />
+        </span>
+        <span class="step__text">
+          <b>
+            <span class="step__n">{i + 1}</span>
+            {step.label}
+          </b>
+          <small>{step.note}</small>
+        </span>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .steps {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    margin: 0;
+  }
+
+  .step {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 10px 14px;
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    border: 1px solid var(--line-card);
+  }
+
+  /* Computer vision and the VLM are the AI in the middle: tinted like the slide. */
+  .step--ai {
+    background: rgb(224 86 52 / 0.1);
+    border-color: rgb(224 86 52 / 0.35);
+  }
+
+  .step__icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-s);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+  }
+
+  .step--ai .step__icon {
+    color: var(--accent);
+    border-color: rgb(224 86 52 / 0.35);
+  }
+
+  .step__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .step__text b {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: var(--step-small);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .step__n {
+    font-size: var(--step-label);
+    font-weight: 600;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .step__text small {
+    font-size: var(--step-label);
+    line-height: 1.35;
+    color: var(--ink-3);
+  }
+
+  /* Wide screens: one row of five, joined by chevrons in the gaps. */
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .step {
+      gap: 10px;
+      padding: 10px 12px;
+    }
+
+    .step__icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    /* Below 1200px the five chips are narrow: labels only. */
+    .step__text small {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .step__text small {
+      display: block;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -14px;
+      width: 8px;
+      height: 8px;
+      margin-top: -4px;
+      border-top: 1.5px solid var(--line-strong);
+      border-right: 1.5px solid var(--line-strong);
+      transform: rotate(45deg);
+    }
+  }
+</style>

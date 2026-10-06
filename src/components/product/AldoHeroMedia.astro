@@ -1,0 +1,118 @@
+---
+import { Image } from 'astro:assets';
+import dining from '../../assets/images/dining-room-overhead.jpg';
+import SlackMessage from '../slack/SlackMessage.astro';
+import SlackWindow from '../slack/SlackWindow.astro';
+import Icon from '../ui/Icon.astro';
+
+/**
+ * /aldo hero: one question in Slack and Aldo's numbered answer with the camera clip behind it. The readings
+ * match the home console (Location 03, Cam 04, 12:41).
+ */
+---
+
+<SlackWindow active="district-west" sidebar={false} members="Aldo + 8" class="aldo-hero" label="A district manager asks Aldo about Location 03 in Slack">
+  <SlackMessage author="District manager" avatar="DM" avatarColor="#2b6cb0" time="12:41 PM">
+    <p class="slack-text"><span class="slack-mention">@Aldo</span> how’s Location 03 doing right now?</p>
+  </SlackMessage>
+  <SlackMessage author="Aldo" app time="12:41 PM" class="aldo-hero__reply">
+    <p class="slack-text">Location 03 is busy. Three things from the floor:</p>
+    <ol class="aldo-hero__answer" role="list">
+      <li><b>14 guests</b> seated, 9% above this time last week.</li>
+      <li><b>Table 6</b> has waited 3 minutes to be cleared. I’ve asked <span class="slack-mention">@Maya</span> to reset it.</li>
+      <li>Counter and floor are both staffed.</li>
+    </ol>
+    <div class="slack-media aldo-hero__clip">
+      <Image
+        src={dining}
+        alt="Camera clip of the dining room at Location 03, with table 6 outlined"
+        widths={[320, 480, 640]}
+        sizes="(min-width: 520px) 300px, 70vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <span class="slack-media__box" style="left:26%;top:64%;width:34%;height:28%"></span>
+      <span class="aldo-hero__play" aria-hidden="true"><Icon name="play" size={14} /></span>
+      <span class="slack-media__label aldo-hero__label">Cam 04 · Table 6</span>
+    </div>
+    <div class="slack-actions"><span class="slack-btn slack-btn--primary">View clip</span><span class="slack-btn">Open records</span></div>
+  </SlackMessage>
+</SlackWindow>
+
+<style>
+  :global(.aldo-hero) {
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.9);
+  }
+
+  /* Slack's own numbered list: hanging numbers, the text column aligned. */
+  .aldo-hero__answer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    counter-reset: answer;
+  }
+
+  .aldo-hero__answer li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 15px;
+    line-height: 1.46668;
+    color: var(--slack-text);
+    counter-increment: answer;
+  }
+
+  .aldo-hero__answer li::before {
+    content: counter(answer) '.';
+    position: absolute;
+    left: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .aldo-hero__answer b {
+    font-weight: 700;
+  }
+
+  .aldo-hero__clip {
+    width: min(300px, 100%);
+    aspect-ratio: 16 / 9;
+  }
+
+  .aldo-hero__clip img {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The table box sits low in the frame, so the label moves to the top. */
+  .aldo-hero__label {
+    top: 8px;
+    bottom: auto;
+  }
+
+  .aldo-hero__play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 0.6);
+    color: #ffffff;
+    translate: -50% -50%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.aldo-hero__reply) {
+      animation: aldo-hero-post 0.5s var(--ease-out) 0.3s both;
+    }
+  }
+
+  @keyframes aldo-hero-post {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+</style>

@@ -1,0 +1,166 @@
+---
+import { PRODUCTS } from '../../data/products';
+import { LINKS } from '../../data/site';
+import Button from '../ui/Button.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import HeroCards from './HeroCards.astro';
+import HeroConsole from './HeroConsole.astro';
+import ProofBar from './ProofBar.astro';
+
+const { verify, vision } = PRODUCTS;
+// "See Aldo in action" scrolls to the Meet Aldo section on this page (AldoDemo, id="aldo"); other pages use LINKS.seeAldo.
+const seeAldo = '#aldo';
+---
+
+<section class="hero tone-dark" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__stage">
+      <HeroCards />
+      <div class="hero__copy">
+        <div class="hero__heading">
+          <Eyebrow text="For restaurant chains and franchise operators" class="hero__eyebrow" />
+          <h1 id="hero-title" class="hero__title">Your AI Chief of Staff <span>with eyes.</span></h1>
+        </div>
+        <p class="hero__lead">
+          Aldo from Aldente AI sees every location through your cameras, catches order errors before they leave, and runs the daily checks
+          your team gives it, right in Slack.
+        </p>
+        <div class="hero__cta">
+          <div class="hero__actions">
+            <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
+            <Button href={seeAldo} variant="secondary" size="lg">See Aldo in action</Button>
+          </div>
+          <p class="hero__note">
+            Aldo comes with{' '}<a href={verify.href}>{verify.name}</a>{' '}or{' '}<a href={vision.href}>{vision.name}</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <HeroConsole />
+    <ProofBar />
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(80px, 11vw, 160px) clamp(64px, 8vw, 112px);
+    /* clip, not hidden, so the pinned console can stick */
+    overflow-x: clip;
+  }
+
+  /* Below 1240px the card deck sits above the headline and supplies the top space. */
+  @media (max-width: 1239px) {
+    .hero {
+      padding-top: clamp(24px, 5vw, 56px);
+    }
+  }
+
+  .hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(48px, 6vw, 80px);
+  }
+
+  .hero__stage {
+    position: relative;
+    margin-bottom: clamp(64px, 11vw, 160px);
+  }
+
+  .hero__copy {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    text-align: center;
+  }
+
+  /* The audience line sits tight on the headline it qualifies. */
+  .hero__heading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(16px, 1.2vw + 8px, 24px);
+  }
+
+  /* Centred like the headline: the dot runs inline, so a narrow phone wraps the line into two centred rows. */
+  .hero__copy :global(.hero__eyebrow) {
+    display: block;
+    text-align: center;
+  }
+
+  .hero__copy :global(.hero__eyebrow)::before {
+    display: inline-block;
+    margin: 0 10px 0 0;
+    vertical-align: middle;
+    translate: 0 -1px;
+  }
+
+  .hero__title {
+    font-size: var(--step-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .hero__title span {
+    color: var(--accent);
+  }
+
+  .hero__lead {
+    max-width: 36ch;
+    font-size: var(--step-lead);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .hero__cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .hero__note {
+    font-size: var(--step-small);
+    line-height: 1.5;
+    color: var(--fg-3);
+    text-wrap: balance;
+  }
+
+  /* Product names never break across lines. */
+  .hero__note a {
+    white-space: nowrap;
+    color: var(--fg-2);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 4px;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+  }
+
+  .hero__note a:hover {
+    color: var(--fg);
+    text-decoration-color: currentColor;
+  }
+
+  /* Phones: stacked buttons share one width. */
+  @media (max-width: 479px) {
+    .hero__actions > :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

@@ -1,0 +1,271 @@
+---
+import '../../styles/slack.css';
+import type { Asker } from '../../data/solutions';
+import { graphSteps, type Playbook } from '../../lib/playbooks';
+import Icon from '../ui/Icon.astro';
+
+/**
+ * Solution page hero: a team's request to Aldo in Slack, and the Playbook Aldo builds from it (When, If,
+ * Then, Send to, and what the team receives). Same pattern as the Playbooks section on home.
+ */
+interface Props {
+  playbook: Playbook;
+  asker: Asker;
+}
+
+const { playbook, asker } = Astro.props;
+const steps = graphSteps(playbook);
+---
+
+<figure class="pbh" aria-label={`Playbook: ${playbook.title}`}>
+  <div class="pbh__request slack">
+    <span class="pbh__avatar" style={`background:${asker.color}`} aria-hidden="true">{asker.initials}</span>
+    <div>
+      <p class="pbh__meta"><b>{asker.role}</b> to Aldo</p>
+      <p class="slack-text">{playbook.say}</p>
+    </div>
+  </div>
+  <div class="pbh__card">
+    <div class="pbh__head">
+      <span class="pbh__kind">New Playbook</span>
+      <span class="pbh__title">{playbook.title}</span>
+      <span class="pbh__status"><Icon name="check" size={12} strokeWidth={3} />Confirmed</span>
+    </div>
+    <ol class="pbh__steps" role="list">
+      {
+        steps.map((step) => (
+          <li class="pbh__node">
+            <span class="pbh__label">{step.label}</span>
+            <span class="pbh__value">{step.value}</span>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="pbh__result">
+      <span class="pbh__ok" aria-hidden="true"><Icon name="check" size={13} strokeWidth={3} /></span>
+      <span>{playbook.result}</span>
+    </p>
+  </div>
+</figure>
+
+<style>
+  .pbh {
+    margin: 0;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Above the card, so the card's soft shadow doesn't tint the white bubble. */
+  .pbh__request {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 10px;
+    padding: 16px 18px;
+    border-radius: var(--radius-l);
+    background: #ffffff;
+  }
+
+  .pbh__avatar {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-s);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .pbh__meta {
+    margin: 0 0 2px;
+    font-size: var(--step-label);
+    color: var(--slack-muted);
+  }
+
+  .pbh__meta b {
+    color: var(--slack-text);
+  }
+
+  .pbh__card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: var(--card-pad-m);
+    border-radius: var(--radius-l);
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.9);
+  }
+
+  /* Same header behaviour as the Playbooks section card: the badge wraps under the title when space runs out. */
+  .pbh__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+
+  .pbh__kind {
+    flex-basis: 100%;
+    font-size: var(--step-label);
+    color: var(--fg-3);
+  }
+
+  .pbh__title {
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .pbh__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--ok-soft);
+    color: var(--ok);
+    font-size: var(--step-label);
+    font-weight: 600;
+  }
+
+  .pbh__steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pbh__node {
+    position: relative;
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--line-card);
+    background: var(--bg);
+  }
+
+  .pbh__node + .pbh__node {
+    margin-top: 18px;
+  }
+
+  /* The wire between two steps. */
+  .pbh__node + .pbh__node::before {
+    content: '';
+    position: absolute;
+    left: 32px;
+    top: -19px;
+    width: 2px;
+    height: 18px;
+    background: var(--line-strong);
+  }
+
+  .pbh__label {
+    font-size: var(--step-label);
+    font-weight: 600;
+    color: var(--fg-2);
+  }
+
+  .pbh__value {
+    font-weight: 500;
+  }
+
+  .pbh__result {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--fg-2);
+  }
+
+  .pbh__ok {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ok);
+    color: var(--on-accent);
+  }
+
+  /* Phones: a narrower label column so each step's value fits on one line. */
+  @container (max-width: 420px) {
+    .pbh__request {
+      padding: 14px;
+    }
+
+    .pbh__card {
+      gap: 16px;
+      padding: 18px;
+      border-radius: var(--radius-l);
+    }
+
+    .pbh__node {
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: var(--step-small);
+    }
+
+    .pbh__node + .pbh__node::before {
+      left: 26px;
+    }
+
+    .pbh__result {
+      font-size: var(--step-small);
+    }
+  }
+
+  /* One pass on load: each step lights in turn, then settles. */
+  @media (prefers-reduced-motion: no-preference) {
+    .pbh__node {
+      animation: pbh-node 1.4s var(--ease-out) both;
+    }
+
+    .pbh__node:nth-child(2) {
+      animation-delay: 0.25s;
+    }
+
+    .pbh__node:nth-child(3) {
+      animation-delay: 0.5s;
+    }
+
+    .pbh__node:nth-child(4) {
+      animation-delay: 0.75s;
+    }
+
+    .pbh__ok {
+      animation: pbh-ok 0.5s var(--ease-out) 1.1s both;
+    }
+  }
+
+  @keyframes pbh-node {
+    0% {
+      border-color: var(--line-card);
+    }
+    20%,
+    55% {
+      border-color: var(--accent);
+      background: rgb(224 86 52 / 0.1);
+    }
+  }
+
+  @keyframes pbh-ok {
+    from {
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+</style>

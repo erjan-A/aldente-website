@@ -1,0 +1,264 @@
+---
+import '../../styles/slack.css';
+import mark from '../../assets/logos/aldente-mark.svg';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  /** Channel shown first. */
+  active: string;
+  workspace?: string;
+  channels?: string[];
+  members?: string;
+  /** Hide the aubergine sidebar for small placements. */
+  sidebar?: boolean;
+  /** Text for the composer; defaults to "Message #channel". */
+  composer?: string;
+  label?: string;
+  class?: string;
+}
+
+const {
+  active,
+  workspace = 'Harbor Restaurant Group',
+  channels = [active],
+  members,
+  sidebar = true,
+  composer,
+  label = 'Aldo in Slack',
+  class: className,
+} = Astro.props;
+---
+
+<figure class:list={['slack', 'slack-window', className]} aria-label={label}>
+  <div class="slack-window__top" aria-hidden="true">
+    <span class="slack-window__dots"><i></i><i></i><i></i></span>
+    <span class="slack-window__search"><Icon name="search" size={13} /><span>Search {workspace}</span></span>
+    <span></span>
+  </div>
+  <div class="slack-window__body">
+    {
+      sidebar && (
+        <div class="slack-window__sidebar" aria-hidden="true">
+          <p class="slack-window__workspace">
+            {workspace} <Icon name="chevron-down" size={14} />
+          </p>
+          <p class="slack-window__group">Channels</p>
+          <ul role="list">
+            {channels.map((channel) => (
+              <li>
+                <span data-channel-link={channel} aria-current={channel === active ? 'page' : undefined}>
+                  <Icon name="hash" size={14} /> {channel}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p class="slack-window__group">Apps</p>
+          <ul role="list">
+            <li>
+              <span>
+                <img src={mark.src} alt="" width="16" height="20" /> Aldo
+              </span>
+            </li>
+          </ul>
+        </div>
+      )
+    }
+    <div class="slack-window__main">
+      <div class="slack-window__header">
+        <span class="slack-window__channel"><Icon name="hash" size={16} strokeWidth={2.25} /><span data-slack-channel>{active}</span></span>
+        {members && <span class="slack-window__members">{members}</span>}
+      </div>
+      <div class="slack-window__messages">
+        <slot />
+      </div>
+      <div class="slack-window__composer" aria-hidden="true">
+        <span data-slack-composer>{composer ?? `Message #${active}`}</span>
+        <span class="slack-window__tools"><Icon name="plus" size={16} /><Icon name="mic" size={16} /></span>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .slack-window {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid var(--line-card);
+    min-width: 0;
+  }
+
+  .slack-window__top {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 2fr) 1fr;
+    align-items: center;
+    gap: 12px;
+    height: 38px;
+    padding: 0 12px;
+    background: var(--slack-aubergine-2);
+  }
+
+  .slack-window__dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .slack-window__dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.25);
+  }
+
+  .slack-window__search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: var(--radius-s);
+    background: rgb(255 255 255 / 0.18);
+    color: rgb(255 255 255 / 0.85);
+    font-size: 12px;
+  }
+
+  .slack-window__search span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .slack-window__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .slack-window__sidebar {
+    flex: none;
+    width: 220px;
+    padding: 12px 8px;
+    background: var(--slack-aubergine);
+    color: var(--slack-sidebar-text);
+    font-size: 15px;
+  }
+
+  .slack-window__workspace {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 14px;
+    padding: 0 10px;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .slack-window__group {
+    margin: 12px 0 4px;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+
+  .slack-window__sidebar span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: var(--radius-s);
+    white-space: nowrap;
+  }
+
+  .slack-window__sidebar span[aria-current='page'] {
+    background: var(--slack-active);
+    color: #ffffff;
+  }
+
+  .slack-window__sidebar img {
+    width: 16px;
+    height: 20px;
+    padding: 2px;
+    border-radius: var(--radius-xs);
+    background: #0b0b0b;
+  }
+
+  .slack-window__main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+  }
+
+  .slack-window__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 49px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--slack-border);
+  }
+
+  .slack-window__channel {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--slack-text);
+  }
+
+  .slack-window__members {
+    font-size: 13px;
+    color: var(--slack-muted);
+    border: 1px solid var(--slack-border);
+    border-radius: var(--radius-xs);
+    padding: 3px 8px;
+  }
+
+  .slack-window__messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 0;
+  }
+
+  /* New messages sit at the bottom, above the composer, as in Slack. */
+  .slack-window__messages > :global(:first-child) {
+    margin-top: auto;
+  }
+
+  .slack-window__composer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 16px 16px;
+    padding: 11px 12px;
+    border: 1px solid #bbbabb;
+    border-radius: var(--radius-s);
+    color: #616061;
+    font-size: 15px;
+  }
+
+  .slack-window__tools {
+    display: flex;
+    gap: 10px;
+  }
+
+  @media (max-width: 720px) {
+    .slack-window__sidebar {
+      display: none;
+    }
+  }
+</style>

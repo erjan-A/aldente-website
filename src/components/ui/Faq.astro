@@ -1,0 +1,117 @@
+---
+import { LINKS, SITE } from '../../data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  items: { q: string; a: string }[];
+  title?: string;
+  /** The quieter end of the heading, as on every section heading. */
+  muted?: string;
+  tone?: 'paper' | 'dark';
+}
+
+const { items, title = 'Questions,', muted = 'answered.', tone = 'paper' } = Astro.props;
+---
+
+<section class:list={['faq', 'section', `tone-${tone}`]} aria-labelledby="faq-title">
+  <div class="container faq__inner">
+    <div class="faq__intro">
+      <h2 id="faq-title">{title}{muted && <> <span class="faq__muted">{muted}</span></>}</h2>
+      <p>
+        Something else? Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>, call <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a> or{' '}
+        <a href={LINKS.demo}>book a demo</a>.
+      </p>
+    </div>
+    <div class="faq__list">
+      {
+        items.map((item) => (
+          <details>
+            <summary>
+              {item.q}
+              <span class="faq__plus" aria-hidden="true"><Icon name="plus" size={20} strokeWidth={2} /></span>
+            </summary>
+            <p>{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+  }
+
+  .faq__intro {
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .faq__intro h2 {
+    font-size: var(--step-h2);
+    letter-spacing: -0.035em;
+    line-height: 1.04;
+  }
+
+  .faq__muted {
+    color: var(--fg-3);
+  }
+
+  .faq__intro p {
+    color: var(--fg-2);
+  }
+
+  .faq__intro a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .faq__list {
+    flex: 2 1 520px;
+    border-top: 1px solid var(--card-line);
+  }
+
+  details {
+    border-bottom: 1px solid var(--card-line);
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 0;
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__plus {
+    flex: none;
+    /* Centred on the first line of the question. */
+    margin-top: calc((1.35em - 20px) / 2);
+    color: var(--accent);
+    transition: transform 0.2s ease;
+  }
+
+  details[open] .faq__plus {
+    transform: rotate(45deg);
+  }
+
+  details p {
+    max-width: 62ch;
+    padding-bottom: 22px;
+    color: var(--fg-2);
+  }
+</style>

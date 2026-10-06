@@ -1,0 +1,242 @@
+---
+import LegalPage, { type LegalSection } from '../components/site/LegalPage.astro';
+import { LINKS, SITE } from '../data/site';
+import { CONSENT_KEY } from '../lib/consent';
+
+const mailto = `mailto:${SITE.email}`;
+
+const sections: LegalSection[] = [
+  { id: 'who-we-are', title: 'Who we are and what this covers', toc: 'Who we are' },
+  { id: 'information-we-collect', title: 'Information we collect' },
+  { id: 'how-we-use-it', title: 'How we use information', toc: 'How we use it' },
+  { id: 'legal-bases', title: 'Legal bases' },
+  { id: 'sharing', title: 'Who we share information with', toc: 'Sharing' },
+  { id: 'international-transfers', title: 'International transfers' },
+  { id: 'retention', title: 'How long we keep information', toc: 'Retention' },
+  { id: 'security', title: 'Security' },
+  { id: 'your-rights', title: 'Your rights' },
+  { id: 'children', title: 'Children' },
+  { id: 'changes', title: 'Changes to this policy', toc: 'Changes' },
+  { id: 'contact', title: 'Contact us', toc: 'Contact' },
+];
+---
+
+<LegalPage
+  title="Privacy policy"
+  muted="In plain words."
+  description="How Aldente AI handles personal information on aldenteai.com and in Aldo, Aldente Verify and Aldente Vision, and the rights you have."
+  lead="What we collect, why we collect it, and the choices you have."
+  updated="2026-10-06"
+  sections={sections}
+>
+  <Fragment slot="summary">
+    <ul>
+      <li>Our website sets no cookies of its own. It only remembers your cookie choice, in your browser.</li>
+      <li>We count visits with Plausible Analytics, which uses no cookies and collects no personal data.</li>
+      <li>We do not sell personal information or share it for cross-context advertising.</li>
+      <li>When a business uses Aldo, Aldente Verify or Aldente Vision, we handle its data for it, under its agreement with us.</li>
+      <li>To ask about your data, write to <a href={mailto}>{SITE.email}</a>.</li>
+    </ul>
+  </Fragment>
+
+  <Fragment slot="who-we-are">
+    <p>Aldente AI (“Aldente”, “we”, “us”) runs aldenteai.com and makes Aldo, Aldente Verify and Aldente Vision.</p>
+    <p>
+      This policy explains what personal information we collect when you visit this website, book a call with us or email us, and what
+      we do with it. For that information, Aldente is the controller: we decide how it is used.
+    </p>
+    <p>
+      It also explains our role when businesses use our products. For the data a business connects, that business is the controller
+      and Aldente is its processor, or “service provider”. See <a href="#customer-data">when a business uses our products</a>.
+    </p>
+  </Fragment>
+
+  <Fragment slot="information-we-collect">
+    <h3>When you visit this website</h3>
+    <p>
+      We count visits with Plausible Analytics. It sets no cookies and collects no personal data. We see totals only: the pages
+      viewed, the site that sent you, your browser, device type and country. Your IP address is not stored.
+    </p>
+    <p>
+      The site remembers your cookie choice in your browser’s local storage, under the name “{CONSENT_KEY}”, for 12 months. It stays
+      in your browser. Our <a href={LINKS.cookies}>cookie policy</a> has the details.
+    </p>
+    <p>
+      Like any website, the servers that host it receive the technical details your browser sends with each request, such as your IP
+      address, so they can deliver the pages.
+    </p>
+
+    <h3>When you book a call</h3>
+    <p>
+      The demo page uses Calendly to book calls. When you book, Calendly collects your name, email address, time zone and any answers
+      you give, and passes them to us.
+    </p>
+    <p>
+      Calendly asks for its own cookie consent on the demo page, unless you have accepted marketing cookies on this site, and sets its
+      own cookies under its own privacy policy.
+    </p>
+
+    <h3>When you email us</h3>
+    <p>When you write to <a href={mailto}>{SITE.email}</a>, we receive your email address, your message and anything else you include.</p>
+
+    <h3 id="customer-data">When a business uses our products</h3>
+    <p>
+      Aldo, Aldente Verify and Aldente Vision work with data that our business customers connect: camera footage, order and POS
+      records, staff and schedule records, and messages in Slack, Telegram or WhatsApp. This can include information about staff and
+      guests.
+    </p>
+    <p>
+      We process this data for the customer, on its instructions and under its agreement with us. The customer is the controller and
+      decides why and how the data is used. Aldente is its processor, or “service provider”.
+    </p>
+    <p>
+      If you work at or visit one of our customers and have a question about your data, please contact that business first. If you
+      write to us, we will pass your request to the business and help it respond.
+    </p>
+  </Fragment>
+
+  <Fragment slot="how-we-use-it">
+    <p>We use personal information to:</p>
+    <ul>
+      <li>run, secure and improve this website, using the totals from Plausible</li>
+      <li>arrange the calls you book, hold them and follow up afterwards</li>
+      <li>answer your emails and questions</li>
+      <li>provide Aldo, Aldente Verify and Aldente Vision to our customers, as their agreements set out</li>
+      <li>meet our legal obligations and protect our rights</li>
+    </ul>
+    <p>We use customer data in our products only as the customer’s agreement allows.</p>
+  </Fragment>
+
+  <Fragment slot="legal-bases">
+    <p>
+      If you are in the European Economic Area or the United Kingdom, the GDPR and UK GDPR require a legal basis for each use of your
+      personal information. We rely on these:
+    </p>
+    <dl>
+      <div>
+        <dt>Contract</dt>
+        <dd>To take the steps you ask for before a contract, such as booking a call, and to provide our services to customers.</dd>
+      </div>
+      <div>
+        <dt>Legitimate interests</dt>
+        <dd>
+          To run, secure and improve our website, to answer questions, and to follow up with businesses interested in our products. We
+          rely on this only when your rights do not outweigh these interests.
+        </dd>
+      </div>
+      <div>
+        <dt>Consent</dt>
+        <dd>
+          Where we ask for it, such as for marketing cookies. You can withdraw it at any time in{' '}
+          <button type="button" data-cookie-settings>cookie settings</button>.
+        </dd>
+      </div>
+      <div>
+        <dt>Legal obligation</dt>
+        <dd>When the law requires us to keep or share information.</dd>
+      </div>
+    </dl>
+    <p>For customer data in our products, the customer decides the legal basis, as the controller.</p>
+  </Fragment>
+
+  <Fragment slot="sharing">
+    <p>We share personal information only with service providers that process it for us, under contract:</p>
+    <ul>
+      <li><strong>Calendly</strong>, to book calls.</li>
+      <li><strong>Plausible Analytics</strong>, to count visits. It stores no personal data.</li>
+      <li><strong>Hosting and infrastructure providers</strong> that run our website and services.</li>
+      <li><strong>Email and business software</strong> we use to run the company and answer you.</li>
+    </ul>
+    <p>
+      We may also share information when the law requires it, to protect our rights or the safety of others, or if Aldente is part of a
+      merger, acquisition or sale of assets. In that case your information stays protected by this policy.
+    </p>
+    <p>Customer data in our products is shared only as the customer’s agreement allows.</p>
+    <p><strong>We do not sell personal information, and we do not share it for cross-context behavioural advertising.</strong></p>
+  </Fragment>
+
+  <Fragment slot="international-transfers">
+    <p>
+      Our service providers may process information in countries other than the one where you live, including outside the European
+      Economic Area and the United Kingdom. Those countries may have different data protection laws.
+    </p>
+    <p>When we transfer personal information across borders, we use the safeguards the law requires.</p>
+  </Fragment>
+
+  <Fragment slot="retention">
+    <p>We keep personal information only as long as we need it for the purposes in this policy, or as long as the law requires.</p>
+    <ul>
+      <li><strong>Your cookie choice:</strong> 12 months in your browser, then we ask again.</li>
+      <li><strong>Visit statistics:</strong> Plausible keeps totals only, with no personal data.</li>
+      <li>
+        <strong>Bookings and emails:</strong> while we are in touch with you, and for a reasonable time afterwards. You can ask us to delete
+        them sooner.
+      </li>
+      <li>
+        <strong>Customer data:</strong> for the period set in the customer’s agreement. Customers can set how long footage and records are
+        kept, per location.
+      </li>
+    </ul>
+  </Fragment>
+
+  <Fragment slot="security">
+    <p>
+      We protect personal information with technical and organisational measures suited to the risk. Our{' '}
+      <a href={LINKS.security}>Security page</a> explains how we protect customer data.
+    </p>
+    <p>If you think something is wrong, tell us at <a href={mailto}>{SITE.email}</a>.</p>
+  </Fragment>
+
+  <Fragment slot="your-rights">
+    <p>Depending on where you live, you can ask us to:</p>
+    <ul>
+      <li>give you a copy of your personal information (access)</li>
+      <li>correct it if it is wrong</li>
+      <li>delete it</li>
+      <li>stop using it for some purposes (objection)</li>
+      <li>limit how we use it (restriction)</li>
+      <li>send it to you or to another company in a common format (portability)</li>
+    </ul>
+    <p>Where we rely on your consent, you can withdraw it at any time. This does not affect what we did before.</p>
+    <p>
+      To use any of these rights, write to <a href={mailto}>{SITE.email}</a>. We may need to confirm who you are first. We reply within the
+      time the law sets, and we will not treat you differently for using your rights.
+    </p>
+    <p>
+      You can also complain to a data protection supervisory authority, for example where you live or work. We would welcome the chance
+      to help first.
+    </p>
+
+    <h3>If you live in California</h3>
+    <p>
+      California law gives you the right to know what personal information we collect and how we use and share it, and to ask us to
+      delete or correct it. You can also opt out of the sale or sharing of your personal information. We do not sell it or share it for
+      cross-context behavioural advertising, so there is nothing to opt out of. You can make a request through an authorised agent, and
+      we will not discriminate against you for using your rights.
+    </p>
+
+    <h3>If your data is in our products</h3>
+    <p>If your information is in one of our customers’ workspaces, that business handles your request, and we help it respond.</p>
+  </Fragment>
+
+  <Fragment slot="children">
+    <p>
+      This website is for businesses. It is not directed at children under 16, and we do not knowingly collect their personal
+      information. If you believe a child has given us personal information, write to us and we will delete it.
+    </p>
+  </Fragment>
+
+  <Fragment slot="changes">
+    <p>
+      We update this policy when our practices or the law change. The date at the top of this page shows the latest version. If we make
+      a significant change, we will say so here.
+    </p>
+  </Fragment>
+
+  <Fragment slot="contact">
+    <p>
+      For questions or requests about privacy, write to Aldente AI at <a href={mailto}>{SITE.email}</a> or call{' '}
+      <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a>.
+    </p>
+  </Fragment>
+</LegalPage>

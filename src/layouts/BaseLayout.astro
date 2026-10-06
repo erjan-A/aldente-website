@@ -1,0 +1,69 @@
+---
+import '@fontsource-variable/onest';
+import onestLatin from '@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url';
+import '../styles/global.css';
+import CookieConsent from '../components/site/CookieConsent.astro';
+import Footer from '../components/site/Footer.astro';
+import Header from '../components/site/Header.astro';
+import { SITE } from '../data/site';
+import { pagePath } from '../lib/paths';
+
+interface Props {
+  /** Page name; the site name is appended. Omit on the home page. */
+  title?: string;
+  description?: string;
+}
+
+const { title, description = SITE.description } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
+const canonical = new URL(pagePath(Astro.url.pathname), Astro.site);
+const ogImage = new URL('/og.jpg', Astro.site);
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+  logo: new URL('/favicon.svg', Astro.site).href,
+  email: SITE.email,
+  telephone: SITE.phone,
+  sameAs: [SITE.linkedin],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={onestLatin} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <CookieConsent />
+    <script>
+      // Cookieless visit counting (Plausible); loads on aldenteai.com only.
+      import '../scripts/analytics';
+      // Holds the animations of sections that are off screen.
+      import '../scripts/offscreen-pause';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,833 @@
+---
+import { Image } from 'astro:assets';
+import trayComplete from '../../assets/images/order-tray-complete.jpg';
+import tray from '../../assets/images/order-tray.jpg';
+import type { ProductId } from '../../data/products';
+import Icon from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+interface Props {
+  /** false: a visually hidden h2 only (the page around it supplies the visible heading). */
+  heading?: boolean;
+  /** The visible heading. Override where the page hero already uses the home wording (/order-verification). */
+  title?: string;
+  muted?: string;
+  lead?: string;
+  /** Product pill above the title; omit on the product's own page. */
+  product?: ProductId | null;
+}
+
+const {
+  heading = true,
+  title = 'Every order checked',
+  muted = 'before it leaves the counter.',
+  lead = 'Scroll through one order, from the ticket to the refund dispute.',
+  product = 'verify',
+} = Astro.props;
+
+const steps = [
+  { title: 'Order arrives', time: '12:39', text: 'The ticket comes from your POS: a turkey sandwich, fries and two drinks.' },
+  { title: 'Bag is checked', time: '12:40', text: 'The tablet camera checks every item and quantity. One drink is in the bag. Two are required.' },
+  { title: 'Mistake fixed', time: '12:41', text: 'The team adds the second drink and checks again. Fixed before the courier arrives.' },
+  { title: 'Evidence saved', time: '12:41', text: 'The photo, the detections and a 42-second clip are saved as one record for order #4821.' },
+  { title: 'Refund disputed', time: 'Day 2', text: 'Uber Eats reports a missing drink. Aldente sends the packing clip and disputes the charge for you.' },
+];
+
+// Counts per state: before the check, after the check, after the fix.
+const items = [
+  { name: 'Turkey sandwich', pending: '0/1', checked: '1/1', fixed: '1/1' },
+  { name: 'Fries', pending: '0/1', checked: '1/1', fixed: '1/1' },
+  { name: 'Drinks', pending: '0/2', checked: '1/2', fixed: '2/2', flag: true },
+];
+---
+
+<section class="story tone-dark section" id="verification" aria-labelledby="story-title">
+  <div class="container story__inner">
+    {
+      heading && (
+        <SectionHeader product={product ?? undefined} id="story-title" title={title} muted={muted} lead={lead} />
+      )
+    }
+    {/* Without the visible heading, a hidden one keeps the step titles (h3) under an h2, as in Playbooks. */}
+    {!heading && <h2 id="story-title" class="visually-hidden">How an order is verified</h2>}
+
+    <scroll-story class="story__grid" data-step="0">
+      <ol class="story__steps" role="list">
+        {
+          steps.map((step, i) => (
+            <li class="story__step" data-story-step aria-current={i === 0 ? 'step' : undefined}>
+              <div class="story__row">
+                <span class="story__marker">{step.time}</span>
+                <div class="story__text">
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="story__visual" aria-hidden="true" data-story-visual>
+        <div class="stage">
+          <div class="layer layer--photo">
+            <Image src={tray} alt="" widths={[480, 720, 960]} sizes="(min-width: 960px) 560px, 92vw" />
+            <Image class="photo-complete" src={trayComplete} alt="" widths={[480, 720, 960]} sizes="(min-width: 960px) 560px, 92vw" />
+          </div>
+          <div class="layer layer--boxes">
+            <span class="det det--ok" style="left:2%;top:30%;width:57%;height:58%"><b>Sandwich</b></span>
+            <span class="det det--ok" style="left:55%;top:4%;width:30%;height:46%"><b>Fries</b></span>
+            <span class="det det--ok" style="left:68%;top:38%;width:30%;height:52%"><b>Drink 1</b></span>
+            <span class="det det--missing" style="left:13%;top:1%;width:23%;height:28%"><b class="when-missing">Drink 2 missing</b><b class="when-fixed">Drink 2 added</b></span>
+          </div>
+          <div class="layer layer--ticket">
+            <div class="ticket">
+              <div class="ticket__head"><b>#4821</b><span>Location 01 · Delivery</span></div>
+              {
+                items.map((item) => (
+                  <div class:list={['ticket__row', { 'ticket__row--flag': item.flag }]}>
+                    <span>{item.name}</span>
+                    <b>
+                      <span class="when-pending">{item.pending}</span>
+                      <span class:list={[item.flag ? 'when-missing' : 'when-checked']}>{item.checked}</span>
+                      <span class="when-fixed">{item.fixed}</span>
+                    </b>
+                  </div>
+                ))
+              }
+              <div class="ticket__status">
+                <span class="when-pending">Waiting for the bag</span>
+                <span class="when-missing">Add 1 drink</span>
+                <span class="when-fixed">Verified 12:41</span>
+              </div>
+            </div>
+          </div>
+          <div class="layer layer--dispute">
+            <div class="thread">
+              <p class="thread__msg thread__msg--them"><b>Uber Eats Support</b>Customer reports a missing drink on #4821. A $17.40 refund will be charged to your store.</p>
+              <p class="thread__msg thread__msg--us"><b>Aldente</b>The packing clip from 12:41 shows both drinks in the bag. Evidence attached. We’re disputing this charge.</p>
+              <p class="thread__msg thread__msg--them"><b>Uber Eats Support</b>Evidence reviewed. <span class="thread__ok">Charge reversed.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="record">
+          <p class="record__head"><Icon name="shield-check" size={18} /><b>Evidence saved</b><span>#4821</span></p>
+          <ul role="list">
+            <li><Icon name="camera" size={16} />Packing photo<span>12:41:07</span></li>
+            <li><Icon name="video" size={16} />Packing clip<span>42 s</span></li>
+            <li><Icon name="check" size={16} />Items detected<span>4 of 4</span></li>
+            <li><Icon name="receipt" size={16} />POS order<span>Linked</span></li>
+          </ul>
+          <p class="record__foot">Ready for any complaint or refund claim.</p>
+        </div>
+        <ol class="story__progress" role="list">
+          {steps.map(() => <li />)}
+        </ol>
+      </div>
+    </scroll-story>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/scroll-story';
+</script>
+
+<style>
+  .story {
+    overflow-x: clip;
+  }
+
+  .story__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .story__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .story__steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .story__step {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    color: var(--ink-3);
+    transition: color 0.4s ease;
+  }
+
+  .story__row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .story__step[aria-current='step'] {
+    color: var(--ink);
+  }
+
+  .story__marker {
+    flex: none;
+    align-self: center;
+    min-width: 68px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--step-label);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .story__step[aria-current='step'] .story__marker {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .story__text {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 36ch;
+  }
+
+  .story__text h3 {
+    font-size: var(--step-h3);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+
+  .story__text p:last-child {
+    font-size: 1.125rem;
+  }
+
+  .story__step[aria-current='step'] .story__text p:last-child {
+    color: var(--ink-2);
+  }
+
+  .story__visual {
+    position: sticky;
+    top: 14vh;
+    height: 72vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .stage {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    transform-style: preserve-3d;
+    transition: transform 0.9s var(--ease-out);
+  }
+
+  .layer {
+    position: absolute;
+    inset: 0;
+    transition:
+      opacity 0.5s ease,
+      transform 0.9s var(--ease-out);
+  }
+
+  .layer--photo {
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+
+  .layer--photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      filter 0.5s ease,
+      opacity 0.6s ease;
+  }
+
+  .layer--photo :global(.photo-complete) {
+    opacity: 0;
+  }
+
+  .det {
+    position: absolute;
+    border: 2px solid var(--ok);
+    border-radius: var(--radius-s);
+    transition:
+      border-color 0.4s ease,
+      background-color 0.4s ease;
+  }
+
+  .det b {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+    background: var(--ok);
+    color: var(--on-accent);
+    font-size: 0.75rem;
+  }
+
+  .det--missing {
+    border: 2px dashed var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .det--missing b {
+    background: var(--accent);
+  }
+
+  .ticket {
+    position: absolute;
+    left: -5%;
+    bottom: -7%;
+    width: min(260px, 60%);
+    padding: var(--card-pad-s);
+    border-radius: var(--radius-m);
+    background: var(--bg);
+    border: 1px solid var(--card-line);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.875rem;
+  }
+
+  .ticket__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .ticket__head b {
+    font-size: 1.125rem;
+  }
+
+  .ticket__head span {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  .ticket__row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: var(--radius-s);
+    background: var(--surface);
+  }
+
+  .ticket__row b {
+    color: var(--ok);
+  }
+
+  .ticket__row--flag {
+    background: var(--accent-soft);
+  }
+
+  .ticket__row--flag b {
+    color: var(--accent);
+  }
+
+  .ticket__status {
+    margin-top: 4px;
+    padding: 10px;
+    border-radius: var(--radius-s);
+    text-align: center;
+    font-weight: 700;
+    background: var(--surface-2);
+  }
+
+  .thread {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 6%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .thread__msg {
+    max-width: 88%;
+    padding: 12px 14px;
+    border-radius: var(--radius-m);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .thread__msg b {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+  }
+
+  .thread__msg--them {
+    align-self: flex-start;
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .thread__msg--us {
+    align-self: flex-end;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .thread__ok {
+    color: #007a5a;
+    font-weight: 700;
+  }
+
+  /* Inside the media column: its right edge stays on the container edge, like everything else on the grid. */
+  .record {
+    position: absolute;
+    right: 0;
+    top: 6%;
+    z-index: 3;
+    width: min(300px, 62%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: var(--card-pad-s);
+    border-radius: var(--radius-m);
+    background: var(--ink);
+    color: var(--bg);
+    opacity: 0;
+    translate: 0 12px;
+    pointer-events: none;
+    transition:
+      opacity 0.5s ease,
+      translate 0.6s var(--ease-out);
+  }
+
+  .record__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #007a5a;
+  }
+
+  .record__head b {
+    color: var(--bg);
+    font-size: 1rem;
+  }
+
+  .record__head span {
+    margin-left: auto;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--paper-ink-3);
+  }
+
+  .record ul {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .record li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid var(--paper-line);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .record li span {
+    margin-left: auto;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .record__foot {
+    font-size: 0.8125rem;
+    color: var(--paper-ink-3);
+  }
+
+  .story__progress {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .story__progress li {
+    width: 28px;
+    height: 4px;
+    border-radius: var(--radius-xs);
+    background: var(--line);
+    transition: background-color 0.3s ease;
+  }
+
+  /* ---- State machine driven by data-step ---- */
+  .layer--boxes,
+  .layer--dispute,
+  .when-missing,
+  .when-fixed {
+    opacity: 0;
+  }
+
+  .when-missing,
+  .when-checked,
+  .when-fixed,
+  .when-pending {
+    display: none;
+  }
+
+  scroll-story[data-step='0'] .ticket__row,
+  scroll-story[data-step='0'] .ticket__row--flag {
+    background: var(--surface);
+  }
+
+  scroll-story[data-step='0'] .ticket__row b {
+    color: var(--ink-3);
+  }
+
+  scroll-story[data-step='1'] .when-checked {
+    display: inline;
+  }
+
+  /* 0: ticket only */
+  scroll-story[data-step='0'] .layer--photo img {
+    filter: brightness(0.35) saturate(0.4);
+  }
+
+  scroll-story[data-step='0'] .when-pending {
+    display: inline;
+  }
+
+  /* 1: detections, one drink missing */
+  scroll-story[data-step='1'] .layer--boxes,
+  scroll-story[data-step='2'] .layer--boxes,
+  scroll-story[data-step='3'] .layer--boxes {
+    opacity: 1;
+  }
+
+  scroll-story[data-step='1'] .when-missing {
+    display: inline;
+    opacity: 1;
+  }
+
+  scroll-story[data-step='1'] .ticket__status {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  /* 2+: fixed */
+  scroll-story:is([data-step='2'], [data-step='3'], [data-step='4']) .when-fixed {
+    display: inline;
+    opacity: 1;
+  }
+
+  scroll-story:is([data-step='2'], [data-step='3'], [data-step='4']) .ticket__row--flag {
+    background: var(--surface);
+  }
+
+  scroll-story:is([data-step='2'], [data-step='3'], [data-step='4']) .ticket__row--flag b {
+    color: var(--ok);
+  }
+
+  scroll-story:is([data-step='2'], [data-step='3'], [data-step='4']) .ticket__status {
+    background: var(--ok);
+    color: var(--on-accent);
+  }
+
+  scroll-story:is([data-step='2'], [data-step='3']) .det--missing {
+    border-style: solid;
+    border-color: var(--ok);
+    background: var(--ok-soft);
+  }
+
+  scroll-story:is([data-step='2'], [data-step='3']) .det--missing b {
+    background: var(--ok);
+  }
+
+  /* 2+: the complete photo replaces the one with the missing drink */
+  scroll-story:is([data-step='2'], [data-step='3'], [data-step='4']) .layer--photo :global(.photo-complete) {
+    opacity: 1;
+  }
+
+  /* 3: the layers lift apart and the saved record lands, flat and readable */
+  scroll-story[data-step='3'] .stage {
+    transform: perspective(1600px) rotateX(26deg) rotateZ(-8deg) scale(0.86) translateX(6%);
+  }
+
+  scroll-story[data-step='3'] .layer--boxes {
+    transform: translateZ(40px);
+  }
+
+  scroll-story[data-step='3'] .layer--ticket {
+    transform: translateZ(90px);
+  }
+
+  scroll-story[data-step='3'] .record {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* 4: the dispute */
+  scroll-story[data-step='4'] .layer--photo img {
+    filter: brightness(0.3) saturate(0.4);
+  }
+
+  scroll-story[data-step='4'] .layer--ticket {
+    opacity: 0;
+  }
+
+  scroll-story[data-step='4'] .layer--dispute {
+    opacity: 1;
+  }
+
+  scroll-story[data-step='0'] .story__progress li:nth-child(-n + 1),
+  scroll-story[data-step='1'] .story__progress li:nth-child(-n + 2),
+  scroll-story[data-step='2'] .story__progress li:nth-child(-n + 3),
+  scroll-story[data-step='3'] .story__progress li:nth-child(-n + 4),
+  scroll-story[data-step='4'] .story__progress li:nth-child(-n + 5) {
+    background: var(--accent);
+  }
+
+  @media (max-width: 960px) {
+    .story__grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* Stuck flush under the header (the top padding is the breathing room), so no strip of scrolled
+       text shows between the two. */
+    .story__visual {
+      order: -1;
+      top: var(--header-h);
+      z-index: 2;
+      height: auto;
+      padding: 20px 0 12px;
+      background: var(--bg);
+    }
+
+    /* Outgoing step text fades under the visual instead of being sliced mid-line. It ends where the
+       current step's text sticks (--story-cover + 16px). */
+    .story__visual::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: 16px;
+      background: linear-gradient(var(--bg), rgb(11 11 11 / 0));
+      pointer-events: none;
+    }
+
+    .stage {
+      width: min(100%, 520px);
+      margin-inline: auto;
+    }
+
+    /* Each step's text sits at its top and, once it comes out from under the sticky visual, sticks
+       right below it (--story-cover, set by <scroll-story>) until the next step pushes it out.
+       So the current step always reads under the picture, with no screen of empty black. */
+    /* About one text block of scroll per step: the next step follows without a screen of empty black. */
+    .story__step {
+      min-height: 30vh;
+      align-items: flex-start;
+      padding-top: 20px;
+    }
+
+    .story__row {
+      position: sticky;
+      top: calc(var(--story-cover, 50vh) + 16px);
+      align-items: flex-start;
+    }
+
+    .story__marker {
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+
+    /* A sticky element stops at the end of its container (minus its margin). The visual's bottom
+       margin (taken back by the steps below) frees it early enough that the last step's text never
+       slides underneath it. */
+    .story__visual {
+      margin-bottom: 200px;
+    }
+
+    .story__steps {
+      margin-top: -200px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    /* Too small to explode in 3D: keep the layers flat and let the record land on top. */
+    scroll-story[data-step='3'] .stage,
+    scroll-story[data-step='3'] .layer--boxes,
+    scroll-story[data-step='3'] .layer--ticket {
+      transform: none;
+    }
+
+    .story__visual {
+      gap: 10px;
+      padding: 16px 0 12px;
+    }
+
+    /* The ticket moves below the photo: photo, detections and dispute share the first row. */
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 8px;
+      width: 100%;
+      aspect-ratio: auto;
+    }
+
+    .layer {
+      position: relative;
+      inset: auto;
+      grid-area: 1 / 1;
+    }
+
+    .layer--photo {
+      aspect-ratio: 3 / 2;
+      border-radius: var(--radius-m);
+    }
+
+    .layer--ticket {
+      grid-area: 2 / 1;
+    }
+
+    /* The ticket stays during the dispute: it is the order being disputed. */
+    scroll-story[data-step='4'] .layer--ticket {
+      opacity: 1;
+    }
+
+    /* One compact strip: number and status on top, the three items side by side. */
+    .ticket {
+      position: static;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: 6px;
+      padding: 10px;
+      border-radius: var(--radius-m);
+      font-size: var(--step-label);
+    }
+
+    .ticket__head {
+      grid-column: 1;
+      grid-row: 1;
+      align-items: center;
+      margin: 0;
+    }
+
+    .ticket__head b {
+      font-size: var(--step-small);
+    }
+
+    .ticket__head span {
+      display: none;
+    }
+
+    .ticket__status {
+      grid-column: 2 / 4;
+      grid-row: 1;
+      margin: 0;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: var(--step-label);
+    }
+
+    .ticket__row {
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+      padding: 6px 8px;
+      border-radius: var(--radius-s);
+      line-height: 1.3;
+    }
+
+    .ticket__row > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--ink-2);
+      font-size: 0.75rem;
+    }
+
+    .story__step {
+      min-height: 27vh;
+    }
+
+    .story__row {
+      gap: 14px;
+    }
+
+    .story__marker {
+      min-width: 56px;
+      height: 28px;
+      padding: 0 10px;
+    }
+
+    .story__text p:last-child {
+      font-size: var(--step-body);
+    }
+
+    .det b {
+      left: 4px;
+      top: 4px;
+      padding: 2px 6px;
+      font-size: 0.6875rem;
+    }
+
+    .record {
+      right: 2%;
+      top: 4%;
+      width: 70%;
+      padding: 12px;
+      gap: 6px;
+    }
+
+    .record li {
+      padding: 5px 0;
+      font-size: 0.75rem;
+    }
+
+    .record__foot {
+      display: none;
+    }
+
+    .thread {
+      left: 4%;
+      right: 4%;
+      bottom: 5%;
+      gap: 5px;
+    }
+
+    .thread__msg {
+      max-width: 92%;
+      padding: 6px 10px;
+      border-radius: var(--radius-s);
+      font-size: 0.6875rem;
+      line-height: 1.4;
+    }
+
+    .thread__msg b {
+      margin-bottom: 0;
+      font-size: 0.75rem;
+    }
+
+    scroll-story[data-step='3'] .det b {
+      opacity: 0;
+    }
+  }
+</style>

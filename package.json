@@ -1,0 +1,41 @@
+{
+  "name": "aldente-website",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "aldenteai.com: the Aldente AI marketing site (static Astro build)",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "verify": "npm run check && npm test && npm run build && npm run test:e2e",
+    "astro": "astro",
+    "smoke": "sh deploy/smoke-test.sh"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/onest": "^5.3.1",
+    "astro": "^7.3.5"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
+    "happy-dom": "^20.14.5",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.3"
+  },
+  "overrides": {
+    "playwright-core": "1.62.1"
+  }
+}

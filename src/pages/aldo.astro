@@ -1,0 +1,139 @@
+---
+import AldoDemo from '../components/home/AldoDemo.astro';
+import Connections from '../components/home/Connections.astro';
+import Cta from '../components/home/Cta.astro';
+import Playbooks from '../components/home/Playbooks.astro';
+import AldoHeroMedia from '../components/product/AldoHeroMedia.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Button from '../components/ui/Button.astro';
+import Faq from '../components/ui/Faq.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import { PRODUCTS } from '../data/products';
+import { LINKS } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const abilities = [
+  { title: 'Ask anything about any location', text: 'Type or say a question in Slack. Aldo checks your cameras, orders and staff records and answers with the source attached.' },
+  { title: 'Every answer comes with the receipts', text: 'Aldo links each answer to the clip, frame or record behind it, so your team can check before they act.' },
+  { title: 'The right person hears first', text: 'Route each event to the person who can act: the shift lead, the district manager, or HR. Every alert carries the location, the time and the camera view.' },
+  { title: 'Say it out loud', text: 'Send Aldo a voice note from the floor. It turns the request into a question or a Playbook and confirms what it heard.' },
+  { title: 'Works in the background', text: 'The best AI at work runs quietly and proactively. Aldo watches every location around the clock and only speaks up when something needs a person.' },
+  { title: 'Lives where your team already works', text: 'Slack, Telegram, WhatsApp, voice, or the web dashboard. No new app to learn.' },
+];
+
+const { verify, vision } = PRODUCTS;
+// Aldo comes with Aldente Verify or Aldente Vision, so its booking links open the "Get Aldo with…" demo page.
+const demoPlan = 'starter';
+
+const faq = [
+  { q: 'What can Aldo see?', a: 'Whatever your connected cameras see, plus your orders, staff and other connected records.' },
+  { q: 'Do I need new cameras?', a: 'No. Aldo works with most existing IP cameras. Aldente Verify adds a tablet at the packing station.' },
+  { q: 'Can I control who gets which alerts?', a: 'Yes. Each Playbook names its channel or person, and access follows roles and locations.' },
+  { q: 'What counts as a Playbook?', a: 'One saved task with its schedule or trigger. Questions are unlimited on every plan.' },
+];
+---
+
+<BaseLayout title="Aldo, the AI Chief of Staff for restaurants" description="Aldo watches every location through your cameras, answers questions in Slack and runs recurring checks for your team. Comes with Aldente Verify or Aldente Vision.">
+  <PageHero
+    product="aldo"
+    title="Meet Aldo."
+    muted="Your Chief of Staff with eyes."
+    lead="Aldo works in Slack beside your team. It sees every location through your cameras, answers with numbers and clips, and takes the routine checks off your managers’ plates."
+  >
+    <Button href={`${LINKS.demo}?plan=${demoPlan}`} size="lg" arrow>Book a demo</Button>
+    <Button href="#aldo" variant="secondary" size="lg">See Aldo in action</Button>
+    <p class="hero-note">Aldo comes with{' '}<a href={verify.href}>{verify.name}</a>{' '}or{' '}<a href={vision.href}>{vision.name}</a>.</p>
+    <AldoHeroMedia slot="media" />
+  </PageHero>
+  <AldoDemo title="Aldo in Slack." muted="Ask, assign, alert." lead="Ask it anything. Give it the work you repeat. Pick a tab, or let it run." product={null} padTop />
+  <section class="abilities tone-dark section section--flush-top" aria-labelledby="abilities-title">
+    <div class="container abilities__inner">
+      <SectionHeader id="abilities-title" title="One colleague," muted="every location, every shift." />
+      <ul class="abilities__grid" role="list">
+        {
+          abilities.map((a) => (
+            <li>
+              <h3>{a.title}</h3>
+              <p>{a.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+  <Playbooks product={null} />
+  <Connections padTop product={null} />
+  <Faq items={faq} />
+  <Cta
+    title="Put Aldo on your next shift."
+    text="Aldo comes with Aldente Verify or Aldente Vision. Book a demo to see it set up for your team."
+    plan={demoPlan}
+  />
+</BaseLayout>
+
+<style>
+  .hero-note {
+    flex-basis: 100%;
+    font-size: var(--step-small);
+    color: var(--fg-3);
+  }
+
+  /* Linked product names, as in the home hero note. */
+  .hero-note a {
+    white-space: nowrap;
+    color: var(--fg-2);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 4px;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+  }
+
+  .hero-note a:hover {
+    color: var(--fg);
+    text-decoration-color: currentColor;
+  }
+
+  .abilities__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  /* One panel ruled into cells: the 1px gaps show the card edge colour between the cells. */
+  .abilities__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 1px;
+    border: 1px solid var(--card-line);
+    border-radius: var(--radius-l);
+    background: var(--card-line);
+    overflow: hidden;
+  }
+
+  .abilities__grid li {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: var(--card-pad-l);
+    background: var(--card);
+  }
+
+  .abilities__grid h3 {
+    font-size: var(--step-h4);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+  }
+
+  .abilities__grid p {
+    color: var(--fg-2);
+  }
+
+  /* Meet Aldo above is the same tone and already brings its bottom space. */
+  .section--flush-top {
+    padding-top: 0;
+  }
+</style>

@@ -1,0 +1,551 @@
+---
+import { Image } from 'astro:assets';
+import dining from '../../assets/images/dining-room-overhead.jpg';
+import SlackMessage from '../slack/SlackMessage.astro';
+import SlackWindow from '../slack/SlackWindow.astro';
+import Icon from '../ui/Icon.astro';
+
+// Each beat pairs what the camera sees with what Aldo posts about it.
+const detections = [
+  { beat: 1, pin: 1, tone: 'alert', label: 'Table 6 · waiting to be cleared · 3:12', box: 'left:26%;top:64%;width:34%;height:28%' },
+  { beat: 2, pin: 2, tone: 'neutral', label: 'Table 9 · seated 41 min · no check yet', box: 'left:61.5%;top:30%;width:16%;height:40%' },
+  { beat: 3, pin: 3, tone: 'ok', label: 'Server · on the floor', box: 'left:45.2%;top:7.5%;width:6%;height:26%', below: true },
+  { beat: 3, pin: 3, tone: 'ok', label: 'Counter · staffed', box: 'left:70%;top:4%;width:8%;height:13%', below: true, end: true },
+];
+---
+
+<scroll-beats class="beats" data-beats="3" data-beat="3" data-start="0">
+  <div class="beats__stage">
+    <div class="console" data-loop>
+      <div class="console__bar">
+        <span class="console__live"><i class="console__rec" aria-hidden="true"></i>Live</span>
+        <span class="console__where">Location 03 · <span class="console__room">Dining room · </span>Cam 04</span>
+        <ol class="console__pips" aria-hidden="true"><li></li><li></li><li></li></ol>
+      </div>
+      <div class="console__body">
+        <div class="console__feed">
+          <Image
+            src={dining}
+            alt="Overhead camera view of a busy restaurant dining room"
+            widths={[640, 960, 1280, 1600]}
+            sizes="(min-width: 1280px) 820px, (min-width: 960px) 62vw, 100vw"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <span class="console__scan" aria-hidden="true"></span>
+          <div class="hud b3" aria-hidden="true">
+            <span class="hud__label">Guests in room</span>
+            <span class="hud__value">14</span>
+            <span class="hud__trend">+9% vs last Thu</span>
+          </div>
+          {
+            detections.map((d) => (
+              <span class:list={['det', `det--${d.tone}`, `b${d.beat}`]} style={d.box} aria-hidden="true">
+                <span class:list={['det__label', { 'det__label--below': d.below, 'det__label--end': d.end }]}>
+                  <i class="det__pin">{d.pin}</i>
+                  <span class="det__text">{d.label}</span>
+                </span>
+              </span>
+            ))
+          }
+        </div>
+
+        <SlackWindow
+          active="location-03"
+          sidebar={false}
+          composer="Message #location-03"
+          members="Aldo + 12"
+          class="console__slack"
+          label="Aldo posting what the camera sees to Slack"
+        >
+          <div class="feed">
+            <div class="msg b1">
+              <p class="typing" aria-hidden="true"><i></i><i></i><i></i> Aldo is typing</p>
+              <SlackMessage author="Aldo" app time="12:38 PM">
+                <p class="slack-text">Table 6 has been waiting to be cleared for 3 minutes. <span class="slack-mention">@Maya</span>, can you reset it?</p>
+                <span class="frame"><Icon name="camera" size={13} /><i class="det__pin">1</i> Cam 04 frame</span>
+              </SlackMessage>
+            </div>
+            <div class="msg b2">
+              <p class="typing" aria-hidden="true"><i></i><i></i><i></i> Aldo is typing</p>
+              <SlackMessage author="Aldo" app time="12:40 PM">
+                <p class="slack-text">Table 9 has been seated for 41 minutes and hasn’t asked for the check. Good moment to offer dessert.</p>
+                <span class="frame"><Icon name="camera" size={13} /><i class="det__pin">2</i> Cam 04 frame</span>
+              </SlackMessage>
+            </div>
+            <div class="msg b3">
+              <p class="typing" aria-hidden="true"><i></i><i></i><i></i> Aldo is typing</p>
+              <SlackMessage author="Aldo" app time="12:41 PM">
+                <p class="slack-text">Location 03 is busy: 14 guests seated, 9% above this time last week. Counter and floor are both staffed.</p>
+                <span class="frame"><Icon name="camera" size={13} /><i class="det__pin">3</i> Cam 04 frame</span>
+              </SlackMessage>
+            </div>
+          </div>
+        </SlackWindow>
+      </div>
+    </div>
+  </div>
+</scroll-beats>
+
+<script>
+  import '../../scripts/scroll-beats';
+</script>
+
+<style>
+  .beats {
+    display: block;
+  }
+
+  /* The console pins while scrolling reveals each beat: on wide screens, and on phones and
+     tablets tall enough to hold it. scroll-beats reads the sticky position to follow suit. */
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference),
+    (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+    .beats {
+      height: 210vh;
+    }
+
+    .beats__stage {
+      position: sticky;
+      top: calc(var(--header-h) + 12px);
+    }
+  }
+
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .beats__stage {
+      /* centre the console in the viewport below the header */
+      top: max(calc(var(--header-h) + 16px), calc(50vh - 280px));
+    }
+  }
+
+  .console {
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    border: 1px solid var(--line-card);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .console__bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 6px 10px 2px;
+    font-size: var(--step-label);
+    color: var(--ink-3);
+  }
+
+  .console__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .console__rec {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .console__where {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Progress through the three beats, at the far end of the bar */
+  .console__pips {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  .console__pips li {
+    width: 18px;
+    height: 3px;
+    border-radius: var(--radius-xs);
+    background: var(--line);
+    transition: background-color 0.3s ease;
+  }
+
+  scroll-beats[data-beat='1'] .console__pips li:nth-child(-n + 1),
+  scroll-beats[data-beat='2'] .console__pips li:nth-child(-n + 2),
+  scroll-beats[data-beat='3'] .console__pips li:nth-child(-n + 3) {
+    background: var(--accent);
+  }
+
+  .console__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .console__feed {
+    position: relative;
+    flex: 999 1 560px;
+    min-width: 0;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+
+  .console__feed img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.55) contrast(1.05) brightness(0.82);
+  }
+
+  .console__scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.45;
+  }
+
+  /* Detections */
+  .det {
+    position: absolute;
+    border: 2px solid;
+    border-radius: var(--radius-s);
+  }
+
+  .det--alert {
+    border-color: var(--accent);
+    background: rgb(224 86 52 / 0.12);
+  }
+
+  .det--neutral {
+    border-color: var(--ink);
+  }
+
+  .det--ok {
+    border-color: var(--ok);
+  }
+
+  .det__label {
+    position: absolute;
+    left: -2px;
+    bottom: calc(100% + 6px);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px 4px 4px;
+    border-radius: var(--radius-s);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .det__label--below {
+    bottom: auto;
+    top: calc(100% + 6px);
+  }
+
+  .det__label--end {
+    left: auto;
+    right: -2px;
+  }
+
+  .det--alert .det__label {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .det--neutral .det__label {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .det--ok .det__label {
+    background: var(--ok);
+    color: var(--on-accent);
+  }
+
+  .det__pin {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 0.85);
+    color: #ffffff;
+    font-size: 0.6875rem;
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .hud {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    gap: 0 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-s);
+    background: rgb(11 11 11 / 0.82);
+  }
+
+  .hud__label {
+    grid-column: 1 / -1;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .hud__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hud__trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ok);
+  }
+
+  /* Slack side: the same corner as the camera feed beside it. */
+  .console :global(.console__slack) {
+    flex: 1 1 340px;
+    border-radius: var(--radius-l);
+  }
+
+  /* Wide screens: the camera sets the height; Slack fills it and older posts scroll off the top. */
+  @media (min-width: 1024px) {
+    .console__body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+
+    .console :global(.console__slack) {
+      contain: size;
+    }
+
+    .console :global(.console__slack .slack-window__messages) {
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+  }
+
+  /* Phones and tablets: the pinned console fills the screen below the header. The camera sits
+     on top; Slack takes the rest at a fixed height, so a new post pushes older ones up instead
+     of growing the page. */
+  @media (max-width: 1023px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+    .console {
+      height: calc(100vh - 100px);
+      height: calc(100svh - 100px);
+      max-height: 980px;
+    }
+
+    .console__body {
+      flex: 1;
+      min-height: 0;
+      flex-direction: column;
+      flex-wrap: nowrap;
+    }
+
+    .console__feed {
+      flex: none;
+    }
+
+    .console :global(.console__slack) {
+      flex: 1 1 0;
+      min-height: 0;
+      contain: size;
+    }
+
+    .console :global(.console__slack .slack-window__messages) {
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+  }
+
+  .feed {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .frame {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 6px;
+    border-radius: var(--radius-xs);
+    border: 1px solid #dddddd;
+    color: #616061;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .typing {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    margin: 0 20px;
+    font-size: 12px;
+    color: #616061;
+  }
+
+  .typing i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #9c9c9c;
+  }
+
+  /* Beat states: markup ships with every beat on; scroll-beats narrows it. */
+  scroll-beats[data-beat='0'] :is(.b1, .b2, .b3),
+  scroll-beats[data-beat='1'] :is(.b2, .b3),
+  scroll-beats[data-beat='2'] .b3 {
+    display: none;
+  }
+
+  /* Phones and tablets (the stacked console) keep only the numbered pins: the full labels would overlap
+     on a feed this size, and each Slack post still points at its box by number. */
+  @media (max-width: 1023px) {
+    .console__room,
+    .det__text {
+      display: none;
+    }
+
+    .det__label {
+      padding: 2px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    /* A narrow stack in the empty top-left corner, clear of every detection box. */
+    .hud {
+      left: 8px;
+      top: 8px;
+      grid-template-columns: auto;
+      padding: 6px 10px;
+    }
+
+    .hud__label {
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hud__value {
+      font-size: 1.25rem;
+    }
+
+    .hud__trend {
+      font-size: 0.6875rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .console__rec {
+      animation: rec 1.6s ease infinite;
+    }
+
+    .console__scan {
+      animation: scan 5s linear infinite;
+    }
+
+    .det,
+    .hud {
+      animation: det-in 0.5s var(--ease-out) both;
+    }
+
+    .det__label {
+      animation: label-in 0.4s var(--ease-out) 0.25s both;
+    }
+
+    /* Aldo types, then posts. */
+    .typing {
+      display: flex;
+      animation: typing-out 0.25s ease 0.75s forwards;
+    }
+
+    .typing i {
+      animation: dot 0.9s ease-in-out infinite;
+    }
+
+    .typing i:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing i:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .msg :global(.slack-message) {
+      animation: post 0.45s var(--ease-out) 0.85s both;
+    }
+  }
+
+  @keyframes rec {
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  @keyframes scan {
+    to {
+      top: 100%;
+    }
+  }
+
+  @keyframes det-in {
+    from {
+      opacity: 0;
+      scale: 1.08;
+    }
+  }
+
+  @keyframes label-in {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+
+  @keyframes dot {
+    50% {
+      translate: 0 -3px;
+      background: #616061;
+    }
+  }
+
+  @keyframes typing-out {
+    to {
+      opacity: 0;
+      height: 0;
+      margin-block: 0;
+      overflow: hidden;
+    }
+  }
+
+  @keyframes post {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+</style>
