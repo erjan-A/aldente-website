@@ -23,7 +23,7 @@ Consult these guides before working on related tasks:
 
 ## This project
 
-- Read `README.md` for the architecture: logic in `src/lib` (unit-tested), behaviour in `src/scripts` custom elements (happy-dom tests), content in `src/data`, sections in `src/components`.
+- Architecture: logic in `src/lib` (unit-tested), behaviour in `src/scripts` custom elements (happy-dom tests), content in `src/data`, sections in `src/components`.
 - Write the failing test first, then the code.
 - Before finishing, run `npm run verify` (type check, Vitest, build, Playwright on desktop and mobile, axe, link check, size budget).
 - Playwright starts `astro preview --ignore-lock` itself; don't start another server on port 4322.

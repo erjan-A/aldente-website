@@ -16,9 +16,12 @@ const headers = securityHeaders();
 
 describe('server configuration', () => {
   it('sends the security headers the site needs, from one file', () => {
-    expect(Object.keys(headers).sort()).toEqual(
-      ['Content-Security-Policy', 'Permissions-Policy', 'Referrer-Policy', 'X-Content-Type-Options', 'X-Frame-Options'].sort(),
-    );
+    // Strict-Transport-Security is optional: it is added here once HTTPS works (see aldenteai.com.conf).
+    expect(
+      Object.keys(headers)
+        .filter((name) => name !== 'Strict-Transport-Security')
+        .sort(),
+    ).toEqual(['Content-Security-Policy', 'Permissions-Policy', 'Referrer-Policy', 'X-Content-Type-Options', 'X-Frame-Options'].sort());
     expect(headers['X-Content-Type-Options']).toBe('nosniff');
     expect(headers['X-Frame-Options']).toBe('DENY');
   });

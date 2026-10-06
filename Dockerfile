@@ -1,5 +1,5 @@
 # aldenteai.com as a container: build the static site with Node, serve dist/ with nginx on port 80.
-# Put it behind the server's HTTPS reverse proxy (see DEPLOY.md).
+# Put it behind the server's HTTPS reverse proxy (see README.md).
 #
 #   docker build -t aldente-website .
 #   docker run -d --name aldente-website -p 8080:80 --restart unless-stopped aldente-website
