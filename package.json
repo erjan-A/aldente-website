@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:browsers": "playwright test -c playwright.browsers.config.ts",
     "verify": "npm run check && npm test && npm run build && npm run test:e2e",
     "astro": "astro",
     "smoke": "sh deploy/smoke-test.sh"

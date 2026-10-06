@@ -5,7 +5,7 @@ The Aldente AI marketing site: a static [Astro](https://astro.build) build with 
 ## Requirements
 
 - Node.js 22.12 or later (`.nvmrc` pins 22). Node is only needed to build; the server only serves files.
-- For end-to-end tests: Playwright's Chromium (`npx playwright install chromium`).
+- For end-to-end tests: Playwright's browsers (`npx playwright install chromium`; add `webkit firefox` for `test:e2e:browsers`).
 
 ## Commands
 
@@ -17,6 +17,7 @@ npm run preview     # serve dist/ locally
 npm test            # unit, DOM and component tests (Vitest)
 npm run test:e2e    # builds, serves and runs Playwright on desktop and mobile
 npm run verify      # all of the above: type check, tests, build, e2e
+npm run test:e2e:browsers   # the same e2e suite in Safari's WebKit (desktop, iPhone) and Firefox
 npm run smoke -- https://aldenteai.com   # check a deployed copy from outside (see DEPLOY.md)
 ```
 

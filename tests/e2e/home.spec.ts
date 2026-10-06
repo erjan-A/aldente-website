@@ -52,7 +52,8 @@ test.describe('home page', () => {
     const story = page.locator('scroll-story');
     await expect(story).toHaveAttribute('data-step', '0');
     await page.locator('[data-story-step]').last().scrollIntoViewIfNeeded();
-    await page.mouse.wheel(0, 200);
+    // Scroll the page itself (not a mouse wheel), so this runs in every engine, mobile WebKit included.
+    await page.evaluate(() => window.scrollBy(0, 200));
     await expect(story).toHaveAttribute('data-step', '4');
     await expect(page.locator('[data-story-step]').last()).toHaveAttribute('aria-current', 'step');
   });
@@ -84,7 +85,7 @@ test.describe('home page', () => {
 
     for (let i = 0; i < 30; i++) {
       if ((await beats.getAttribute('data-beat')) === '3') break;
-      await page.mouse.wheel(0, 150);
+      await page.evaluate(() => window.scrollBy(0, 150));
       await page.waitForTimeout(50);
     }
     await expect(beats).toHaveAttribute('data-beat', '3');
