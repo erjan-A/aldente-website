@@ -5,6 +5,7 @@
 - The home page loses its document shell (the viewer adds one) and gets the artifact title.
 - The viewer blocks other sites' frames, so the demo page's calendar area (the element marked
   data-artifact-calendar) becomes a month calendar whose days open Calendly on that date.
+- The viewer keeps the scroll position when a link opens another page, so each page starts at the top.
 
 Usage: python3 tools/make-artifact.py dist <out-dir>
 """
@@ -12,6 +13,20 @@ import base64, glob, os, re, shutil, sys
 
 CALENDLY = 'https://calendly.com/aldenteai/30min'
 CALENDAR_MARKER = 'data-artifact-calendar'
+
+# The viewer frame can keep the previous page's scroll position (a footer link then opens the next page at its
+# footer). Start each page at the top unless the link names a section or the visitor went back. After a link
+# from this site, also scroll whatever holds the frame back to the frame's top, in case the viewer sizes the
+# frame to the page and scrolls itself.
+SCROLL_TOP = (
+    '<script>(function(){var nav=performance.getEntriesByType&&performance.getEntriesByType("navigation")[0];'
+    'if(location.hash||(nav&&nav.type==="back_forward"))return;'
+    'try{history.scrollRestoration="manual"}catch(e){}'
+    'var fromSite=false;try{fromSite=new URL(document.referrer).origin===location.origin}catch(e){}'
+    'function top(){window.scrollTo({top:0,left:0,behavior:"instant"});'
+    'if(fromSite)document.documentElement.scrollIntoView({block:"start",behavior:"instant"})}'
+    'top();document.addEventListener("DOMContentLoaded",top);addEventListener("load",top)})();</script>'
+)
 
 
 def calendar_card(url):
@@ -127,6 +142,7 @@ def main(DIST, OUT):
         s = re.sub(r'url\((/_astro/[^)]+)\)', lambda m: 'url(%s%s)' % (prefix, m.group(1)[1:]), s)
         s = re.sub(r'<link rel="preload"[^>]*as="font"[^>]*>', '', s)
         s = swap_calendar(s)
+        s = s.replace('<body>', '<body>' + SCROLL_TOP, 1)
         s = s.replace('_astro/', 'assets/')
         open(html, 'w').write(s)
 
