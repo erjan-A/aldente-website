@@ -111,16 +111,16 @@ const channels = ['ops-leads', 'hr-ops', 'hr-review', 'district-west'];
               <li><Icon name="check" size={14} strokeWidth={2.5} />Analyzing company context knowledge base</li>
               <li><Icon name="check" size={14} strokeWidth={2.5} />Checking locations, employees, and shift hours</li>
             </ul>
-            <p class="slack-text">I found your company procedures, locations, employee profiles and confirmed shift hours. Review the Playbook below.</p>
+            <p class="slack-text aldo__intro">I found your company procedures, locations, employee profiles and confirmed shift hours. Review the Playbook below.</p>
             <SlackCard tone="ok">
               <p class="slack-text"><b>Missing clock-out review</b></p>
               <dl class="slack-fields aldo__spec">
                 <div><dt>When</dt><dd>After each closing shift · local time</dd></div>
-                <div><dt>Locations</dt><dd>All 24</dd></div>
-                <div><dt>Schedule</dt><dd>Confirmed shift timetable</dd></div>
+                <div class="aldo__wide"><dt>Locations</dt><dd>All 24</dd></div>
+                <div class="aldo__wide"><dt>Schedule</dt><dd>Confirmed shift timetable</dd></div>
                 <div><dt>Check</dt><dd>Missing clock-outs and departure evidence</dd></div>
                 <div><dt>Action</dt><dd>Prepare an HR case for review</dd></div>
-                <div><dt>Owner</dt><dd>HR team</dd></div>
+                <div class="aldo__wide"><dt>Owner</dt><dd>HR team</dd></div>
                 <div><dt>Send to</dt><dd>#hr-review</dd></div>
               </dl>
               <div class="slack-actions aldo__decide">
@@ -416,8 +416,13 @@ const channels = ['ops-leads', 'hr-ops', 'hr-review', 'district-west'];
     .aldo__box :global(.aldo__slack) {
       order: 2;
       flex: none;
-      height: 620px;
+      height: 660px;
       min-height: 0;
+    }
+
+    .aldo__box :global(.slack-window__messages) {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 32px);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 32px);
     }
 
     .aldo__box :global(.slack-message) {
@@ -515,6 +520,14 @@ const channels = ['ops-leads', 'hr-ops', 'hr-review', 'district-west'];
 
     .aldo__spec dd {
       margin: 0;
+    }
+
+    /* Phones keep the whole request in view: Aldo's preamble and the rows the request already implies
+       (locations, schedule, owner) stay on wider screens. The card keeps When, Check, Action, Send to. */
+    .aldo__box .aldo__checks,
+    .aldo__box .aldo__intro,
+    .aldo__spec > .aldo__wide {
+      display: none;
     }
   }
 

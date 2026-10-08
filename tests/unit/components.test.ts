@@ -112,7 +112,6 @@ describe('Playbooks', () => {
           asker: { role: 'Shift lead', initials: 'SL', color: '#805ad5' },
           title: 'More Playbooks',
           muted: 'for operations teams.',
-          band: false,
         },
       }),
     );
@@ -127,16 +126,10 @@ describe('Playbooks', () => {
     expect(doc.querySelector('.playbooks__cta')).toBeNull();
   });
 
-  it('points the band under the explorer at the plans, not at a booking', async () => {
+  it('ends on the explorer, with no "comes with" band under it', async () => {
     const doc = parse(await container.renderToString(Playbooks));
-    const band = doc.querySelector('.playbooks__cta')!;
-    expect(band.querySelector('p')?.textContent).toBe('Aldo and its Playbooks come with Aldente Verify or Aldente Vision.');
-    const link = band.querySelector('a')!;
-    expect(link.textContent?.trim()).toBe('Compare plans');
-    expect(link.getAttribute('href')).toBe('/pricing');
-    expect(link.classList.contains('btn--primary')).toBe(false);
-    // No arrow: "Compare plans" never carries one; arrows mark the booking button.
-    expect(link.querySelector('.btn__arrow')).toBeNull();
+    expect(doc.querySelector('.playbooks__cta')).toBeNull();
+    expect(doc.body.textContent).not.toContain('Aldo and its Playbooks come with');
   });
 });
 

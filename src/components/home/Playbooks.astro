@@ -2,10 +2,8 @@
 import type { ProductId } from '../../data/products';
 import '../../styles/slack.css';
 import { PLAYBOOKS } from '../../data/playbooks';
-import { LINKS } from '../../data/site';
 import type { Asker } from '../../data/solutions';
 import { filterByTeam, graphSteps, teamsOf, type Playbook, type TeamFilter } from '../../lib/playbooks';
-import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
@@ -22,8 +20,6 @@ interface Props {
   lead?: string;
   /** The product pill over the heading; null on Aldo's own page, where the hero already names it. */
   product?: ProductId | null;
-  /** The "comes with Aldente Verify or Aldente Vision" band; off where the closing CTA band follows right after. */
-  band?: boolean;
 }
 
 const {
@@ -34,7 +30,6 @@ const {
   title = 'Ask once.',
   muted = 'Aldo handles it every shift.',
   lead = 'A Playbook is a saved task: what to check, when to run, and where to send the result. Say it in a sentence, or say it out loud. Aldo confirms the details and starts working.',
-  band = true,
 } = Astro.props;
 const playbooks: Playbook[] = filterByTeam(PLAYBOOKS, team).filter((p) => !exclude.includes(p.id));
 // The links to the solution pages belong on the overview (home, /aldo), not on a solution page itself.
@@ -113,16 +108,6 @@ const steps = graphSteps(first);
       </div>
     </playbook-explorer>
 
-    {
-      band && (
-        <div class="playbooks__cta tone-dark">
-          <p>Aldo and its Playbooks come with Aldente Verify or Aldente Vision.</p>
-          <Button href={LINKS.pricing} variant="secondary">
-            Compare plans
-          </Button>
-        </div>
-      )
-    }
     {
       overview && (
         <nav class="playbooks__teams" aria-label="Playbooks by team">
@@ -500,25 +485,6 @@ const steps = graphSteps(first);
       transform: scale(1.25);
       box-shadow: 0 0 0 6px rgb(79 191 133 / 0.25);
     }
-  }
-
-  /* A dark band on the paper section: .tone-dark gives it the dark ground and ink roles. */
-  .playbooks__cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 20px 20px 20px 28px;
-    border-radius: var(--radius-l);
-  }
-
-  .playbooks__cta p {
-    font-size: var(--step-h4);
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    text-wrap: balance;
   }
 
   .playbooks__teams {
