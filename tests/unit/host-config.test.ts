@@ -26,18 +26,19 @@ describe('server configuration', () => {
     expect(headers['X-Frame-Options']).toBe('DENY');
   });
 
-  it('lets the CSP load what the site uses: Plausible and Calendly’s scheduler, nothing else', () => {
+  it('lets the CSP load what the site uses: Umami and Calendly’s scheduler, nothing else', () => {
     const csp = Object.fromEntries(
       headers['Content-Security-Policy']!.split(';').map((d) => {
         const [name, ...values] = d.trim().split(/\s+/);
         return [name, values];
       }),
     );
-    const plausible = new URL(ANALYTICS.script).origin;
+    const umamiScript = new URL(ANALYTICS.script).origin;
+    const umamiEndpoint = new URL(ANALYTICS.endpoint).origin;
     const calendly = new URL(SITE.calendly).origin;
     expect(csp['default-src']).toEqual(["'self'"]);
-    expect(csp['script-src']).toEqual(["'self'", plausible]);
-    expect(csp['connect-src']).toEqual(["'self'", plausible]);
+    expect(csp['script-src']).toEqual(["'self'", umamiScript]);
+    expect(csp['connect-src']).toEqual(["'self'", umamiEndpoint]);
     expect(csp['frame-src']).toEqual([calendly]);
     expect(csp['frame-ancestors']).toEqual(["'none'"]);
     expect(csp['object-src']).toEqual(["'none'"]);

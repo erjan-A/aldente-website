@@ -1,7 +1,7 @@
 import { ANALYTICS } from '../data/analytics';
 import { isDemoPlan } from './demo';
 
-/** Event properties as Plausible takes them. */
+/** Event properties, sent to Umami as event data. */
 export type EventProps = Record<string, string>;
 
 /** True only on the production site, so development, previews and shared copies send nothing. */

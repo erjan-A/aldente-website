@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import './demo-intent';
+import { queued } from './analytics';
 import { mount } from './test-utils';
 
 const fixture = `
@@ -10,11 +11,10 @@ const fixture = `
 </demo-intent>`;
 
 const visit = (path: string) => window.history.replaceState(null, '', path);
-const queue = () => window.plausible!.q!;
 
 describe('<demo-intent>', () => {
   beforeEach(() => {
-    queue().length = 0;
+    queued.length = 0;
   });
   afterEach(() => visit('/'));
 
@@ -45,9 +45,9 @@ describe('<demo-intent>', () => {
     mount(fixture);
     visit('/demo?plan=rockets');
     mount(fixture);
-    expect(queue()).toEqual([
-      ['Demo view', { props: { plan: 'vision' } }],
-      ['Demo view', { props: { plan: 'general' } }],
+    expect(queued).toEqual([
+      ['Demo view', { plan: 'vision' }],
+      ['Demo view', { plan: 'general' }],
     ]);
   });
 });

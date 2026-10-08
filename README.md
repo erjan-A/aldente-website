@@ -56,5 +56,5 @@ It checks every page, redirect, the 404, security headers, caching and compressi
 
 - **DNS:** A/AAAA records for `aldenteai.com` and `www.aldenteai.com` point to the server.
 - **Updates:** rebuild and upload `dist/` again (or rebuild the image). Pages revalidate on every visit; hashed files in `/_astro/` are cached for a year.
-- **Security headers** live in `deploy/nginx/snippets/aldente-headers.conf`. The CSP allows only Plausible and Calendly; after changing it, run `npm run verify`.
+- **Security headers** live in `deploy/nginx/snippets/aldente-headers.conf`. The CSP allows only Umami (analytics) and Calendly; after changing it, run `npm run verify`.
 - **HSTS** is off. Turn it on once HTTPS works for both hostnames (instructions in `aldenteai.com.conf`).

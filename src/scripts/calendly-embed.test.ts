@@ -2,6 +2,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ALL, CONSENT_KEY, NONE, makeConsent } from '../lib/consent';
 import { SLOW_MS } from './calendly-embed';
+import { queued } from './analytics';
 import type { CalendlyEmbed } from './calendly-embed';
 import { mount } from './test-utils';
 
@@ -21,7 +22,6 @@ const fixture = `
 const host = () => document.querySelector<CalendlyEmbed>('calendly-embed')!;
 const frame = () => document.querySelector<HTMLIFrameElement>('calendly-embed iframe');
 const part = (name: string) => document.querySelector<HTMLElement>(`[data-cal-${name}]`)!;
-const queue = () => window.plausible!.q!;
 
 function post(data: unknown, origin = 'https://calendly.com'): void {
   window.dispatchEvent(new MessageEvent('message', { data, origin }));
@@ -37,7 +37,7 @@ describe('<calendly-embed>', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    queue().length = 0;
+    queued.length = 0;
     window.history.replaceState(null, '', '/demo');
   });
 
@@ -91,7 +91,7 @@ describe('<calendly-embed>', () => {
   it('counts a picked time in the funnel', () => {
     mount(fixture);
     post({ event: 'calendly.date_and_time_selected', payload: {} });
-    expect(queue()).toContainEqual(['Time selected', { props: { plan: 'general' } }]);
+    expect(queued).toContainEqual(['Time selected', { plan: 'general' }]);
   });
 
   it('keeps the skeleton while Calendly shows its own spinner', () => {
@@ -136,7 +136,7 @@ describe('<calendly-embed>', () => {
     expect(part('alt').hidden).toBe(true);
     expect(part('booked').hidden).toBe(false);
     expect(document.activeElement?.textContent).toBe('You’re booked.');
-    expect(queue()).toContainEqual(['Demo booked', { props: { plan: 'enterprise' } }]);
+    expect(queued).toContainEqual(['Demo booked', { plan: 'enterprise' }]);
   });
 
   it('offers Calendly’s own page when the scheduler is slow', () => {

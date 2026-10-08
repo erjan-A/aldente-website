@@ -1,6 +1,6 @@
 /**
  * Cookie consent: which optional categories the visitor allowed, and when. Necessary storage (this choice)
- * is always on. Visit counting (Plausible) is cookieless and stores nothing in the browser, so it is not a
+ * is always on. Visit counting (Umami) is cookieless and stores nothing in the browser, so it is not a
  * category to choose: the only optional one is marketing, which lets Calendly's booking calendar on the
  * demo page set its own cookies without asking again (hide_gdpr_banner).
  */
