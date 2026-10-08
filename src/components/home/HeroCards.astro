@@ -1,82 +1,84 @@
 ---
 import { Image } from 'astro:assets';
+import '../../styles/slack.css';
 import dining from '../../assets/images/dining-room-overhead.jpg';
-import trayComplete from '../../assets/images/order-tray-complete.jpg';
 import tray from '../../assets/images/order-tray.jpg';
-import departure from '../../assets/images/staff-departure.jpg';
+import mark from '../../assets/logos/aldente-mark.svg';
+import Icon from '../ui/Icon.astro';
 import ProductPill from '../ui/ProductPill.astro';
 import HeroDeck from './HeroDeck.astro';
 
 /**
- * The hero's cards, "What Aldente sees": four camera frames, each with the one thing Aldente spotted and
- * what happened next, under the product's pill. Every frame is 16:9; boxes are in % of the frame (photos
- * cropped centre). The first frame loads with the page; the rest wait their turn.
+ * The hero's cards, "What Aldente sees": four 16:9 frames, each under its product's pill with what
+ * happened next. Two are camera frames with one detection (boxes in % of the frame, photos cropped centre);
+ * the dispute and Aldo's HR case show the product UI instead. The first frame loads with the page.
  */
-const cards = [
-  {
-    product: 'verify' as const,
+const photos = {
+  check: {
     image: tray,
     box: { left: 66, top: 33, width: 32, height: 62 },
     label: '1 of 2 drinks',
-    tone: 'alert',
-    title: 'Wrong order caught at packing.',
-    detail: 'The drink goes in before pickup.',
   },
-  {
-    product: 'verify' as const,
-    image: trayComplete,
-    box: { left: 3, top: 4, width: 94, height: 90 },
-    label: 'All 4 items in the bag',
-    tone: 'ok',
-    inside: true,
-    title: 'Refund disputed with the clip.',
-    detail: 'Uber Eats returns the $17.40.',
-  },
-  {
-    product: 'vision' as const,
+  table: {
     image: dining,
     box: { left: 26, top: 64, width: 34, height: 28 },
     label: 'Table 6 · to clear · 3:12',
-    tone: 'alert',
-    title: 'Table 6 waiting 3 minutes.',
-    detail: 'The floor team hears in Slack.',
   },
-  {
-    product: 'aldo' as const,
-    image: departure,
-    box: { left: 63, top: 13, width: 19, height: 50 },
-    label: 'Left 21:14 · no clock-out',
-    tone: 'alert',
-    labelEnd: true,
-    labelBelow: true,
-    title: 'Missed clock-out found.',
-    detail: 'Aldo prepares the HR case.',
-  },
-];
+};
 ---
 
 <HeroDeck>
-  {
-    cards.map((c, i) => (
-      <div class="hd__card see">
-        <div class="see__frame">
-          <Image src={c.image} alt="" widths={[320, 560]} sizes="280px" loading={i === 0 ? 'eager' : 'lazy'} />
-          <span
-            class:list={['see__box', `see__box--${c.tone}`, { 'see__box--inside': c.inside, 'see__box--end': c.labelEnd, 'see__box--below': c.labelBelow }]}
-            style={`left:${c.box.left}%;top:${c.box.top}%;width:${c.box.width}%;height:${c.box.height}%`}
-          >
-            <span class="see__label">{c.label}</span>
-          </span>
-          <span class="see__pill">
-            <ProductPill product={c.product} />
-          </span>
-        </div>
-        <p class="see__text">
-          <b>{c.title}</b> <span>{c.detail}</span>
-        </p>
+  <div class="hd__card see">
+    <div class="see__frame">
+      <Image src={photos.check.image} alt="" widths={[320, 560]} sizes="280px" loading="eager" />
+      <span class="see__box" style={`left:${photos.check.box.left}%;top:${photos.check.box.top}%;width:${photos.check.box.width}%;height:${photos.check.box.height}%`}>
+        <span class="see__label">{photos.check.label}</span>
+      </span>
+      <span class="see__pill"><ProductPill product="verify" /></span>
+    </div>
+    <p class="see__text"><b>Wrong order caught at packing.</b> <span>The drink goes in before pickup.</span></p>
+  </div>
+
+  <div class="hd__card see">
+    <div class="see__frame see__frame--ui dsp">
+      <span class="see__pill"><ProductPill product="verify" /></span>
+      <span class="dsp__status"><Icon name="check" size={10} strokeWidth={3} />Reversed</span>
+      <div class="dsp__body">
+        <p class="dsp__order"><b>Order #4821</b> · Uber Eats</p>
+        <p class="dsp__claim">Claim: missing drink · <b>$17.40</b></p>
+        <p class="dsp__msg"><b>Aldente</b> All 4 items were packed. Clip attached.</p>
+        <p class="dsp__back"><Icon name="check" size={11} strokeWidth={3} />$17.40 back to Location 01</p>
       </div>
-    ))
-  }
+    </div>
+    <p class="see__text"><b>Refund disputed with the clip.</b> <span>Uber Eats returns the $17.40.</span></p>
+  </div>
+
+  <div class="hd__card see">
+    <div class="see__frame">
+      <Image src={photos.table.image} alt="" widths={[320, 560]} sizes="280px" loading="lazy" />
+      <span class="see__box" style={`left:${photos.table.box.left}%;top:${photos.table.box.top}%;width:${photos.table.box.width}%;height:${photos.table.box.height}%`}>
+        <span class="see__label">{photos.table.label}</span>
+      </span>
+      <span class="see__pill"><ProductPill product="vision" /></span>
+    </div>
+    <p class="see__text"><b>Table 6 waiting 3 minutes.</b> <span>The floor team hears in Slack.</span></p>
+  </div>
+
+  <div class="hd__card see">
+    <div class="see__frame see__frame--ui hr slack">
+      <span class="see__pill"><ProductPill product="aldo" /></span>
+      <span class="hr__channel">#hr-review</span>
+      <div class="hr__msg">
+        <span class="hr__av"><img src={mark.src} alt="" width="10" height="12" /></span>
+        <div class="hr__body">
+          <p class="hr__title"><b>1 missing clock-out needs review</b></p>
+          <p class="hr__fields">EMP-07 · left 21:14 · clock-out <em>missing</em></p>
+          <span class="hr__btn">Review case</span>
+        </div>
+      </div>
+    </div>
+    <p class="see__text"><b>Missed clock-out found.</b> <span>Aldo prepares the HR case.</span></p>
+  </div>
 </HeroDeck>
 
 <style>
@@ -93,7 +95,7 @@ const cards = [
     background: #000000;
   }
 
-  .see__frame :global(img) {
+  .see__frame > :global(img) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -111,16 +113,8 @@ const cards = [
   /* The design system's detection: a 3px box with a 10px radius, the label in a solid chip above it. */
   .see__box {
     position: absolute;
-    border: 3px solid;
+    border: 3px solid var(--accent);
     border-radius: 10px;
-  }
-
-  .see__box--alert {
-    border-color: var(--accent);
-  }
-
-  .see__box--ok {
-    border-color: var(--ok);
   }
 
   .see__label {
@@ -135,31 +129,144 @@ const cards = [
     white-space: nowrap;
   }
 
-  .see__box--end .see__label {
-    left: auto;
-    right: -3px;
-  }
-
-  /* Near the top edge the label goes under the box, as the design system says. */
-  .see__box--below .see__label {
-    top: calc(100% + 4px);
-    bottom: auto;
-  }
-
-  .see__box--inside .see__label {
-    left: 6px;
-    top: auto;
-    bottom: 6px;
-  }
-
-  .see__box--alert .see__label {
+  .see__label {
     background: var(--accent);
     color: #0b0b0b;
   }
 
-  .see__box--ok .see__label {
-    background: var(--ok);
+  /* The two UI frames: light panels, with the content under the pill. */
+  .see__frame--ui {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 46px 12px 10px;
+  }
+
+  /* The dispute: the decks' light dispute desk (#fafaf8, #141414 ink, green for resolved, darkened for AA). */
+  .dsp {
+    background: #fafaf8;
+    color: #141414;
+  }
+
+  .dsp__status {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e6f5ec;
+    color: #147a43;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .dsp__body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+
+  .dsp__claim {
+    color: #6b6b6b;
+  }
+
+  .dsp__claim b {
+    color: #141414;
+  }
+
+  .dsp__msg {
+    align-self: flex-end;
+    max-width: 92%;
+    margin-top: 2px;
+    padding: 4px 8px;
+    border-radius: 10px 10px 3px 10px;
+    background: #e05634;
     color: #0b0b0b;
+  }
+
+  .dsp__msg b {
+    margin-right: 4px;
+  }
+
+  .dsp__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    color: #147a43;
+    font-weight: 700;
+  }
+
+  /* Aldo's HR case in Slack: the minimal window's message, with the next action. */
+  .hr {
+    justify-content: center;
+    background: #ffffff;
+    color: var(--slack-text);
+  }
+
+  .hr__channel {
+    position: absolute;
+    top: 16px;
+    right: 12px;
+    color: var(--slack-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+
+  .hr__msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .hr__av {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    background: #0b0b0b;
+  }
+
+  .hr__av img {
+    width: 10px;
+    height: auto;
+  }
+
+  .hr__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    min-width: 0;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .hr__fields {
+    color: var(--slack-muted);
+  }
+
+  .hr__fields em {
+    font-style: normal;
+    font-weight: 700;
+    color: #b8401f;
+  }
+
+  .hr__btn {
+    margin-top: 2px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: var(--slack-green);
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
   }
 
   .see__text {

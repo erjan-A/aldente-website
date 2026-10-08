@@ -672,8 +672,12 @@ describe('Hero cards', () => {
       'Aldente Vision',
       'Aldo',
     ]);
-    expect(cards.every((c) => c.querySelector('.see__box .see__label') && c.querySelector('.see__text b'))).toBe(true);
+    expect(cards.every((c) => c.querySelector('.see__text b'))).toBe(true);
+    // Camera frames for the order check and the table; the product UI for the dispute and the HR case.
+    expect(cards.map((c) => (c.querySelector('.see__box') ? 'photo' : 'ui'))).toEqual(['photo', 'ui', 'photo', 'ui']);
+    expect(cards[1]!.textContent).toContain('Reversed');
+    expect(cards[3]!.textContent).toContain('Review case');
     // Only the first frame loads with the page.
-    expect(cards.map((c) => c.querySelector('img')?.getAttribute('loading'))).toEqual(['eager', 'lazy', 'lazy', 'lazy']);
+    expect(cards.map((c) => c.querySelector('.see__frame > img')?.getAttribute('loading') ?? null)).toEqual(['eager', null, 'lazy', null]);
   });
 });
