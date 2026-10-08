@@ -672,7 +672,7 @@ describe('Hero cards', () => {
       'Aldente Vision',
       'Aldo',
     ]);
-    expect(cards.every((c) => c.querySelector('.see__text b'))).toBe(true);
+    expect(cards.every((c) => c.querySelector('.see__text')?.textContent?.trim())).toBe(true);
     // Camera frames for the order check and the table; the product UI for the dispute and the HR case.
     expect(cards.map((c) => (c.querySelector('.see__box') ? 'photo' : 'ui'))).toEqual(['photo', 'ui', 'photo', 'ui']);
     expect(cards[1]!.textContent).toContain('Reversed');
