@@ -1,0 +1,116 @@
+---
+import { ROLLOUT } from '../../data/rollout';
+import Card from './Card.astro';
+
+/**
+ * How we start, week by week (src/data/rollout.ts). `layout="cards"`: three cards in a row from 1024px (home,
+ * /pricing). `layout="list"`: a compact numbered list for narrow columns (/demo).
+ */
+interface Props {
+  layout?: 'cards' | 'list';
+  /** Heading level of each week's title, so the list sits under the page's own outline. */
+  level?: 'h3' | 'h4';
+}
+
+const { layout = 'cards', level: Title = 'h3' } = Astro.props;
+---
+
+{
+  layout === 'cards' ? (
+    <ol class="weeks" role="list">
+      {ROLLOUT.map((w) => (
+        <Card as="li">
+          <span class="weeks__when">{w.when}</span>
+          <Title class="weeks__title">{w.title}</Title>
+          <p class="weeks__text">{w.text}</p>
+        </Card>
+      ))}
+    </ol>
+  ) : (
+    <ol class="steps" role="list">
+      {ROLLOUT.map((w) => (
+        <li>
+          <span class="weeks__when">{w.when}</span>
+          <Title class="weeks__title">{w.title}</Title>
+          <p class="weeks__text">{w.text}</p>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+<style>
+  /* One column on phones, two on tablets with the last week across the row, three from 1024px. */
+  .weeks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  @media (min-width: 640px) {
+    .weeks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .weeks > :global(:last-child:nth-child(odd)) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .weeks {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .weeks > :global(:last-child:nth-child(odd)) {
+      grid-column: auto;
+    }
+  }
+
+  .weeks__when {
+    font-size: var(--step-label);
+    font-weight: 600;
+    color: var(--fg-accent);
+  }
+
+  .weeks__title {
+    font-size: var(--step-h4);
+    font-weight: 600;
+  }
+
+  .weeks__text {
+    color: var(--fg-2);
+  }
+
+  /* The list: weeks on a hairline rail, each title beside its week label. */
+  .steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: 6.5em minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .steps li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .steps .weeks__when {
+    grid-row: 1 / span 2;
+    padding-top: 0.3em;
+  }
+
+  .steps .weeks__title {
+    font-size: var(--step-body);
+  }
+
+  .steps .weeks__text {
+    font-size: var(--step-small);
+  }
+</style>

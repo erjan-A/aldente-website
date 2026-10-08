@@ -5,6 +5,8 @@ import PlanGrid from '../components/pricing/PlanGrid.astro';
 import PageHero from '../components/site/PageHero.astro';
 import Faq from '../components/ui/Faq.astro';
 import Icon from '../components/ui/Icon.astro';
+import RolloutWeeks from '../components/ui/RolloutWeeks.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
 import { PRICING_FAQ } from '../data/pricing';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
@@ -19,7 +21,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   >
     <ul class="assure" role="list">
       {
-        ['Start with one location', 'Monthly per location', 'Live in 30 days'].map((item) => (
+        ['Start with one location', 'Monthly per location', 'Live in 2–3 weeks'].map((item) => (
           <li>
             <Icon name="check" size={14} strokeWidth={3} />
             {item}
@@ -29,12 +31,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </ul>
   </PageHero>
   <PlanGrid />
+  <section class="start tone-dark section" aria-labelledby="start-title">
+    <div class="container start__inner">
+      <SectionHeader
+        id="start-title"
+        label="How we start"
+        title="Start with one location,"
+        muted="live in 2–3 weeks."
+        lead="We install, connect and tune it with your team, then plan the next locations from the first results."
+      />
+      <RolloutWeeks />
+    </div>
+  </section>
   <CompareTable />
   <Faq items={PRICING_FAQ} />
   <Cta />
 </BaseLayout>
 
 <style>
+  .start__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
   .assure {
     display: flex;
     flex-wrap: wrap;

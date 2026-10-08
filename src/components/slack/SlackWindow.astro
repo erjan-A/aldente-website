@@ -8,7 +8,6 @@ interface Props {
   active: string;
   workspace?: string;
   channels?: string[];
-  members?: string;
   /** Hide the aubergine sidebar for small placements. */
   sidebar?: boolean;
   /** Text for the composer; defaults to "Message #channel". */
@@ -21,7 +20,6 @@ const {
   active,
   workspace = 'Harbor Restaurant Group',
   channels = [active],
-  members,
   sidebar = true,
   composer,
   label = 'Aldo in Slack',
@@ -30,11 +28,6 @@ const {
 ---
 
 <figure class:list={['slack', 'slack-window', className]} aria-label={label}>
-  <div class="slack-window__top" aria-hidden="true">
-    <span class="slack-window__dots"><i></i><i></i><i></i></span>
-    <span class="slack-window__search"><Icon name="search" size={13} /><span>Search {workspace}</span></span>
-    <span></span>
-  </div>
   <div class="slack-window__body">
     {
       sidebar && (
@@ -66,7 +59,6 @@ const {
     <div class="slack-window__main">
       <div class="slack-window__header">
         <span class="slack-window__channel"><Icon name="hash" size={16} strokeWidth={2.25} /><span data-slack-channel>{active}</span></span>
-        {members && <span class="slack-window__members">{members}</span>}
       </div>
       <div class="slack-window__messages">
         <slot />
@@ -89,49 +81,6 @@ const {
     background: #ffffff;
     border: 1px solid var(--line-card);
     min-width: 0;
-  }
-
-  .slack-window__top {
-    display: grid;
-    grid-template-columns: 1fr minmax(0, 2fr) 1fr;
-    align-items: center;
-    gap: 12px;
-    height: 38px;
-    padding: 0 12px;
-    background: var(--slack-aubergine-2);
-  }
-
-  .slack-window__dots {
-    display: flex;
-    gap: 6px;
-  }
-
-  .slack-window__dots i {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.25);
-  }
-
-  .slack-window__search {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    overflow: hidden;
-    height: 24px;
-    padding: 0 10px;
-    border-radius: var(--radius-s);
-    background: rgb(255 255 255 / 0.18);
-    color: rgb(255 255 255 / 0.85);
-    font-size: 12px;
-  }
-
-  .slack-window__search span {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .slack-window__body {
@@ -216,14 +165,6 @@ const {
     font-size: 18px;
     font-weight: 900;
     color: var(--slack-text);
-  }
-
-  .slack-window__members {
-    font-size: 13px;
-    color: var(--slack-muted);
-    border: 1px solid var(--slack-border);
-    border-radius: var(--radius-xs);
-    padding: 3px 8px;
   }
 
   .slack-window__messages {

@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Card from '../components/ui/Card.astro';
 import Icon from '../components/ui/Icon.astro';
+import RolloutWeeks from '../components/ui/RolloutWeeks.astro';
 import { CUSTOMER_LOGOS } from '../data/logos';
 import { retina } from '../lib/images';
 import { COUNTER, SITE } from '../data/site';
@@ -67,6 +68,11 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
       </Card>
 
       <div class="demo__details">
+        <section class="demo__start" aria-labelledby="start-title">
+          <h2 id="start-title" class="demo__start-title">How we start</h2>
+          <RolloutWeeks layout="list" />
+        </section>
+
         <figure class="demo__quote">
           <blockquote>“Ask Slack to pull the camera footage from any restaurant? That changes everything.”</blockquote>
           <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
@@ -421,6 +427,19 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     flex-direction: column;
     gap: 40px;
     margin-top: 12px;
+  }
+
+  .demo__start {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 46ch;
+  }
+
+  .demo__start-title {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   .demo__quote {

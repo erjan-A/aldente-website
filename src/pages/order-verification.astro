@@ -2,7 +2,9 @@
 import CaseStudy from '../components/home/CaseStudy.astro';
 import Cta from '../components/home/Cta.astro';
 import OrderStory from '../components/home/OrderStory.astro';
+import DisputeRecover from '../components/product/DisputeRecover.astro';
 import VerifyHeroMedia from '../components/product/VerifyHeroMedia.astro';
+import VerifyLoops from '../components/product/VerifyLoops.astro';
 import PageHero from '../components/site/PageHero.astro';
 import Button from '../components/ui/Button.astro';
 import Card from '../components/ui/Card.astro';
@@ -12,7 +14,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const tiles = [
   ['Verified orders', 'Every bag checked, by location and shift'],
-  ['Mistakes caught', 'What was missing, and where'],
+  ['Wrong orders caught', 'What was missing, and where'],
   ['Disputes won', 'Refund claims answered with video'],
   ['Recovered revenue', 'Money back from delivery platforms'],
   ['Complaint reasons', 'Timing, portions, missing items'],
@@ -20,26 +22,28 @@ const tiles = [
 ];
 ---
 
-<BaseLayout title="Aldente Verify, order verification for restaurants" description="Catch packing errors before pickup, keep photo and clip evidence for every order, and dispute delivery refunds automatically.">
+<BaseLayout title="Aldente Verify, order verification for restaurants" description="Aldente Verify checks every bag before pickup and wins back delivery refunds with video: a camera at the packing station, the packing clip for every claim.">
   <PageHero
     product="verify"
-    title="Every order checked"
-    muted="before it leaves the counter."
-    lead="A camera at the packing station checks every item against the POS order, flags what’s missing, and keeps the evidence for every complaint."
+    title="Verify checks every bag before pickup"
+    muted="and wins back refunds with video."
+    lead="A camera at the packing station checks every item against the POS order before pickup. When a delivery app still charges a refund, Aldente disputes it with the packing clip."
   >
     <Button href={`${LINKS.demo}?plan=verification`} size="lg" arrow>Book a demo</Button>
     <Button href={LINKS.pricing} variant="secondary" size="lg">Compare plans</Button>
     <VerifyHeroMedia slot="media" />
   </PageHero>
+  <VerifyLoops />
   <OrderStory title="How an order" muted="is verified." product={null} />
-  <CaseStudy product={null} />
+  <DisputeRecover />
+  <CaseStudy />
   <section class="tone-dark section" aria-labelledby="dash-title">
     <div class="container dash">
       <SectionHeader
         id="dash-title"
         title="Accuracy for every location,"
         muted="in real time."
-        lead="See verified orders, mistakes caught, disputes won and money recovered by location. Find the stations where checks are skipped and fix them with training."
+        lead="See verified orders, wrong orders caught, disputes won and money recovered by location. Find the stations where checks are skipped and fix them with training."
       />
       <ul class="dash__tiles" role="list">
         {

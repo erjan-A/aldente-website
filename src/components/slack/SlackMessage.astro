@@ -7,11 +7,10 @@ interface Props {
   /** "aldo" shows the Aldo app avatar; anything else is used as initials. */
   avatar?: string;
   avatarColor?: string;
-  app?: boolean;
   class?: string;
 }
 
-const { author, time, avatar = 'aldo', avatarColor = '#4a5568', app = false, class: className } = Astro.props;
+const { author, time, avatar = 'aldo', avatarColor = '#4a5568', class: className } = Astro.props;
 const isAldo = avatar === 'aldo';
 ---
 
@@ -30,7 +29,6 @@ const isAldo = avatar === 'aldo';
   <div class="slack-message__body">
     <p class="slack-message__meta">
       <b>{author}</b>
-      {app && <span class="slack-message__app">APP</span>}
       <time>{time}</time>
     </p>
     <div class="slack-message__content">
@@ -88,16 +86,6 @@ const isAldo = avatar === 'aldo';
 
   .slack-message__meta b {
     font-weight: 900;
-  }
-
-  .slack-message__app {
-    padding: 1px 3px;
-    border-radius: var(--radius-xs);
-    background: rgb(29 28 29 / 0.13);
-    color: rgb(29 28 29 / 0.7);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
   }
 
   .slack-message__meta time {

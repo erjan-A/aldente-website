@@ -13,6 +13,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
   <div class="container products__inner">
     <SectionHeader
       id="products-title"
+      label="Products"
       title="Three connected products"
       muted="that work as one."
       lead="Order and camera records feed Aldo’s answers and Playbooks, so every product makes the others smarter."
@@ -31,14 +32,15 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
                     <span class="voice__wave">{wave.map((h, i) => <i style={`--h:${h}px;--d:${(i % 6) * 0.11}s`} />)}</span>
                     <span class="voice__time">0:04</span>
                   </span>
-                  <p class="mini-transcript">“How many guests did we have yesterday?”</p>
+                  <p class="mini-transcript">“How many visitors yesterday?”</p>
                 </div>
               </div>
               <div class="mini-msg">
                 <span class="mini-avatar mini-avatar--aldo"><img src={mark.src} alt="" width="14" height="17" /></span>
                 <div class="mini-body">
-                  <p class="slack-text"><b>Aldo</b> <span class="mini-app">APP</span></p>
-                  <p class="slack-text">3,646 guests across 3 locations, 6% more than last Tuesday. Busiest: 12:00–13:00 at Location 03.</p>
+                  <p class="slack-text"><b>Aldo</b></p>
+                  <p class="slack-text">3,499 visitors across 3 locations, up 4%. Busiest: 12:00–13:00 at Location 03.</p>
+                  <p class="slack-muted">Source: Aldente Vision · 3 locations</p>
                 </div>
               </div>
             </div>
@@ -46,7 +48,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
           <div class="product__copy">
             <ProductPill product="aldo" />
             <h3>Your AI Chief of Staff</h3>
-            <p>Ask by text or voice in Slack, and give Aldo the recurring work. It answers with numbers, clips and records.</p>
+            <p>Answers in Slack and runs routine work. Ask once: a Playbook repeats the check and posts the result.</p>
             <span class="product__link">Explore Aldo <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
@@ -66,7 +68,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
           <div class="product__copy">
             <ProductPill product="verify" />
             <h3>Order verification</h3>
-            <p>Catch packing errors before pickup, keep the evidence and win refund disputes automatically.</p>
+            <p>Checks every bag before pickup and wins back refunds with video.</p>
             <span class="product__link">Explore Aldente Verify <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
@@ -83,7 +85,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
           <div class="product__copy">
             <ProductPill product="vision" />
             <h3>Camera AI</h3>
-            <p>Computer vision and VLMs turn the cameras you already have into events, triggers and analytics for every location.</p>
+            <p>Turns your cameras into traffic, queue, table and staff data, for every location, hour by hour.</p>
             <span class="product__link">Explore Aldente Vision <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
@@ -228,15 +230,6 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
 
   .mini-avatar--aldo {
     background: #0b0b0b;
-  }
-
-  .mini-app {
-    padding: 1px 3px;
-    border-radius: var(--radius-xs);
-    color: rgb(29 28 29 / 0.8);
-    background: rgb(29 28 29 / 0.13);
-    font-size: 11px;
-    font-weight: 700;
   }
 
   .product__art--slack .slack-text {

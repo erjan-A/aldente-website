@@ -1,33 +1,19 @@
 ---
 import Card from '../ui/Card.astro';
+import RolloutWeeks from '../ui/RolloutWeeks.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
-
-const weeks = [
-  { when: 'Week 1', title: 'Install and connect', text: 'Mount the verification tablet, connect your cameras and POS, and train Aldente on your menu.' },
-  { when: 'Weeks 2–3', title: 'Go live', text: 'Tune accuracy, set up dispute workflows and alert routes, and give Aldo its first Playbooks.' },
-  { when: 'Week 4', title: 'Roll out', text: 'Review the first results with your team and plan the next locations.' },
-];
 ---
 
 <section class="enterprise tone-dark section" aria-labelledby="enterprise-title">
   <div class="container enterprise__inner">
     <SectionHeader
       id="enterprise-title"
+      label="How we start"
       title="Built for chains,"
       muted="ready for your first location."
-      lead="Live in 30 days with the cameras you already have, and the security your IT team expects."
+      lead="Live in 2–3 weeks with the cameras you already have, and the security your IT team expects."
     />
-    <ol class="enterprise__weeks" role="list">
-      {
-        weeks.map((w) => (
-          <Card as="li">
-            <span class="enterprise__when">{w.when}</span>
-            <h3>{w.title}</h3>
-            <p>{w.text}</p>
-          </Card>
-        ))
-      }
-    </ol>
+    <RolloutWeeks />
     <ul class="enterprise__trust" role="list">
       <Card as="li" class="trust">
         <span class="trust__badge" aria-hidden="true"><b>SOC 2</b><span>Type II</span></span>
@@ -45,48 +31,6 @@ const weeks = [
     display: flex;
     flex-direction: column;
     gap: 56px;
-  }
-
-  /* One column on phones, two on tablets with the last week across the row, three from 1024px. */
-  .enterprise__weeks {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-  }
-
-  @media (min-width: 640px) {
-    .enterprise__weeks {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .enterprise__weeks > :global(:last-child:nth-child(odd)) {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .enterprise__weeks {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .enterprise__weeks > :global(:last-child:nth-child(odd)) {
-      grid-column: auto;
-    }
-  }
-
-  .enterprise__when {
-    font-size: var(--step-label);
-    font-weight: 600;
-    color: var(--fg-accent);
-  }
-
-  .enterprise__weeks h3 {
-    font-size: var(--step-h4);
-    font-weight: 600;
-  }
-
-  .enterprise__weeks p {
-    color: var(--ink-2);
   }
 
   .enterprise__trust {

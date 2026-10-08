@@ -74,6 +74,7 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
   <div class="container connections__inner">
     <SectionHeader
       product={product ?? undefined}
+      label={product === 'aldo' ? 'Aldo in Slack' : undefined}
       id="connections-title"
       title="Aldo, your AI Chief of Staff,"
       muted="connected to your restaurant data."

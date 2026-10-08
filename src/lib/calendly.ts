@@ -47,7 +47,7 @@ export function calendlyEmbedUrl(base: string, { hostname, plan, consented = fal
   const params = new URLSearchParams({
     hide_event_type_details: '1',
     hide_landing_page_details: '1',
-    background_color: '181818',
+    background_color: '151515',
     text_color: 'f1f1f1',
     primary_color: 'e05634',
     embed_domain: hostname,

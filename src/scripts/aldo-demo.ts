@@ -8,7 +8,8 @@ import { define, prefersReducedMotion } from './define';
  * With `data-autoplay="5000"` it steps to the next tab every 5 seconds and loops, while
  * on screen. It pauses under the mouse or keyboard focus, stops for good once the visitor
  * picks a tab, never moves focus, and stays still for reduced motion. `data-autoplay-state`
- * (playing | paused) drives the progress bar on the active tab.
+ * (playing | paused) drives the progress bar on the active tab. A `data-confirm` button marks its panel
+ * `data-confirmed` (the Playbook card locks and "Playbook created" shows) and moves focus to `data-confirmed-focus`.
  */
 export class AldoDemo extends HTMLElement {
   private timer: number | undefined;
@@ -126,6 +127,15 @@ export class AldoDemo extends HTMLElement {
 
   private onClick = (event: Event): void => {
     const target = event.target as Element;
+    // Confirm on a Playbook card locks the card and posts "Playbook created" (CSS reads data-confirmed).
+    const confirm = target.closest<HTMLElement>('[data-confirm]');
+    if (confirm) {
+      this.stop();
+      const panel = confirm.closest<HTMLElement>('[role="tabpanel"]');
+      panel?.setAttribute('data-confirmed', '');
+      panel?.querySelector<HTMLElement>('[data-confirmed-focus]')?.focus({ preventScroll: true });
+      return;
+    }
     // Buttons inside a panel can move the story on, e.g. "Send this every Monday" → Assign.
     const goto = target.closest<HTMLElement>('[data-goto]')?.dataset.goto;
     if (goto) {

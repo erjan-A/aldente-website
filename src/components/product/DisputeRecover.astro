@@ -1,0 +1,515 @@
+---
+import { Image } from 'astro:assets';
+import trayComplete from '../../assets/images/order-tray-complete.jpg';
+import mark from '../../assets/logos/aldente-mark.svg';
+import Icon from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+/**
+ * Dispute & Recover, as on the decks' slide: four numbered steps beside a light dispute desk where one claim
+ * plays out: the claim comes in, the packing clip proves the bag, the dispute goes to the app in its
+ * support chat, and the charge comes back. The order is #4821 from the rest of the page.
+ *
+ * <scroll-beats> reveals the desk step by step as it scrolls into view (data-beat 0-4). The markup ships at
+ * beat 4, so without JavaScript or with reduced motion the whole story shows at once.
+ */
+const steps = [
+  { title: 'Claim comes in', text: 'Uber Eats charges $17.40 for a missing drink.' },
+  { title: 'Proof found', text: 'Aldente pulls the packing clip: all 4 items in the bag.' },
+  { title: 'Dispute sent', text: 'The clip goes to the app in its support chat.' },
+  { title: 'Money back', text: 'The charge is reversed and $17.40 returns to the store.' },
+];
+const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
+---
+
+<section class="dispute tone-dark section" aria-labelledby="dispute-title">
+  <div class="container dispute__inner">
+    <SectionHeader
+      id="dispute-title"
+      label="Dispute & Recover"
+      title="When a refund still hits,"
+      muted="Aldente disputes it with video proof."
+      lead="Delivery apps charge the store for refund claims, right or wrong. Aldente answers each one with the packing clip."
+    />
+
+    <scroll-beats class="dispute__beats" data-beats="4" data-beat="4" data-start="0.05" data-end="0.55">
+      <div class="dispute__stage">
+        <ol class="dispute__steps" role="list">
+          {
+            steps.map((step, i) => (
+              <li class:list={['dispute__step', `s${i + 1}`]}>
+                <span class="dispute__n" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span class="dispute__copy">
+                  <b>{step.title}</b>
+                  <span>{step.text}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <figure class="desk" aria-label="Aldente’s dispute desk: the Uber Eats claim on order #4821, the packing clip, the dispute and the reversed charge">
+          <div class="desk__top">
+            <span class="desk__brand"><img src={mark.src} alt="" width="13" height="16" />Delivery disputes</span>
+            <span class="desk__store">Location 01</span>
+          </div>
+
+          <div class="desk__kpis">
+            <div class="desk__kpi">
+              <span>Won back this month</span>
+              <b><span class="v-before">$4,202</span><span class="v-after">$4,219</span></b>
+            </div>
+            <div class="desk__kpi">
+              <span>Disputes won</span>
+              <b><span class="v-before">41</span><span class="v-after">42</span></b>
+            </div>
+          </div>
+
+          <div class="desk__case b1">
+            <div class="desk__case-head">
+              <span><b>Order #4821</b> · Uber Eats</span>
+              <span class="desk__status">
+                <span class="st st--new">New claim</span>
+                <span class="st st--proof">Clip found</span>
+                <span class="st st--sent">Disputed</span>
+                <span class="st st--back"><Icon name="check" size={12} strokeWidth={3} />Reversed</span>
+              </span>
+            </div>
+            <p class="desk__claim">Claim: missing drink · <b>$17.40</b></p>
+
+            <div class="desk__proof b2">
+              <div class="desk__clip">
+                <Image src={trayComplete} alt="" widths={[240, 400]} sizes="160px" loading="lazy" />
+                <span class="desk__rec">Packing clip · 12:41 · 0:42</span>
+              </div>
+              <div class="desk__items">
+                <ul role="list">
+                  {
+                    items.map((item) => (
+                      <li>
+                        <Icon name="check" size={12} strokeWidth={3} />
+                        {item}
+                      </li>
+                    ))
+                  }
+                </ul>
+                <p>All 4 items were in the bag.</p>
+              </div>
+            </div>
+
+            <div class="desk__chat">
+              <p class="msg msg--app b1"><b>Uber Eats support</b>Guest reported a missing drink. $17.40 charged to the store.</p>
+              <p class="msg msg--us b3"><b>Aldente</b>All 4 items were packed. The clip from the packing station is attached.</p>
+              <p class="msg msg--app b4"><b>Uber Eats support</b>Evidence reviewed. Charge reversed.</p>
+            </div>
+          </div>
+
+          <p class="desk__toast b4"><Icon name="check" size={14} strokeWidth={3} />$17.40 returned to Location 01</p>
+        </figure>
+      </div>
+    </scroll-beats>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/scroll-beats';
+</script>
+
+<style>
+  .dispute__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .dispute__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .dispute__stage {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(40px, 5vw, 80px);
+    }
+  }
+
+  /* ---------- The four steps ---------- */
+
+  .dispute__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .dispute__step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .dispute__n {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    font-size: var(--step-small);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-2);
+  }
+
+  .dispute__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 4px;
+  }
+
+  .dispute__copy b {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .dispute__copy span {
+    color: var(--fg-2);
+  }
+
+  /* The step the desk has reached is lit; the last one in green. */
+  scroll-beats[data-beat='1'] .s1 .dispute__n,
+  scroll-beats[data-beat='2'] .s2 .dispute__n,
+  scroll-beats[data-beat='3'] .s3 .dispute__n {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  scroll-beats[data-beat='4'] .s4 .dispute__n {
+    border-color: var(--ok);
+    background: var(--ok);
+    color: var(--on-accent);
+  }
+
+  /* ---------- The desk: a light dashboard, as the decks draw it ---------- */
+
+  .desk {
+    --d-bg: #fafaf8;
+    --d-card: #ffffff;
+    --d-ink: #141414;
+    --d-muted: #6b6b6b;
+    --d-line: #e4e4e0;
+    --d-ok: #147a43; /* the decks' #1e9e5a, darkened to keep AA on white and on --d-ok-soft */
+    --d-ok-soft: #e6f5ec;
+    position: relative;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 0 18px;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    background: var(--d-bg);
+    color: var(--d-ink);
+    font-size: var(--step-small);
+    line-height: 1.4;
+  }
+
+  .desk__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--d-card);
+    border-bottom: 1px solid var(--d-line);
+  }
+
+  .desk__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+
+  .desk__brand img {
+    width: 22px;
+    height: 22px;
+    padding: 4px 5px;
+    border-radius: var(--radius-xs);
+    background: #0b0b0b;
+  }
+
+  .desk__store {
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--d-line);
+    color: var(--d-muted);
+    font-size: var(--step-label);
+    font-weight: 600;
+  }
+
+  .desk__kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0 18px;
+  }
+
+  .desk__kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    border: 1px solid var(--d-line);
+    border-radius: var(--radius-s);
+    background: var(--d-card);
+  }
+
+  .desk__kpi span {
+    color: var(--d-muted);
+    font-size: var(--step-label);
+  }
+
+  .desk__kpi b {
+    font-size: var(--step-h4);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .desk__case {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 18px;
+    padding: 14px;
+    border: 1px solid #e05634;
+    border-radius: var(--radius-m);
+    background: var(--d-card);
+  }
+
+  .desk__case-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+  }
+
+  .desk__claim {
+    margin-top: -6px;
+    color: var(--d-muted);
+  }
+
+  .desk__claim b {
+    color: var(--d-ink);
+  }
+
+  /* One status at a time: the latest the claim has reached. */
+  .st {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--step-label);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .st--new {
+    color: #b8401f;
+    background: #fde8df;
+  }
+
+  .st--proof,
+  .st--sent {
+    color: #8a5a0a;
+    background: #fdf1dc;
+  }
+
+  .st--back {
+    color: var(--d-ok);
+    background: var(--d-ok-soft);
+  }
+
+  scroll-beats[data-beat='0'] .st--new,
+  scroll-beats[data-beat='1'] .st--new,
+  scroll-beats[data-beat='2'] .st--proof,
+  scroll-beats[data-beat='3'] .st--sent,
+  scroll-beats[data-beat='4'] .st--back {
+    display: inline-flex;
+  }
+
+  .desk__proof {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .desk__clip {
+    position: relative;
+    flex: 0 0 42%;
+    min-height: 104px;
+    border-radius: var(--radius-s);
+    overflow: hidden;
+    background: #000000;
+  }
+
+  .desk__clip :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .desk__rec {
+    position: absolute;
+    left: 6px;
+    bottom: 6px;
+    padding: 2px 7px;
+    border-radius: var(--radius-xs);
+    background: rgb(0 0 0 / 0.72);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .desk__items {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .desk__items ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .desk__items li {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--radius-xs);
+    background: var(--d-ok-soft);
+    color: var(--d-ok);
+    font-size: var(--step-label);
+    font-weight: 600;
+  }
+
+  .desk__items p {
+    font-weight: 600;
+  }
+
+  .desk__chat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--radius-s);
+    background: var(--d-bg);
+  }
+
+  .msg {
+    max-width: 88%;
+    padding: 8px 12px;
+    border-radius: 14px;
+  }
+
+  .msg b {
+    display: block;
+    font-size: 12px;
+    opacity: 0.75;
+  }
+
+  .msg--app {
+    align-self: flex-start;
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+    border-bottom-left-radius: 4px;
+  }
+
+  /* Dark text on the orange bubble: white on #e05634 would miss AA at this size. */
+  .msg--us {
+    align-self: flex-end;
+    background: #e05634;
+    color: #0b0b0b;
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg--us b {
+    opacity: 1;
+  }
+
+  .desk__toast {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: var(--radius-pill);
+    background: var(--d-ok);
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .v-after {
+    display: none;
+  }
+
+  scroll-beats[data-beat='4'] .v-before {
+    display: none;
+  }
+
+  scroll-beats[data-beat='4'] .v-after {
+    display: inline;
+    color: var(--d-ok);
+  }
+
+  /* Beats: the markup ships with every part showing; scroll-beats hides what the claim hasn't reached. */
+  scroll-beats[data-beat='0'] :is(.b2, .b3, .b4),
+  scroll-beats[data-beat='1'] :is(.b2, .b3, .b4),
+  scroll-beats[data-beat='2'] :is(.b3, .b4),
+  scroll-beats[data-beat='3'] .b4 {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .desk :is(.b1, .b2, .b3, .b4) {
+      transition:
+        opacity 0.4s var(--ease-out),
+        transform 0.4s var(--ease-out),
+        visibility 0.4s;
+    }
+
+    scroll-beats[data-beat='0'] :is(.b2, .b3, .b4),
+    scroll-beats[data-beat='1'] :is(.b2, .b3, .b4),
+    scroll-beats[data-beat='2'] :is(.b3, .b4),
+    scroll-beats[data-beat='3'] .b4 {
+      transform: translateY(8px);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .desk__proof {
+      flex-direction: column;
+    }
+
+    .desk__clip {
+      flex-basis: auto;
+      min-height: 140px;
+    }
+  }
+</style>

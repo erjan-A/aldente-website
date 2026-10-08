@@ -11,11 +11,11 @@ import Icon from '../ui/Icon.astro';
  */
 ---
 
-<SlackWindow active="district-west" sidebar={false} members="Aldo + 8" class="aldo-hero" label="A district manager asks Aldo about Location 03 in Slack">
+<SlackWindow active="district-west" sidebar={false} class="aldo-hero" label="A district manager asks Aldo about Location 03 in Slack">
   <SlackMessage author="District manager" avatar="DM" avatarColor="#2b6cb0" time="12:41 PM">
     <p class="slack-text"><span class="slack-mention">@Aldo</span> how’s Location 03 doing right now?</p>
   </SlackMessage>
-  <SlackMessage author="Aldo" app time="12:41 PM" class="aldo-hero__reply">
+  <SlackMessage author="Aldo" time="12:41 PM" class="aldo-hero__reply">
     <p class="slack-text">Location 03 is busy. Three things from the floor:</p>
     <ol class="aldo-hero__answer" role="list">
       <li><b>14 guests</b> seated, 9% above this time last week.</li>
@@ -35,6 +35,7 @@ import Icon from '../ui/Icon.astro';
       <span class="aldo-hero__play" aria-hidden="true"><Icon name="play" size={14} /></span>
       <span class="slack-media__label aldo-hero__label">Cam 04 · Table 6</span>
     </div>
+    <p class="slack-muted">Source: Aldente Vision · Location 03, Cam 04</p>
     <div class="slack-actions"><span class="slack-btn slack-btn--primary">View clip</span><span class="slack-btn">Open records</span></div>
   </SlackMessage>
 </SlackWindow>

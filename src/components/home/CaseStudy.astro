@@ -1,14 +1,7 @@
 ---
-import type { ProductId } from '../../data/products';
 import ProductPill from '../ui/ProductPill.astro';
 
-interface Props {
-  /** The product pill; null on Aldente Verify's own page. */
-  product?: ProductId | null;
-}
-
-const { product = 'verify' } = Astro.props;
-
+// The numbers and the footnote match the decks' "Customer results" slide.
 const BEFORE_ERRORS = new Set([3, 17, 28, 41, 55, 66, 79, 92]);
 const AFTER_ERRORS = new Set([55]);
 const dots = Array.from({ length: 100 }, (_, i) => i);
@@ -17,10 +10,11 @@ const dots = Array.from({ length: 100 }, (_, i) => i);
 <section class="case tone-paper section" id="customers" aria-labelledby="case-title">
   <div class="container case__inner">
     <div class="case__story">
-      {product && <ProductPill product={product} />}
-      <h2 id="case-title" class="case__title"><span class="case__accent">87% fewer</span> order errors.</h2>
-      <p class="case__context">At one location of a regional restaurant chain, with about 200 delivery and drive-thru orders a day and a $17 average order.</p>
-      <p class="case__result">That’s <b>4,300+ fewer wrong orders</b> and <b>$74K+ saved</b> a year.</p>
+      <ProductPill label="Customer results" />
+      <h2 id="case-title" class="case__title"><span class="case__accent">87% fewer</span> wrong orders.</h2>
+      <p class="case__context">At one location of a regional restaurant chain, with about 200 delivery and drive-thru orders a day and a $17 average check.</p>
+      <p class="case__result">That’s <b>4,300+ fewer wrong orders</b> and <b>$74K+ saved</b> a year.*</p>
+      <p class="case__note">* 12 fewer wrong orders a day × 365 days × $17 average check, with a full refund for each wrong order.</p>
     </div>
 
     <div class="case__compare">
@@ -32,11 +26,11 @@ const dots = Array.from({ length: 100 }, (_, i) => i);
         <p>14–16 wrong orders a day</p>
       </figure>
       <figure class="case__panel case__panel--after">
-        <figcaption><span>With Aldente</span><b>&lt;1%</b></figcaption>
-        <div class="dots" role="img" aria-label="Fewer than 1 wrong order in every 100 with Aldente">
+        <figcaption><span>With Aldente</span><b>~1%</b></figcaption>
+        <div class="dots" role="img" aria-label="About 1 wrong order in every 100 with Aldente">
           {dots.map((i) => <i class:list={{ on: AFTER_ERRORS.has(i) }} />)}
         </div>
-        <p>Under 2 wrong orders a day</p>
+        <p>~2 wrong orders a day</p>
       </figure>
     </div>
   </div>
@@ -81,6 +75,12 @@ const dots = Array.from({ length: 100 }, (_, i) => i);
     max-width: 40ch;
     font-size: 1.25rem;
     line-height: 1.45;
+  }
+
+  .case__note {
+    max-width: 48ch;
+    font-size: var(--step-small);
+    color: var(--fg-3);
   }
 
   .case__compare {
@@ -157,7 +157,7 @@ const dots = Array.from({ length: 100 }, (_, i) => i);
   .dots i {
     aspect-ratio: 1;
     border-radius: 50%;
-    background: var(--paper-line);
+    background: var(--paper-dot);
   }
 
   .case__panel--after .dots i {

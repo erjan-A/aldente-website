@@ -72,7 +72,7 @@ export const SOLUTIONS: Solution[] = [
     playbook: 'refund-evidence',
     asker: { role: 'Area manager', initials: 'AM', color: '#2b6cb0' },
     points: [
-      { title: 'Fewer wrong orders', text: '87% fewer order errors at one location of a regional chain.' },
+      { title: 'Fewer wrong orders', text: '87% fewer wrong orders at one location of a regional chain.' },
       { title: 'Refunds answered with video', text: 'Every claim gets the packing clip from the moment the bag was sealed.' },
       { title: 'Catering, counted', text: 'Trays are checked against the order and the handover is logged.' },
     ],

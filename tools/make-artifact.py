@@ -34,7 +34,7 @@ def calendar_card(url):
     only): a month calendar in the dark card's style. Each day from today on opens Calendly on that date in a
     new tab, where the real times show. The month is drawn in the browser, so it is always the current one."""
     return (
-        '<div class="art-cal" data-url="' + url + '" style="padding:20px clamp(16px,4vw,32px) 24px;border-top:1px solid #2e2e2e;color:#f1f1f1">'
+        '<div class="art-cal" data-url="' + url + '" style="padding:20px clamp(16px,4vw,32px) 24px;border-top:1px solid #2b2b2b;color:#f1f1f1">'
         '<style>'
         '.art-cal__head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}'
         '.art-cal__title{font-size:17px;font-weight:600}'
@@ -42,12 +42,12 @@ def calendar_card(url):
         '.art-cal__nav button{width:36px;height:36px;border-radius:50%;border:1px solid #363636;background:none;color:#f1f1f1;font:inherit;cursor:pointer}'
         '.art-cal__nav button:disabled{opacity:.35;cursor:default}'
         '.art-cal__grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}'
-        '.art-cal__wd{font-size:12px;font-weight:600;color:#939393;padding-bottom:4px}'
-        '.art-cal__day{display:grid;place-items:center;aspect-ratio:1;max-height:52px;border-radius:50%;font-size:15px;font-weight:600;color:#939393}'
+        '.art-cal__wd{font-size:12px;font-weight:600;color:#898989;padding-bottom:4px}'
+        '.art-cal__day{display:grid;place-items:center;aspect-ratio:1;max-height:52px;border-radius:50%;font-size:15px;font-weight:600;color:#898989}'
         'a.art-cal__day{color:#f1f1f1;background:rgb(224 86 52 / .14);text-decoration:none;transition:background-color .2s}'
         'a.art-cal__day:hover,a.art-cal__day:focus-visible{background:#e05634;color:#0b0b0b}'
         '.art-cal__day.is-today{box-shadow:inset 0 0 0 1.5px #e05634}'
-        '.art-cal__foot{margin-top:16px;font-size:13px;line-height:1.5;color:#939393}'
+        '.art-cal__foot{margin-top:16px;font-size:13px;line-height:1.5;color:#898989}'
         '</style>'
         '<div class="art-cal__head"><span class="art-cal__title" data-month>Select a day</span>'
         '<span class="art-cal__nav"><button type="button" data-prev aria-label="Previous month">&#8249;</button>'

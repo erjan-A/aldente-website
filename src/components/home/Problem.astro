@@ -2,7 +2,7 @@
 import SectionHeader from '../ui/SectionHeader.astro';
 
 const facts = [
-  { value: '7–8%', text: 'of delivery orders leave a typical location with a mistake.' },
+  { value: '7–8%', text: 'of delivery orders leave a typical location wrong.' },
   { value: '2×', text: 'the loss on every wrong order: the refund, then the gift card to win the guest back.' },
   { value: 'Hours', text: 'of footage reviewed by staff for a single missing clock-out or incident.' },
 ];
@@ -10,7 +10,7 @@ const facts = [
 
 <section class="problem tone-orange section" aria-labelledby="problem-title">
   <div class="container problem__inner">
-    <SectionHeader id="problem-title" layout="stack" title="Every restaurant already has cameras. Nobody has time to watch them." />
+    <SectionHeader id="problem-title" label="The problem" layout="stack" title="Every restaurant already has cameras. Nobody has time to watch them." />
     <dl class="problem__facts">
       {
         facts.map((fact) => (

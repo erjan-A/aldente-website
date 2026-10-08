@@ -26,7 +26,7 @@ const parse = (html: string) => parser.parseFromString(html, 'text/html') as unk
 describe('SlackWindow', () => {
   it('renders the channel list, the active channel and the composer', async () => {
     const html = await container.renderToString(SlackWindow, {
-      props: { active: 'hr-ops', channels: ['ops-leads', 'hr-ops'], members: 'Aldo + 8' },
+      props: { active: 'hr-ops', channels: ['ops-leads', 'hr-ops'] },
       slots: { default: '<p>message</p>' },
     });
     const doc = parse(html);
@@ -38,6 +38,13 @@ describe('SlackWindow', () => {
     expect(html).toContain('<p>message</p>');
   });
 
+  it('stays minimal, as the design system asks: no title bar with search, no member count', async () => {
+    const html = await container.renderToString(SlackWindow, { props: { active: 'hr-ops' } });
+    const doc = parse(html);
+    expect(doc.querySelector('.slack-window__top, .slack-window__search, .slack-window__members')).toBeNull();
+    expect(doc.body.textContent).not.toContain('Search');
+  });
+
   it('can hide the sidebar', async () => {
     const html = await container.renderToString(SlackWindow, { props: { active: 'floor-team', sidebar: false } });
     expect(parse(html).querySelector('.slack-window__sidebar')).toBeNull();
@@ -45,10 +52,11 @@ describe('SlackWindow', () => {
 });
 
 describe('SlackMessage', () => {
-  it('shows the app badge for Aldo', async () => {
-    const html = await container.renderToString(SlackMessage, { props: { author: 'Aldo', time: '9:02 AM', app: true } });
+  it('shows Aldo with its avatar and no app badge', async () => {
+    const html = await container.renderToString(SlackMessage, { props: { author: 'Aldo', time: '9:02 AM' } });
     const doc = parse(html);
-    expect(doc.querySelector('.slack-message__app')?.textContent).toBe('APP');
+    expect(doc.querySelector('.slack-message__avatar--aldo')).not.toBeNull();
+    expect(doc.body.textContent).not.toContain('APP');
     expect(doc.querySelector('time')?.textContent).toBe('9:02 AM');
   });
 
@@ -221,7 +229,7 @@ describe('Home sections consistency', () => {
   it('builds card-like blocks from the shared Card', async () => {
     const { default: Enterprise } = await import('../../src/components/home/Enterprise.astro');
     const enterprise = parse(await container.renderToString(Enterprise));
-    expect(enterprise.querySelectorAll('.enterprise__weeks > li.card')).toHaveLength(3);
+    expect(enterprise.querySelectorAll('.weeks > li.card')).toHaveLength(3);
     expect(enterprise.querySelectorAll('.enterprise__trust > li.card.trust')).toHaveLength(4);
     const analytics = parse(await container.renderToString(Analytics));
     expect(analytics.querySelectorAll('.cams > li.cam')).toHaveLength(4);
@@ -247,7 +255,38 @@ describe('Product pills', () => {
 
   it('labels each product in the overview', async () => {
     const doc = parse(await container.renderToString(Products));
-    expect([...doc.querySelectorAll('.pill')].map((p) => p.textContent?.trim())).toEqual(['Aldo', 'Aldente Verify', 'Aldente Vision']);
+    expect([...doc.querySelectorAll('.product .pill')].map((p) => p.textContent?.trim())).toEqual([
+      'Aldo',
+      'Aldente Verify',
+      'Aldente Vision',
+    ]);
+  });
+
+  it('gives topic sections a plain pill, as the decks do ("Customer results")', async () => {
+    const doc = parse(await container.renderToString(SectionHeader, { props: { title: 'Results', label: 'Customer results' } }));
+    const pill = doc.querySelector('.pill')!;
+    expect(pill.textContent?.trim()).toBe('Customer results');
+    expect(pill.classList.contains('pill--plain')).toBe(true);
+    expect(pill.querySelector('svg, img')).toBeNull();
+  });
+
+  it('can rename a product pill and keep its cue ("Aldo in Slack")', async () => {
+    const doc = parse(await container.renderToString(SectionHeader, { props: { title: 'Aldo', product: 'aldo', label: 'Aldo in Slack' } }));
+    const pill = doc.querySelector('.pill')!;
+    expect(pill.textContent?.trim()).toBe('Aldo in Slack');
+    expect(pill.querySelector('.pill__avatar')).not.toBeNull();
+  });
+
+  it('labels the home sections the way the decks label their slides', async () => {
+    const label = async (path: string) => {
+      const { default: Section } = await import(/* @vite-ignore */ path);
+      return parse(await container.renderToString(Section))
+        .querySelector('.pill')
+        ?.textContent?.trim();
+    };
+    expect(await label('../../src/components/home/Problem.astro')).toBe('The problem');
+    expect(await label('../../src/components/home/CaseStudy.astro')).toBe('Customer results');
+    expect(await label('../../src/components/home/Enterprise.astro')).toBe('How we start');
   });
 });
 
@@ -587,5 +626,42 @@ describe('Footer', () => {
     // The divider sits inside the container's padding, so it spans the text column only.
     expect(row.parentElement?.classList.contains('container')).toBe(true);
     expect(row.classList.contains('container')).toBe(false);
+  });
+});
+
+describe('Aldente Verify', () => {
+  it('shows both loops, each ending on its result', async () => {
+    const { default: VerifyLoops } = await import('../../src/components/product/VerifyLoops.astro');
+    const doc = parse(await container.renderToString(VerifyLoops));
+    expect([...doc.querySelectorAll('.loop__title')].map((t) => t.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      '1. Check & Prevent',
+      '2. Dispute & Recover',
+    ]);
+    expect([...doc.querySelectorAll('.loop__result b')].map((b) => b.textContent)).toEqual(['87%', 'Reversed']);
+  });
+
+  it('tells Dispute & Recover in four steps and ships the finished story for no-JS and reduced motion', async () => {
+    const { default: DisputeRecover } = await import('../../src/components/product/DisputeRecover.astro');
+    const doc = parse(await container.renderToString(DisputeRecover));
+    expect([...doc.querySelectorAll('.dispute__copy b')].map((b) => b.textContent)).toEqual([
+      'Claim comes in',
+      'Proof found',
+      'Dispute sent',
+      'Money back',
+    ]);
+    const beats = doc.querySelector('scroll-beats')!;
+    expect(beats.getAttribute('data-beats')).toBe('4');
+    expect(beats.getAttribute('data-beat')).toBe('4');
+  });
+});
+
+describe('How we start', () => {
+  it('lists the rollout weeks from one source, as cards or as a list', async () => {
+    const { default: RolloutWeeks } = await import('../../src/components/ui/RolloutWeeks.astro');
+    const { ROLLOUT } = await import('../../src/data/rollout');
+    const cards = parse(await container.renderToString(RolloutWeeks));
+    expect([...cards.querySelectorAll('.weeks > li .weeks__when')].map((w) => w.textContent)).toEqual(ROLLOUT.map((w) => w.when));
+    const list = parse(await container.renderToString(RolloutWeeks, { props: { layout: 'list' } }));
+    expect(list.querySelectorAll('.steps > li')).toHaveLength(ROLLOUT.length);
   });
 });

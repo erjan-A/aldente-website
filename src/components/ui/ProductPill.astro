@@ -3,25 +3,29 @@ import mark from '../../assets/logos/aldente-mark.svg';
 import { PRODUCTS, type ProductId } from '../../data/products';
 import Icon from './Icon.astro';
 
-interface Props {
-  product: ProductId;
-}
+/**
+ * The label over a section title, as on every deck slide. With `product`: the product's name and cue (Aldente
+ * Verify's check, Aldente Vision's eye, Aldo's avatar); `label` can rename it ("Aldo in Slack"). Without
+ * `product`: a plain topic pill ("Customer results").
+ */
+type Props = { product: ProductId; label?: string } | { product?: undefined; label: string };
 
-const { product } = Astro.props;
-const { name, icon } = PRODUCTS[product];
+const { product, label } = Astro.props;
+const meta = product ? PRODUCTS[product] : undefined;
 ---
 
-<span class:list={['pill', `pill--${product}`]}>
+<span class:list={['pill', product && `pill--${product}`, { 'pill--plain': !product }]}>
   {
-    icon ? (
-      <Icon name={icon} size={14} strokeWidth={2.25} />
-    ) : (
-      <span class="pill__avatar" aria-hidden="true">
-        <img src={mark.src} alt="" width="9" height="11" />
-      </span>
-    )
+    meta &&
+      (meta.icon ? (
+        <Icon name={meta.icon} size={14} strokeWidth={2.25} />
+      ) : (
+        <span class="pill__avatar" aria-hidden="true">
+          <img src={mark.src} alt="" width="9" height="11" />
+        </span>
+      ))
   }
-  {name}
+  {label ?? meta?.name}
 </span>
 
 <style>
@@ -41,6 +45,15 @@ const { name, icon } = PRODUCTS[product];
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
+  }
+
+  .pill--plain {
+    padding: 0 13px;
+  }
+
+  /* On the orange ground: a white wash with a white hairline, as the decks do. */
+  :global(.tone-orange) .pill {
+    background: rgb(255 255 255 / 0.12);
   }
 
   .pill :global(svg) {

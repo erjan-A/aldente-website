@@ -19,13 +19,13 @@ import tray from '../../assets/images/order-tray.jpg';
 
   <div class="card card--stat" style="--slot:1">
     <span class="card__big">87%</span>
-    <span class="card__caption">fewer order errors at one location</span>
+    <span class="card__caption">fewer wrong orders at one location</span>
   </div>
 
   <div class="card card--slack slack" style="--slot:3">
     <div class="card__slack-head">
       <span class="card__avatar"><img src={mark.src} alt="" width="14" height="17" /></span>
-      <b>Aldo</b><span class="card__app">APP</span><span class="slack-muted">#district-west</span>
+      <b>Aldo</b><span class="slack-muted">#district-west</span>
     </div>
     <p class="slack-text">The queue at Location 03 has been over 6 people for 6 minutes. <span class="slack-mention">@Dana</span>, you're closest.</p>
     <div class="slack-actions"><span class="slack-btn slack-btn--primary">On my way</span><span class="slack-btn">Call the store</span></div>
@@ -33,8 +33,8 @@ import tray from '../../assets/images/order-tray.jpg';
 
   <div class="card card--playbook slack" style="--slot:2">
     <span class="slack-muted">New Playbook</span>
-    <b class="card__title">Missing clock-outs</b>
-    <span class="slack-muted">After each closing shift ·{' '}<span class="card__channel">#hr-ops</span></span>
+    <b class="card__title">Missing clock-out review</b>
+    <span class="slack-muted">After each closing shift ·{' '}<span class="card__channel">#hr-review</span></span>
     <span class="card__confirmed"><Icon name="check" size={12} strokeWidth={3} /> Confirmed</span>
   </div>
 </div>
@@ -335,14 +335,6 @@ import tray from '../../assets/images/order-tray.jpg';
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .card__app {
-    padding: 1px 3px;
-    border-radius: var(--radius-xs);
-    background: rgb(29 28 29 / 0.13);
-    font-size: 9px;
-    font-weight: 700;
   }
 
   .card__title {

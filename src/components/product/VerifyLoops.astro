@@ -1,0 +1,175 @@
+---
+/**
+ * Aldente Verify's two loops, as on the decks' Verify slide: check and prevent at the packing station, then
+ * dispute and recover when a delivery app still charges the store. Each loop ends on its result. The
+ * example order is #4821 from the rest of the page (one drink short, then a $17.40 Uber Eats charge).
+ */
+const loops = [
+  {
+    n: '1',
+    title: 'Check & Prevent',
+    when: 'At the packing station, in seconds',
+    steps: [
+      { title: 'Order arrives', text: 'POS ticket on the tablet' },
+      { title: 'Camera checks the bag', text: 'Every item and quantity' },
+      { title: 'Error caught', text: '“Add 1 drink” before pickup' },
+    ],
+    result: { value: '87%', text: 'fewer wrong orders leave the store', tone: 'accent' },
+  },
+  {
+    n: '2',
+    title: 'Dispute & Recover',
+    when: 'When a delivery app still charges a refund',
+    steps: [
+      { title: 'Refund charged', text: 'Uber Eats charges $17.40' },
+      { title: 'Proof found', text: 'The packing clip for the order' },
+      { title: 'Dispute filed', text: 'Clip sent to the app' },
+    ],
+    result: { value: 'Reversed', text: 'The charge comes back to the store', tone: 'ok' },
+  },
+];
+---
+
+<section class="loops tone-dark" aria-labelledby="loops-title">
+  <div class="container loops__inner">
+    <h2 id="loops-title" class="visually-hidden">How Aldente Verify works</h2>
+    {
+      loops.map((loop) => (
+        <div class="loop">
+          <div class="loop__head">
+            <h3 class="loop__title">
+              {loop.n}. {loop.title}
+            </h3>
+            <p class="loop__when">{loop.when}</p>
+          </div>
+          <ol class="loop__steps" role="list">
+            {loop.steps.map((step) => (
+              <li class="loop__step">
+                <b>{step.title}</b>
+                <span>{step.text}</span>
+              </li>
+            ))}
+            <li class:list={['loop__step', 'loop__result', `loop__result--${loop.result.tone}`]}>
+              <b>{loop.result.value}</b>
+              <span>{loop.result.text}</span>
+            </li>
+          </ol>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .loops {
+    padding-bottom: var(--section-y);
+  }
+
+  .loops__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .loop {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .loop__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 16px;
+  }
+
+  .loop__title {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .loop__when {
+    font-size: var(--step-small);
+    color: var(--fg-3);
+  }
+
+  /* Two by two on phones and tablets; one row from 900px, with a chevron in each gap. */
+  .loop__steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .loop__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-height: 88px;
+    padding: var(--card-pad-s) 18px;
+    border-radius: var(--radius-m);
+    background: var(--surface-2);
+  }
+
+  .loop__step b {
+    font-size: var(--step-body);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .loop__step span {
+    font-size: var(--step-small);
+    line-height: 1.4;
+    color: var(--fg-2);
+  }
+
+  .loop__result {
+    border: 1px solid transparent;
+  }
+
+  .loop__result b {
+    font-size: var(--step-h3);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .loop__result--accent {
+    background: var(--accent-soft);
+    border-color: rgb(224 86 52 / 0.5);
+  }
+
+  .loop__result--accent b {
+    color: var(--accent);
+  }
+
+  .loop__result--ok {
+    background: var(--ok-soft);
+    border-color: rgb(79 191 133 / 0.5);
+  }
+
+  .loop__result--ok b {
+    color: var(--ok);
+  }
+
+  @media (min-width: 900px) {
+    .loop__steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    .loop__step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -17px;
+      width: 7px;
+      height: 7px;
+      border-top: 2px solid var(--fg-3);
+      border-right: 2px solid var(--fg-3);
+      transform: translateY(-50%) rotate(45deg);
+    }
+  }
+</style>

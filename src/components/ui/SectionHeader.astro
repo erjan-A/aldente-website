@@ -9,6 +9,8 @@ import ProductPill from './ProductPill.astro';
 interface Props {
   /** Which product the section belongs to, shown as a pill above the title. */
   product?: ProductId;
+  /** The pill's text: a topic on its own ("Customer results"), or a product's own wording ("Aldo in Slack"). */
+  label?: string;
   /** The claim, in full ink. */
   title: string;
   /** The continuation, in muted ink. */
@@ -19,12 +21,12 @@ interface Props {
   id?: string;
 }
 
-const { product, title, muted, lead, layout = 'split', as: Heading = 'h2', id } = Astro.props;
+const { product, label, title, muted, lead, layout = 'split', as: Heading = 'h2', id } = Astro.props;
 ---
 
 <header class:list={['head', `head--${layout}`]}>
   <div class="head__titles">
-    {product && <ProductPill product={product} />}
+    {product ? <ProductPill product={product} label={label} /> : label && <ProductPill label={label} />}
     <Heading class:list={['head__title', { 'head__title--page': Heading === 'h1' }]} id={id}>
       {title}{muted && <> <span class="head__muted">{muted}</span></>}
     </Heading>

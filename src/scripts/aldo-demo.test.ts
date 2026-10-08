@@ -16,7 +16,10 @@ const fixture = `
   <span data-slack-channel>ops-leads</span>
   <span data-slack-composer>Message #ops-leads</span>
   <div role="tabpanel" id="p-ask" aria-labelledby="t-ask">ask <button type="button" data-goto="assign">Send this every Monday</button></div>
-  <div role="tabpanel" id="p-assign" aria-labelledby="t-assign" hidden>assign</div>
+  <div role="tabpanel" id="p-assign" aria-labelledby="t-assign" hidden>
+    assign <button type="button" data-confirm>Confirm</button>
+    <p tabindex="-1" data-confirmed-focus>Playbook created</p>
+  </div>
   <div role="tabpanel" id="p-alert" aria-labelledby="t-alert" hidden>alert</div>
 </aldo-demo>`;
 
@@ -47,6 +50,14 @@ describe('<aldo-demo>', () => {
     expect(tab('t-assign').getAttribute('aria-selected')).toBe('true');
     expect(panel('p-assign').hidden).toBe(false);
     expect(document.activeElement).toBe(tab('t-assign'));
+  });
+
+  it('locks a Playbook card on Confirm and moves focus to "Playbook created"', () => {
+    tab('t-assign').click();
+    (document.querySelector('[data-confirm]') as HTMLButtonElement).click();
+    expect(panel('p-assign').hasAttribute('data-confirmed')).toBe(true);
+    expect(document.activeElement).toBe(document.querySelector('[data-confirmed-focus]'));
+    expect(tab('t-assign').getAttribute('aria-selected')).toBe('true');
   });
 
   it('moves selection with the arrow keys and Home/End', () => {

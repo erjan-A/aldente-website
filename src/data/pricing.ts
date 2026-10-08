@@ -99,7 +99,7 @@ export const PRICING_FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'How long does setup take?',
-    a: 'Most locations are live within 30 days. Once you’re a customer, Aldo connects to Slack in minutes.',
+    a: 'Most locations are live within 2–3 weeks. Once you’re a customer, Aldo connects to Slack in minutes.',
   },
   { q: 'Can we start with one location?', a: 'Yes. Many chains start with one or two locations and roll out after the first results.' },
   {

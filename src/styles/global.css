@@ -1,19 +1,22 @@
-/* Design tokens: extended from the Aldente slide system (dark ground, logo orange, Onest). */
+/*
+ * Design tokens. The values come from the Aldente Slides design system (dark ground, logo orange, Onest), which
+ * the decks share: change a value there and here together. --line-card is the website's own addition.
+ */
 :root {
   /*
-   * Surfaces on the dark ground. A card's fill alone barely separates from #0b0b0b, so cards
-   * carry a visible 1px edge: --line-card (via the tone role --card-line). Ink contrast:
-   * --ink-3 stays >= 4.5:1 on --bg, --surface and --surface-2.
+   * Surfaces on the dark ground. A card's fill alone barely separates from #0b0b0b, so cards on the web
+   * carry a slightly brighter 1px edge than the slides' --line: --line-card (via the tone role --card-line).
+   * Ink contrast: --ink-3 stays >= 4.5:1 on --bg, --surface and --surface-2.
    */
   --bg: #0b0b0b;
-  --surface: #181818; /* cards, panels */
-  --surface-2: #242424; /* a step up: tags, inner tiles, rows inside a card */
-  --line: #2e2e2e; /* dividers and hairlines */
+  --surface: #151515; /* cards, panels */
+  --surface-2: #1f1f1f; /* a step up: tags, inner tiles, rows inside a card */
+  --line: #2b2b2b; /* dividers and hairlines */
   --line-card: #363636; /* card edges on dark */
   --line-strong: #636363; /* hover edges, outline buttons, dashed guides */
   --ink: #f1f1f1;
   --ink-2: #b3b3b3;
-  --ink-3: #939393;
+  --ink-3: #898989;
   --accent: #e05634;
   --accent-soft: rgb(224 86 52 / 0.14);
   --on-accent: #0b0b0b;
@@ -32,7 +35,8 @@
   --paper-ink: #0b0b0b;
   --paper-ink-2: #3d3d3d;
   --paper-ink-3: #636363;
-  --paper-line: #d4d4d4;
+  --paper-line: #dadada;
+  --paper-dot: #d4d4d4; /* neutral dots of a dot matrix on a paper card */
 
   /* One family everywhere, machine data included: times and counts use tabular figures, not a mono face. */
   --font: 'Onest Variable', 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;

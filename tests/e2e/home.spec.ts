@@ -28,7 +28,9 @@ test.describe('home page', () => {
     const demo = page.locator('aldo-demo');
     await demo.getByRole('tab', { name: /Assign/ }).click();
     await expect(demo.locator('[data-slack-channel]')).toHaveText('hr-ops');
-    await expect(demo.getByRole('tabpanel')).toContainText('New Playbook · Missing clock-outs');
+    await expect(demo.getByRole('tabpanel')).toContainText('Missing clock-out review');
+    await expect(demo.getByRole('tabpanel')).toContainText('Owner');
+    await expect(demo.getByText('Cancel', { exact: true })).toBeVisible();
 
     await demo.getByRole('tab', { name: /Assign/ }).press('ArrowDown');
     await expect(demo.getByRole('tab', { name: /Alert/ })).toHaveAttribute('aria-selected', 'true');
@@ -99,11 +101,29 @@ test.describe('home page', () => {
     await expect(demo.getByRole('tab', { name: /Assign/ })).toHaveAttribute('aria-selected', 'true', { timeout: 8000 });
   });
 
-  test('labels each product section with the product', async ({ page }) => {
+  test('labels each section the way the decks label their slides', async ({ page }) => {
+    await expect(page.locator('.problem .pill')).toHaveText('The problem');
+    await expect(page.locator('#product .head .pill')).toHaveText('Products');
     await expect(page.locator('#aldo .pill')).toHaveText('Aldo');
     await expect(page.locator('#playbooks .pill')).toHaveText('Aldo');
-    await expect(page.locator('#customers .pill')).toHaveText('Aldente Verify');
+    await expect(page.locator('#verification .pill')).toHaveText('Aldente Verify');
+    await expect(page.locator('#customers .pill')).toHaveText('Customer results');
     await expect(page.locator('#analytics .pill')).toHaveText('Aldente Vision');
+    await expect(page.locator('.connections .pill')).toHaveText('Aldo in Slack');
+  });
+
+  test('confirms a Playbook in Slack: the card locks and Aldo posts "Playbook created"', async ({ page }) => {
+    const demo = page.locator('aldo-demo');
+    await demo.getByRole('tab', { name: /Assign/ }).click();
+    await demo.getByRole('button', { name: 'Confirm' }).click();
+    await expect(demo.getByRole('button', { name: 'Confirm' })).toBeHidden();
+    await expect(demo.getByRole('tabpanel')).toContainText(
+      'Playbook created: Missing clock-out review. Results will be sent to #hr-review.',
+    );
+    await demo.getByRole('tab', { name: /Result/ }).click();
+    await expect(demo.locator('[data-slack-channel]')).toHaveText('hr-review');
+    await demo.getByText('Review case').click();
+    await expect(demo.getByText('A camera event does not prove identity or paid hours.')).toBeVisible();
   });
 
   test('jumps from a Slack answer to the step it sets up', async ({ page }) => {

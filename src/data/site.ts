@@ -7,7 +7,7 @@ export const SITE = {
   url: 'https://aldenteai.com',
   tagline: 'Your AI Chief of Staff with eyes.',
   description:
-    'Aldo sees every restaurant through your cameras, catches order errors before they leave, and runs the daily checks your team gives it, right in Slack.',
+    'Aldente AI sees every restaurant through your cameras, catches wrong orders before they leave, and runs the daily checks your team gives it, right in Slack.',
   email: 'support@aldenteai.com',
   /** Shown as written; dialled from `phoneHref` (E.164). */
   phone: '+1 (818) 974-1857',

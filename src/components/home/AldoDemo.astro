@@ -36,9 +36,9 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
   { id: 'ask', label: 'Ask', desc: 'Answers with the source attached.', channel: 'ops-leads', icon: 'message-square' },
   { id: 'assign', label: 'Assign', desc: 'Say a task once; it becomes a Playbook.', channel: 'hr-ops', icon: 'mic' },
   { id: 'alert', label: 'Alert', desc: 'The right person hears first.', channel: 'district-west', icon: 'bell' },
-  { id: 'result', label: 'Result', desc: 'Finished work, with the evidence.', channel: 'hr-ops', icon: 'check' },
+  { id: 'result', label: 'Result', desc: 'Finished work, with the evidence.', channel: 'hr-review', icon: 'check' },
 ];
-const channels = ['ops-leads', 'hr-ops', 'district-west', 'floor-team'];
+const channels = ['ops-leads', 'hr-ops', 'hr-review', 'district-west'];
 ---
 
 <section class:list={['aldo', 'tone-dark', { 'aldo--pad': padTop }]} id="aldo" aria-labelledby={heading ? 'aldo-title' : undefined} aria-label={heading ? undefined : 'Aldo in Slack'}>
@@ -77,67 +77,80 @@ const channels = ['ops-leads', 'hr-ops', 'district-west', 'floor-team'];
         </p>
       </div>
 
-      <SlackWindow active="ops-leads" channels={channels} members="Aldo + 8" class="aldo__slack">
+      <SlackWindow active="ops-leads" channels={channels} class="aldo__slack">
         <div role="tabpanel" id="aldo-panel-ask" aria-labelledby="aldo-tab-ask" tabindex="0">
           <SlackMessage author="Area manager" avatar="AM" avatarColor="#2b6cb0" time="9:02 AM">
             <p class="slack-text">Hey <span class="slack-mention">@Aldo</span>, how many visitors did each location have yesterday, and when was each busiest?</p>
           </SlackMessage>
-          <SlackMessage author="Aldo" app time="9:02 AM">
+          <SlackMessage author="Aldo" time="9:02 AM">
             <p class="slack-text">Visitors on <b>September 30</b>:</p>
             <SlackCard>
               <table class="slack-table">
                 <tbody>
-                  <tr><td>Location 01 · <b>1,248</b></td><td>busiest 12:00–13:00</td></tr>
-                  <tr><td>Location 02 · <b>986</b></td><td>busiest 13:00–14:00</td></tr>
-                  <tr><td>Location 03 · <b>1,412</b></td><td>busiest 12:00–13:00</td></tr>
+                  <tr><td>Location 01 · <b>1,198</b></td><td>busiest 12:00–13:00</td></tr>
+                  <tr><td>Location 02 · <b>946</b></td><td>busiest 13:00–14:00</td></tr>
+                  <tr><td>Location 03 · <b>1,355</b></td><td>busiest 12:00–13:00</td></tr>
                 </tbody>
               </table>
             </SlackCard>
-            <p class="slack-text">3,646 visitors in total. Location 03 had the busiest hour.</p>
-            <p class="slack-muted">Source: Aldente Vision, visitor counts</p>
+            <p class="slack-text">3,499 visitors in total, up 4%. Location 03 had the busiest hour.</p>
+            <p class="slack-muted">Source: Aldente Vision · 3 locations</p>
             <div class="slack-actions"><span class="slack-btn">Open records</span><button type="button" class="slack-btn slack-btn--primary" data-goto="assign">Send this every Monday</button></div>
           </SlackMessage>
         </div>
 
         <div role="tabpanel" id="aldo-panel-assign" aria-labelledby="aldo-tab-assign" tabindex="0" hidden>
-          <SlackMessage author="HR manager" avatar="HR" avatarColor="#805ad5" time="4:20 PM">
+          <SlackMessage author="HR manager" avatar="HR" avatarColor="#805ad5" time="6:05 PM">
             <SlackVoiceNote
-              duration="0:09"
-              transcript="Hey Aldo, after each location’s closing shift, check for missing clock-outs. Find the departure clips, prepare an HR case summary, and post it here."
+              duration="0:11"
+              transcript="Hey Aldo, after each location’s closing shift, check for missing clock-outs. Find the departure evidence, prepare an HR case, and post it in #hr-review. Skip anyone still working."
             />
           </SlackMessage>
-          <SlackMessage author="Aldo" app time="4:20 PM">
-            <p class="slack-text">Here’s the Playbook I’ll run. Confirm and I’ll start tonight.</p>
+          <SlackMessage author="Aldo" time="6:05 PM">
+            <ul class="aldo__checks" role="list">
+              <li><Icon name="check" size={14} strokeWidth={2.5} />Analyzing company context knowledge base</li>
+              <li><Icon name="check" size={14} strokeWidth={2.5} />Checking locations, employees, and shift hours</li>
+            </ul>
+            <p class="slack-text">I found your company procedures, locations, employee profiles and confirmed shift hours. Review the Playbook below.</p>
             <SlackCard tone="ok">
-              <p class="slack-text"><b>New Playbook · Missing clock-outs</b></p>
-              <dl class="slack-fields">
-                <div><dt>When</dt><dd>After each closing shift</dd></div>
+              <p class="slack-text"><b>Missing clock-out review</b></p>
+              <dl class="slack-fields aldo__spec">
+                <div><dt>When</dt><dd>After each closing shift · local time</dd></div>
                 <div><dt>Locations</dt><dd>All 24</dd></div>
-                <div><dt>Check</dt><dd>Clock-outs against departures</dd></div>
-                <div><dt>Send to</dt><dd>#hr-ops</dd></div>
+                <div><dt>Schedule</dt><dd>Confirmed shift timetable</dd></div>
+                <div><dt>Check</dt><dd>Missing clock-outs and departure evidence</dd></div>
+                <div><dt>Action</dt><dd>Prepare an HR case for review</dd></div>
+                <div><dt>Owner</dt><dd>HR team</dd></div>
+                <div><dt>Send to</dt><dd>#hr-review</dd></div>
               </dl>
-              <p class="slack-muted">Skips anyone still working.</p>
-              <div class="slack-actions"><button type="button" class="slack-btn slack-btn--primary" data-goto="result">Confirm</button><span class="slack-btn">Edit</span></div>
+              <div class="slack-actions aldo__decide">
+                <button type="button" class="slack-btn slack-btn--primary" data-confirm>Confirm</button><span class="slack-btn">Edit</span><span class="slack-btn">Cancel</span>
+              </div>
+              <p class="aldo__locked"><Icon name="check" size={14} strokeWidth={2.5} />Playbook created</p>
             </SlackCard>
+          </SlackMessage>
+          <SlackMessage author="Aldo" time="6:06 PM" class="aldo__created">
+            <p class="slack-text" tabindex="-1" data-confirmed-focus>Playbook created: <b>Missing clock-out review</b>. Results will be sent to <span class="slack-mention">#hr-review</span>.</p>
           </SlackMessage>
         </div>
 
         <div role="tabpanel" id="aldo-panel-alert" aria-labelledby="aldo-tab-alert" tabindex="0" hidden>
-          <SlackMessage author="Aldo" app time="12:18 PM">
+          <SlackMessage author="Aldo" time="12:18 PM">
             <p class="slack-text">The queue at <b>Location 03</b> has been over 6 people for 6 minutes. <span class="slack-mention">@Dana</span>, you’re the closest district manager.</p>
             <div class="slack-media aldo__frame">
               <Image src={dining} alt="Camera frame of the counter queue at Location 03" widths={[480, 720]} sizes="(min-width: 960px) 420px, 90vw" />
               <span class="slack-media__box" style="left:32%;top:18%;width:44%;height:56%"></span>
               <span class="slack-media__label">Cam 02 · Queue · 6:02</span>
             </div>
+            <p class="slack-muted">Source: Aldente Vision · Location 03, Cam 02</p>
             <div class="slack-actions"><span class="slack-btn slack-btn--primary">On my way</span><span class="slack-btn">Call the store</span></div>
           </SlackMessage>
         </div>
 
         <div role="tabpanel" id="aldo-panel-result" aria-labelledby="aldo-tab-result" tabindex="0" hidden>
-          <SlackMessage author="Aldo" app time="10:30 PM">
+          <SlackMessage author="Aldo" time="10:41 PM">
             <p class="slack-text"><b>1 missing clock-out needs review</b></p>
-            <p class="slack-muted">October 1 · Location 01 · 24 shifts checked · 23 matched</p>
+            <p class="slack-muted">Location 01 · October 1 · 24 shifts checked</p>
             <SlackCard tone="accent">
               <div class="aldo__result">
                 <div class="slack-media aldo__clip">
@@ -146,13 +159,28 @@ const channels = ['ops-leads', 'hr-ops', 'district-west', 'floor-team'];
                 </div>
                 <dl class="slack-fields aldo__fields">
                   <div><dt>Employee</dt><dd>EMP-07</dd></div>
-                  <div><dt>Departure</dt><dd>21:14</dd></div>
+                  <div><dt>Shift</dt><dd>13:00–21:00</dd></div>
                   <div><dt>Clock-out</dt><dd class="aldo__missing">Missing</dd></div>
+                  <div><dt>Departure</dt><dd>21:14 · Aldente Vision</dd></div>
                 </dl>
               </div>
             </SlackCard>
-            <p class="slack-text">HR case summary prepared with the departure clip.</p>
-            <div class="slack-actions"><span class="slack-btn slack-btn--primary">View clip</span><span class="slack-btn">Open case</span></div>
+            <p class="slack-text">Review the employee match and the clip. No attendance record has been changed.</p>
+            <details class="aldo__review">
+              <summary class="slack-btn slack-btn--primary">Review case</summary>
+              <div class="aldo__case">
+                <p class="slack-text"><b>Case review</b> · EMP-07 · Location 01 · Owner: HR team</p>
+                <ol class="aldo__timeline" role="list">
+                  <li><b>13:00</b> Shift starts</li>
+                  <li><b>21:00</b> Shift ends</li>
+                  <li><b>21:14</b> Departure on camera</li>
+                  <li class="aldo__missing">No clock-out found</li>
+                </ol>
+                <p class="slack-muted">A camera event does not prove identity or paid hours.</p>
+                <div class="slack-actions"><span class="slack-btn">Request more evidence</span><span class="slack-btn">Wrong person</span><span class="slack-btn">Still working</span></div>
+              </div>
+            </details>
+            <p class="slack-muted">Sources: shift timetable · time clock · Aldente Vision</p>
           </SlackMessage>
         </div>
       </SlackWindow>
@@ -424,6 +452,110 @@ const channels = ['ops-leads', 'hr-ops', 'district-west', 'floor-team'];
     .aldo__tab-label {
       font-size: var(--step-small);
     }
+  }
+
+  /* The Playbook flow: the context check, the card, then the locked card and "Playbook created" after Confirm. */
+  .aldo__checks {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+    color: var(--slack-muted);
+    font-size: 13px;
+  }
+
+  .aldo__checks li,
+  .aldo__locked {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .aldo__checks :global(svg),
+  .aldo__locked :global(svg) {
+    flex: none;
+    color: var(--slack-green);
+  }
+
+  .aldo__locked {
+    color: var(--slack-green);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .aldo__locked,
+  .aldo__box :global(.aldo__created) {
+    display: none;
+  }
+
+  [data-confirmed] .aldo__decide {
+    display: none;
+  }
+
+  [data-confirmed] .aldo__locked {
+    display: flex;
+  }
+
+  .aldo__box [data-confirmed] :global(.aldo__created) {
+    display: flex;
+  }
+
+  /* Phones: the spec as label-value rows, so the request above it stays in the fixed-height window. */
+  @media (max-width: 720px) {
+    .aldo__spec {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 3px;
+    }
+
+    .aldo__spec > div {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .aldo__spec dd {
+      margin: 0;
+    }
+  }
+
+  [data-confirmed-focus]:focus {
+    outline: none;
+  }
+
+  /* "Review case" opens the case review in place: the shift, the camera event, and three outcomes. */
+  .aldo__review summary {
+    width: fit-content;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .aldo__review summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .aldo__review[open] summary {
+    display: none;
+  }
+
+  .aldo__case {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--slack-border);
+    border-radius: var(--radius-s);
+  }
+
+  .aldo__timeline {
+    display: grid;
+    gap: 2px;
+    font-size: 14px;
+  }
+
+  .aldo__timeline b {
+    display: inline-block;
+    min-width: 48px;
+    font-variant-numeric: tabular-nums;
   }
 
   .aldo__frame {
