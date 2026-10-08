@@ -1,0 +1,206 @@
+---
+/**
+ * The hero's four cards. Phones and tablets: a stack above the headline that deals the next card every
+ * 3.5 s (still with reduced motion). Wide screens: two cards each side of the headline, floating gently.
+ * Pass four `.hd__card` elements; their content is decorative (the page says it all in full further down).
+ */
+---
+
+<div class="hd" aria-hidden="true" data-loop><slot /></div>
+
+<style is:global>
+  .hd__card {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 248px;
+    padding: 14px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line-card);
+    color: var(--ink);
+    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.7);
+  }
+
+  /* Phase offsets so the deck deals in page order: 1, then 2 (waiting right behind), 3, 4. */
+  .hd > :nth-child(1) {
+    --slot: 0;
+  }
+
+  .hd > :nth-child(2) {
+    --slot: 3;
+  }
+
+  .hd > :nth-child(3) {
+    --slot: 2;
+  }
+
+  .hd > :nth-child(4) {
+    --slot: 1;
+  }
+
+  /* Phones and tablets: every card the same size; the two behind show a thin edge above the top card. */
+  @media (max-width: 1239px) {
+    .hd {
+      position: relative;
+      height: 268px;
+      max-width: 360px;
+      margin: 0 auto 28px;
+    }
+
+    .hd__card {
+      left: 50%;
+      top: 0;
+      width: 272px;
+      height: 236px;
+      transform-origin: 50% 0;
+      box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+    }
+
+    /* First frame (and the still deck with reduced motion): card 1 on top, 2 and 3 behind, 4 waiting. */
+    .hd > :nth-child(1) {
+      z-index: 4;
+      translate: -50% 24px;
+    }
+
+    .hd > :nth-child(2) {
+      z-index: 3;
+      translate: -50% 12px;
+      scale: 0.94;
+      filter: brightness(0.6);
+    }
+
+    .hd > :nth-child(3) {
+      z-index: 2;
+      translate: -50% 0;
+      scale: 0.88;
+      filter: brightness(0.42);
+    }
+
+    .hd > :nth-child(4) {
+      z-index: 1;
+      translate: -50% 0;
+      scale: 0.82;
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 1239px) and (prefers-reduced-motion: no-preference) {
+    .hd__card {
+      animation: hd-deal 14s cubic-bezier(0.2, 0.8, 0.2, 1) infinite both;
+      animation-delay: calc(var(--slot) * -3.5s);
+    }
+  }
+
+  @keyframes hd-deal {
+    0%,
+    19% {
+      z-index: 4;
+      translate: -50% 24px;
+      rotate: 0deg;
+      scale: 1;
+      opacity: 1;
+      filter: brightness(1);
+    }
+    22.5%,
+    24.9% {
+      z-index: 4;
+      translate: calc(-50% - 90px) 40px;
+      rotate: -10deg;
+      scale: 1;
+      opacity: 0;
+      filter: brightness(1);
+    }
+    25%,
+    44% {
+      z-index: 1;
+      translate: -50% 0;
+      rotate: 0deg;
+      scale: 0.82;
+      opacity: 0;
+      filter: brightness(0.42);
+    }
+    50%,
+    69% {
+      z-index: 2;
+      translate: -50% 0;
+      rotate: 0deg;
+      scale: 0.88;
+      opacity: 1;
+      filter: brightness(0.42);
+    }
+    75%,
+    94% {
+      z-index: 3;
+      translate: -50% 12px;
+      rotate: 0deg;
+      scale: 0.94;
+      opacity: 1;
+      filter: brightness(0.6);
+    }
+    100% {
+      z-index: 4;
+      translate: -50% 24px;
+      rotate: 0deg;
+      scale: 1;
+      opacity: 1;
+      filter: brightness(1);
+    }
+  }
+
+  /* Wide screens: two cards each side of the headline, upright and aligned to the container. */
+  @media (min-width: 1240px) {
+    .hd {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hd > :nth-child(1) {
+      left: -8px;
+      top: 0;
+    }
+
+    .hd > :nth-child(2) {
+      left: 40px;
+      top: 292px;
+    }
+
+    .hd > :nth-child(3) {
+      right: -8px;
+      top: 20px;
+    }
+
+    .hd > :nth-child(4) {
+      right: 40px;
+      top: 312px;
+    }
+  }
+
+  @media (min-width: 1240px) and (prefers-reduced-motion: no-preference) {
+    .hd__card {
+      animation: hd-float 8s ease-in-out infinite;
+      animation-delay: calc(var(--slot) * -2s);
+    }
+  }
+
+  @keyframes hd-float {
+    50% {
+      translate: 0 -10px;
+    }
+  }
+
+  /* Small phones: a shorter deck, so the hero's buttons clear the cookie banner on a first visit. */
+  @media (max-width: 479px) {
+    .hd {
+      height: 228px;
+      margin-bottom: 16px;
+    }
+
+    .hd__card {
+      width: min(272px, 100%);
+      height: 200px;
+    }
+  }
+</style>

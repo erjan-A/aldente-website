@@ -1,376 +1,191 @@
 ---
 import { Image } from 'astro:assets';
-import '../../styles/slack.css';
-import mark from '../../assets/logos/aldente-mark.svg';
-import Icon from '../ui/Icon.astro';
+import dining from '../../assets/images/dining-room-overhead.jpg';
+import trayComplete from '../../assets/images/order-tray-complete.jpg';
 import tray from '../../assets/images/order-tray.jpg';
+import departure from '../../assets/images/staff-departure.jpg';
+import ProductPill from '../ui/ProductPill.astro';
+import HeroDeck from './HeroDeck.astro';
+
+/**
+ * The hero's cards, "What Aldente sees": four camera frames, each with the one thing Aldente spotted and
+ * what happened next, under the product's pill. Every frame is 16:9; boxes are in % of the frame (photos
+ * cropped centre). The first frame loads with the page; the rest wait their turn.
+ */
+const cards = [
+  {
+    product: 'verify' as const,
+    image: tray,
+    box: { left: 66, top: 33, width: 32, height: 62 },
+    label: '1 of 2 drinks',
+    tone: 'alert',
+    title: 'Wrong order caught at packing.',
+    detail: 'The drink goes in before pickup.',
+  },
+  {
+    product: 'verify' as const,
+    image: trayComplete,
+    box: { left: 3, top: 4, width: 94, height: 90 },
+    label: 'All 4 items in the bag',
+    tone: 'ok',
+    inside: true,
+    title: 'Refund disputed with the clip.',
+    detail: 'Uber Eats returns the $17.40.',
+  },
+  {
+    product: 'vision' as const,
+    image: dining,
+    box: { left: 26, top: 64, width: 34, height: 28 },
+    label: 'Table 6 · to clear · 3:12',
+    tone: 'alert',
+    title: 'Table 6 waiting 3 minutes.',
+    detail: 'The floor team hears in Slack.',
+  },
+  {
+    product: 'aldo' as const,
+    image: departure,
+    box: { left: 63, top: 13, width: 19, height: 50 },
+    label: 'Left 21:14 · no clock-out',
+    tone: 'alert',
+    labelEnd: true,
+    labelBelow: true,
+    title: 'Missed clock-out found.',
+    detail: 'Aldo prepares the HR case.',
+  },
+];
 ---
 
-<!-- Decorative proof cards: a shuffling deck above the headline on phones and tablets, scattered around it on wide screens. The same content appears in full further down. -->
-<div class="cards" aria-hidden="true" data-loop>
-  <div class="card card--order" style="--slot:0">
-    <div class="card__media">
-      <Image src={tray} alt="" width={260} height={170} densities={[2]} />
-      <span class="card__box card__box--ok" style="left:2%;top:30%;width:57%;height:58%"></span>
-      <span class="card__box card__box--alert" style="left:68%;top:38%;width:30%;height:50%"></span>
-    </div>
-    <div class="card__row"><b>#4821</b><span class="card__alert">1 of 2 drinks</span></div>
-  </div>
-
-  <div class="card card--stat" style="--slot:1">
-    <span class="card__big">87%</span>
-    <span class="card__caption">fewer wrong orders at one location</span>
-  </div>
-
-  <div class="card card--slack slack" style="--slot:3">
-    <div class="card__slack-head">
-      <span class="card__avatar"><img src={mark.src} alt="" width="14" height="17" /></span>
-      <b>Aldo</b><span class="slack-muted">#district-west</span>
-    </div>
-    <p class="slack-text">The queue at Location 03 has been over 6 people for 6 minutes. <span class="slack-mention">@Dana</span>, you're closest.</p>
-    <div class="slack-actions"><span class="slack-btn slack-btn--primary">On my way</span><span class="slack-btn">Call the store</span></div>
-  </div>
-
-  <div class="card card--playbook slack" style="--slot:2">
-    <span class="slack-muted">New Playbook</span>
-    <b class="card__title">Missing clock-out review</b>
-    <span class="slack-muted">After each closing shift ·{' '}<span class="card__channel">#hr-review</span></span>
-    <span class="card__confirmed"><Icon name="check" size={12} strokeWidth={3} /> Confirmed</span>
-  </div>
-</div>
+<HeroDeck>
+  {
+    cards.map((c, i) => (
+      <div class="hd__card see">
+        <div class="see__frame">
+          <Image src={c.image} alt="" widths={[320, 560]} sizes="280px" loading={i === 0 ? 'eager' : 'lazy'} />
+          <span
+            class:list={['see__box', `see__box--${c.tone}`, { 'see__box--inside': c.inside, 'see__box--end': c.labelEnd, 'see__box--below': c.labelBelow }]}
+            style={`left:${c.box.left}%;top:${c.box.top}%;width:${c.box.width}%;height:${c.box.height}%`}
+          >
+            <span class="see__label">{c.label}</span>
+          </span>
+          <span class="see__pill">
+            <ProductPill product={c.product} />
+          </span>
+        </div>
+        <p class="see__text">
+          <b>{c.title}</b> <span>{c.detail}</span>
+        </p>
+      </div>
+    ))
+  }
+</HeroDeck>
 
 <style>
-  .card {
-    position: absolute;
-    width: 220px;
-    padding: 14px;
-    border-radius: var(--radius-m);
-    background: #ffffff;
-    color: #1d1c1d;
-    border: 1px solid var(--line-card);
-  }
-
-  .card--stat {
-    width: 200px;
-    background: var(--surface);
-    color: var(--ink);
-  }
-
-  .card--slack {
-    width: 252px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .card--playbook {
-    width: 214px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  /* Phones and tablets: a stack above the headline, like stacked notifications. Every card has the same
-     size; the two behind sit under the top card and show only a thin edge above it (scaled from their
-     top edge), so no blank panel or stray word peeks out. The fourth card waits hidden at the back. */
-  @media (max-width: 1239px) {
-    .cards {
-      position: relative;
-      height: 268px;
-      max-width: 360px;
-      margin: 0 auto 28px;
-    }
-
-    .card {
-      left: 50%;
-      top: 0;
-      width: 272px;
-      height: 236px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 10px;
-      transform-origin: 50% 0;
-      box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
-    }
-
-    .card--order {
-      justify-content: space-between;
-      gap: 0;
-    }
-
-    .card--order .card__media {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .card--order .card__media :global(img) {
-      height: 100%;
-    }
-
-    .card--stat {
-      padding-inline: 20px;
-    }
-
-    /* The first frame of the shuffle (also the still deck with reduced motion): order on top, then the
-       Slack alert and the Playbook behind it, the 87% card waiting at the back. */
-    .card--order {
-      z-index: 4;
-      translate: -50% 24px;
-    }
-
-    .card--slack {
-      z-index: 3;
-      translate: -50% 12px;
-      scale: 0.94;
-      filter: brightness(0.6);
-    }
-
-    .card--playbook {
-      z-index: 2;
-      translate: -50% 0;
-      scale: 0.88;
-      filter: brightness(0.42);
-    }
-
-    .card--stat {
-      z-index: 1;
-      translate: -50% 0;
-      scale: 0.82;
-      opacity: 0;
-    }
-  }
-
-  /* With motion allowed, the top card swipes away every 3.5 s and the stack moves up one place. */
-  @media (max-width: 1239px) and (prefers-reduced-motion: no-preference) {
-    .card {
-      animation: deck 14s cubic-bezier(0.2, 0.8, 0.2, 1) infinite both;
-      animation-delay: calc(var(--slot) * -3.5s);
-    }
-  }
-
-  @keyframes deck {
-    0%,
-    19% {
-      z-index: 4;
-      translate: -50% 24px;
-      rotate: 0deg;
-      scale: 1;
-      opacity: 1;
-      filter: brightness(1);
-    }
-    /* The top card leaves to the left and is gone before the next one settles. */
-    22.5%,
-    24.9% {
-      z-index: 4;
-      translate: calc(-50% - 90px) 40px;
-      rotate: -10deg;
-      scale: 1;
-      opacity: 0;
-      filter: brightness(1);
-    }
-    25%,
-    44% {
-      z-index: 1;
-      translate: -50% 0;
-      rotate: 0deg;
-      scale: 0.82;
-      opacity: 0;
-      filter: brightness(0.42);
-    }
-    50%,
-    69% {
-      z-index: 2;
-      translate: -50% 0;
-      rotate: 0deg;
-      scale: 0.88;
-      opacity: 1;
-      filter: brightness(0.42);
-    }
-    75%,
-    94% {
-      z-index: 3;
-      translate: -50% 12px;
-      rotate: 0deg;
-      scale: 0.94;
-      opacity: 1;
-      filter: brightness(0.6);
-    }
-    100% {
-      z-index: 4;
-      translate: -50% 24px;
-      rotate: 0deg;
-      scale: 1;
-      opacity: 1;
-      filter: brightness(1);
-    }
-  }
-
-  /* Wide screens: the cards float around the headline. */
-  @media (min-width: 1240px) {
-    .cards {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    .card--order {
-      left: -8px;
-      top: 0;
-      rotate: -4deg;
-    }
-
-    .card--stat {
-      left: 36px;
-      top: 290px;
-      rotate: 3deg;
-    }
-
-    .card--slack {
-      right: -8px;
-      top: -8px;
-      rotate: 3deg;
-    }
-
-    .card--playbook {
-      right: 30px;
-      top: 300px;
-      rotate: -3deg;
-    }
-  }
-
-  @media (min-width: 1240px) and (prefers-reduced-motion: no-preference) {
-    .card {
-      animation: float 7s ease-in-out infinite;
-    }
-
-    .card--stat {
-      animation-duration: 8s;
-      animation-delay: -2s;
-    }
-
-    .card--slack {
-      animation-duration: 9s;
-      animation-delay: -4s;
-    }
-
-    .card--playbook {
-      animation-duration: 7.5s;
-      animation-delay: -1s;
-    }
-  }
-
-  @keyframes float {
-    50% {
-      translate: 0 -12px;
-    }
-  }
-
-  .card__media {
-    position: relative;
-    border-radius: var(--radius-s);
+  .see {
+    gap: 0;
+    padding: 0;
     overflow: hidden;
   }
 
-  .card__media img {
+  .see__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    flex: none;
+    background: #000000;
+  }
+
+  .see__frame :global(img) {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: 150px;
+    height: 100%;
     object-fit: cover;
   }
 
-  .card__box {
+  .see__pill {
     position: absolute;
-    border: 2px solid;
-    border-radius: var(--radius-s);
+    left: 10px;
+    top: 10px;
+    display: flex;
   }
 
-  .card__box--ok {
-    border-color: var(--ok);
+  /* The design system's detection: a 3px box with a 10px radius, the label in a solid chip above it. */
+  .see__box {
+    position: absolute;
+    border: 3px solid;
+    border-radius: 10px;
   }
 
-  .card__box--alert {
+  .see__box--alert {
     border-color: var(--accent);
   }
 
-  .card__row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    font-size: 14px;
+  .see__box--ok {
+    border-color: var(--ok);
   }
 
-  .card__alert {
-    color: #b8401f;
-    font-weight: 700;
-  }
-
-  .card__big {
-    display: block;
-    font-size: 64px;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    color: var(--accent);
-  }
-
-  .card__caption {
-    display: block;
-    margin-top: 8px;
-    font-size: 14px;
-    color: var(--ink-2);
-  }
-
-  .card__slack-head {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-  }
-
-  .card__avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: var(--radius-xs);
-    background: #0b0b0b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .card__title {
-    font-size: 17px;
-  }
-
-  /* A channel name never breaks at its hyphen. */
-  .card__channel {
+  .see__label {
+    position: absolute;
+    left: -3px;
+    bottom: calc(100% + 4px);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
     white-space: nowrap;
   }
 
-  .card__confirmed {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 4px;
-    padding: 3px 8px;
-    border-radius: var(--radius-pill);
-    background: #e3f4ec;
-    color: #007a5a;
-    font-size: 12px;
-    font-weight: 700;
+  .see__box--end .see__label {
+    left: auto;
+    right: -3px;
   }
 
-  /* Phones (after the base rules it overrides): a shorter deck, so the hero's buttons clear the cookie banner
-     on a first visit. */
-  @media (max-width: 479px) {
-    .cards {
-      height: 228px;
-      margin-bottom: 16px;
-    }
+  /* Near the top edge the label goes under the box, as the design system says. */
+  .see__box--below .see__label {
+    top: calc(100% + 4px);
+    bottom: auto;
+  }
 
-    .card {
-      width: min(272px, 100%);
-      height: 200px;
+  .see__box--inside .see__label {
+    left: 6px;
+    top: auto;
+    bottom: 6px;
+  }
+
+  .see__box--alert .see__label {
+    background: var(--accent);
+    color: #0b0b0b;
+  }
+
+  .see__box--ok .see__label {
+    background: var(--ok);
+    color: #0b0b0b;
+  }
+
+  .see__text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 10px 14px 12px;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .see__text b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .see__text span {
+    color: var(--ink-2);
+  }
+
+  /* Small phones: the headline only, so the frame keeps its 16:9. */
+  @media (max-width: 479px) {
+    .see__text span {
+      display: none;
     }
   }
 </style>

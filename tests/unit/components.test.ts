@@ -658,3 +658,22 @@ describe('How we start', () => {
     expect(list.querySelectorAll('.steps > li')).toHaveLength(ROLLOUT.length);
   });
 });
+
+describe('Hero cards', () => {
+  it('shows four camera frames, each under its product and with what happened next, as decoration', async () => {
+    const { default: HeroCards } = await import('../../src/components/home/HeroCards.astro');
+    const doc = parse(await container.renderToString(HeroCards));
+    const deck = doc.querySelector('.hd')!;
+    expect(deck.getAttribute('aria-hidden')).toBe('true');
+    const cards = [...deck.querySelectorAll('.hd__card')];
+    expect(cards.map((c) => c.querySelector('.pill')?.textContent?.trim())).toEqual([
+      'Aldente Verify',
+      'Aldente Verify',
+      'Aldente Vision',
+      'Aldo',
+    ]);
+    expect(cards.every((c) => c.querySelector('.see__box .see__label') && c.querySelector('.see__text b'))).toBe(true);
+    // Only the first frame loads with the page.
+    expect(cards.map((c) => c.querySelector('img')?.getAttribute('loading'))).toEqual(['eager', 'lazy', 'lazy', 'lazy']);
+  });
+});
