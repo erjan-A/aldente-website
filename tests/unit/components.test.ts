@@ -134,7 +134,7 @@ describe('Playbooks', () => {
 });
 
 describe('Home hero and CTA band', () => {
-  it('Hero: audience line right above the H1, "See Aldo in action" to Meet Aldo, and which products include Aldo', async () => {
+  it('Hero: audience line right above the H1, "See Aldente in action" to the products, and which products include Aldo', async () => {
     const { default: Hero } = await import('../../src/components/home/Hero.astro');
     const html = await container.renderToString(Hero);
     const doc = parse(html);
@@ -144,7 +144,7 @@ describe('Home hero and CTA band', () => {
     const actions = [...doc.querySelectorAll('.hero__actions a')].map((a) => [a.textContent?.trim(), a.getAttribute('href')]);
     expect(actions).toEqual([
       ['Book a demo', '/demo'],
-      ['See Aldo in action', '#aldo'],
+      ['See Aldente in action', '#product'],
     ]);
     const note = doc.querySelector('.hero__note')!;
     expect(note.textContent?.replace(/\s+/g, ' ').trim()).toBe('Aldo comes with Aldente Verify or Aldente Vision.');

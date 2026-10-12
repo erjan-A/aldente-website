@@ -1,11 +1,19 @@
 ---
+import { Image } from 'astro:assets';
 import '../../styles/slack.css';
+import tray from '../../assets/images/order-tray.jpg';
 import mark from '../../assets/logos/aldente-mark.svg';
 import Icon from '../ui/Icon.astro';
 import ProductPill from '../ui/ProductPill.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
 const bars = [30, 48, 70, 100, 86, 54, 40, 62];
+// The dispute desk's recent claims, newest first (the same #4821 as the rest of the site).
+const claims = [
+  { order: '#4821', app: 'Uber Eats', amount: '$17.40', status: 'Reversed', tone: 'ok' },
+  { order: '#4790', app: 'DoorDash', amount: '$45.84', status: 'Evidence sent', tone: 'wait' },
+  { order: '#4766', app: 'Grubhub', amount: '$24.90', status: 'Reversed', tone: 'ok' },
+];
 const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
 ---
 
@@ -55,14 +63,24 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
       </li>
       <li>
         <a class="product" data-loop href="/order-verification">
-          <div class="product__art" aria-hidden="true">
-            <div class="check__head"><b>Order #4821</b><span>Location 01</span></div>
-            <div class="check__row"><span class="tick tick--1"><Icon name="check" size={13} strokeWidth={3} /></span>Turkey sandwich</div>
-            <div class="check__row"><span class="tick tick--2"><Icon name="check" size={13} strokeWidth={3} /></span>Fries</div>
-            <div class="check__row">
-              <span class="tick tick--miss"><Icon name="check" size={13} strokeWidth={3} /></span>Drinks
-              <span class="check__flag check__flag--miss">1 of 2 in bag</span>
-              <span class="check__flag check__flag--ok">Fixed before pickup</span>
+          {/* The Verify app at the packing station: the camera view with its detections, the POS order, the fix. */}
+          <div class="product__art station" aria-hidden="true">
+            <div class="station__screen">
+              <div class="station__cam">
+                <Image src={tray} alt="" widths={[320, 560]} sizes="(min-width: 640px) 280px, 80vw" />
+                <span class="station__box station__box--ok" style="left:2%;top:36%;width:55%;height:49%"></span>
+                <span class="station__box station__box--alert" style="left:67%;top:38%;width:31%;height:48%"><i>1 of 2</i></span>
+                <span class="station__scan"></span>
+              </div>
+              <div class="station__order">
+                <p class="station__head"><b>#4821</b><span>Delivery</span></p>
+                <ul role="list">
+                  <li><span>Sandwich</span><b>1/1</b></li>
+                  <li><span>Fries</span><b>1/1</b></li>
+                  <li class="station__miss"><span>Drinks</span><b>1/2</b></li>
+                </ul>
+                <p class="station__action">Add 1 drink</p>
+              </div>
             </div>
           </div>
           <div class="product__copy">
@@ -75,13 +93,26 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
       </li>
       <li>
         <a class="product" data-loop href="/order-verification#dispute">
+          {/* The dispute desk, as on the deck: what came back this month and the latest claims with their status. */}
           <div class="product__art" aria-hidden="true">
-            <div class="check__head"><b>Refund claim · $17.40</b><span>Uber Eats</span></div>
-            <div class="check__row"><span class="tick"><Icon name="check" size={13} strokeWidth={3} /></span>Packing clip found</div>
-            <div class="check__row"><span class="tick"><Icon name="check" size={13} strokeWidth={3} /></span>Dispute sent with the clip</div>
-            <div class="check__row">
-              <span class="tick"><Icon name="check" size={13} strokeWidth={3} /></span>Charge reversed
-              <span class="claim__back">+$17.40</span>
+            <div class="desk">
+              <div class="desk__top">
+                <span class="desk__brand"><img src={mark.src} alt="" width="9" height="11" />Delivery disputes</span>
+                <span class="desk__kpi">Won back this month <b>$4,202</b></span>
+              </div>
+              <div class="desk__table">
+                <p class="desk__row desk__row--head"><span>Order</span><span class="desk__app">App</span><span>Amount</span><span>Status</span></p>
+                {
+                  claims.map((c, i) => (
+                    <p class:list={['desk__row', { 'desk__row--new': i === 0 }]}>
+                      <b>{c.order}</b>
+                      <span class="desk__app">{c.app}</span>
+                      <span>{c.amount}</span>
+                      <span class:list={['desk__status', `desk__status--${c.tone}`]}>{c.status}</span>
+                    </p>
+                  ))
+                }
+              </div>
             </div>
           </div>
           <div class="product__copy">
@@ -288,7 +319,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     font-variant-numeric: tabular-nums;
   }
 
-  /* Order card */
+  /* Card heading inside an art panel (Aldente Vision's chart). */
   .check__head {
     display: flex;
     justify-content: space-between;
@@ -300,51 +331,250 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     color: var(--ink);
   }
 
-  .check__row {
+  /* Verify: the packing-station screen. The camera keeps the photo's own shape, so the boxes stay on the items. */
+  .station {
+    padding-block: 18px;
+  }
+
+  .station__screen {
+    display: flex;
+    gap: 10px;
+    height: 100%;
+    padding: 8px;
+    border-radius: var(--radius-m);
+    background: #1a1a1a;
+    border: 1px solid var(--line-card);
+  }
+
+  .station__cam {
     position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: var(--radius-s);
-    background: var(--surface);
-    font-size: var(--step-small);
+    flex: none;
+    height: 100%;
+    aspect-ratio: 962 / 716;
+    border-radius: 10px;
+    overflow: hidden;
   }
 
-  .tick {
-    width: 22px;
-    height: 22px;
-    border-radius: var(--radius-xs);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--ok);
-    color: var(--on-accent);
+  .station__cam :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
-  .check__flag {
+  .station__box {
     position: absolute;
-    right: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    border: 3px solid;
+    border-radius: 10px;
   }
 
-  .check__flag--miss {
-    color: var(--accent);
+  .station__box--ok {
+    border-color: var(--ok);
+  }
+
+  .station__box--alert {
+    border-color: var(--accent);
+  }
+
+  .station__box i {
+    position: absolute;
+    left: -3px;
+    bottom: calc(100% + 4px);
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .station__scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 12px 2px var(--accent);
     opacity: 0;
   }
 
-  .check__flag--ok {
-    color: var(--ok);
+  .station__order {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
   }
 
-  /* Dispute card: the money that comes back. */
-  .claim__back {
-    position: absolute;
-    right: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+  .station__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+
+  .station__head b {
+    color: var(--ink);
+  }
+
+  .station__order ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .station__order li {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: var(--surface-2);
+  }
+
+  .station__order li b {
     color: var(--ok);
+    font-variant-numeric: tabular-nums;
+  }
+
+  li.station__miss {
+    background: var(--accent-soft);
+  }
+
+  li.station__miss b {
+    color: var(--accent);
+  }
+
+  .station__action {
+    margin-top: auto;
+    padding: 7px 8px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Phones: the camera alone, with the fix on it. */
+  @media (max-width: 479px) {
+    .station__screen {
+      justify-content: center;
+    }
+
+    .station__order {
+      display: none;
+    }
+  }
+
+  /* Dispute: the dispute desk's light dashboard (the decks' #fafaf8 ground and darkened green for AA). */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--radius-m);
+    background: #fafaf8;
+    color: #141414;
+    font-size: 13px;
+  }
+
+  .desk__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+  }
+
+  .desk__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+  }
+
+  .desk__brand img {
+    width: 20px;
+    height: 20px;
+    padding: 4px 5px;
+    border-radius: 5px;
+    background: #0b0b0b;
+  }
+
+  .desk__kpi {
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid #e4e4e0;
+    background: #ffffff;
+    color: #6b6b6b;
+    font-size: 12px;
+  }
+
+  .desk__kpi b {
+    margin-left: 4px;
+    color: #147a43;
+    font-size: 14px;
+  }
+
+  .desk__table {
+    border: 1px solid #e4e4e0;
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .desk__row {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 0.9fr 1.3fr;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid #efefec;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .desk__row--head {
+    border-top: 0;
+    background: #f6f6f3;
+    color: #6b6b6b;
+    font-size: 12px;
+  }
+
+  .desk__row--new {
+    background: #fff4ef;
+  }
+
+  .desk__status {
+    justify-self: start;
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .desk__status--ok {
+    background: #e6f5ec;
+    color: #147a43;
+  }
+
+  .desk__status--wait {
+    background: #fdf1dc;
+    color: #8a5a0a;
+  }
+
+  @media (max-width: 479px) {
+    .desk__row {
+      grid-template-columns: 1fr 0.9fr 1.3fr;
+    }
+
+    .desk__app {
+      display: none;
+    }
   }
 
   /* Bars card */
@@ -373,33 +603,33 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     color: var(--ink-3);
   }
 
-  /* Motion that shows the product working: Aldo hears a voice note; a bag gets checked. */
+  /* Motion that shows the product working: Aldo hears a voice note; the station's camera scans the bag. */
   @media (prefers-reduced-motion: no-preference) {
     .voice__wave i {
       animation: voice 1.1s ease-in-out infinite;
       animation-delay: var(--d);
     }
 
-    .tick--1 {
-      animation: tick 5s ease infinite;
-    }
-
-    .tick--2 {
-      animation: tick 5s ease 0.6s infinite;
-    }
-
-    .tick--miss {
-      animation: miss 5s ease infinite;
-    }
-
-    .check__flag--miss {
-      animation: flag-miss 5s ease infinite;
-    }
-
-    .check__flag--ok {
-      animation: flag-ok 5s ease infinite;
+    .station__scan {
+      animation: station-scan 3.2s linear infinite;
     }
   }
+
+  @keyframes station-scan {
+    0% {
+      top: 0;
+      opacity: 0;
+    }
+    10%,
+    90% {
+      opacity: 0.6;
+    }
+    100% {
+      top: 100%;
+      opacity: 0;
+    }
+  }
+
 
   @keyframes voice {
     50% {
@@ -407,51 +637,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     }
   }
 
-  @keyframes tick {
-    0%,
-    20% {
-      background: var(--surface-2);
-      color: transparent;
-    }
-    28%,
-    100% {
-      background: var(--ok);
-      color: var(--on-accent);
-    }
-  }
 
-  @keyframes miss {
-    0%,
-    45% {
-      background: var(--accent);
-      color: transparent;
-    }
-    55%,
-    100% {
-      background: var(--ok);
-      color: var(--on-accent);
-    }
-  }
 
-  @keyframes flag-miss {
-    0%,
-    45% {
-      opacity: 1;
-    }
-    55%,
-    100% {
-      opacity: 0;
-    }
-  }
 
-  @keyframes flag-ok {
-    0%,
-    45% {
-      opacity: 0;
-    }
-    55%,
-    100% {
-      opacity: 1;
-    }
-  }
 </style>

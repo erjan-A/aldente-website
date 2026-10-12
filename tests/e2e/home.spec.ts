@@ -12,16 +12,16 @@ test.describe('home page', () => {
     await page.reload();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your AI Chief of Staff with eyes.');
     await expect(page.locator('.hero .eyebrow')).toHaveText('For restaurant chains and franchise operators');
-    await expect(page.locator('.hero').getByRole('link', { name: 'See Aldo in action' })).toHaveAttribute('href', '#aldo');
+    await expect(page.locator('.hero').getByRole('link', { name: 'See Aldente in action' })).toHaveAttribute('href', '#product');
     await expect(page.locator('.hero__note')).toHaveText('Aldo comes with Aldente Verify or Aldente Vision.');
     await expect(page.getByRole('link', { name: 'Get Aldo in Slack' })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
-  test('"See Aldo in action" scrolls to Meet Aldo', async ({ page }) => {
-    await page.locator('.hero').getByRole('link', { name: 'See Aldo in action' }).click();
-    await expect(page).toHaveURL(/#aldo$/);
-    await expect(page.locator('#aldo')).toBeInViewport();
+  test('"See Aldente in action" scrolls to the products', async ({ page }) => {
+    await page.locator('.hero').getByRole('link', { name: 'See Aldente in action' }).click();
+    await expect(page).toHaveURL(/#product$/);
+    await expect(page.locator('#product')).toBeInViewport();
   });
 
   test('walks through Aldo in Slack with the tabs', async ({ page }) => {
@@ -138,10 +138,11 @@ test.describe('home page', () => {
     const map = page.locator('.connections .map');
     await expect(map.locator('.map__in li')).toHaveText([
       /Aldente Verify/,
+      /Aldente Dispute/,
       /Aldente Vision/,
       /POS/,
       /HR and time clock/,
-      /Delivery/,
+      /Inventory and procurement/,
       /Other customer systems/,
     ]);
     await expect(map.locator('.hub')).toContainText('AI Chief of Staff');

@@ -8,8 +8,8 @@ import HeroConsole from './HeroConsole.astro';
 import ProofBar from './ProofBar.astro';
 
 const { verify, vision } = PRODUCTS;
-// "See Aldo in action" scrolls to the Meet Aldo section on this page (AldoDemo, id="aldo"); other pages use LINKS.seeAldo.
-const seeAldo = '#aldo';
+// "See Aldente in action" scrolls to the four products on this page (Products, id="product").
+const seeAldente = '#product';
 ---
 
 <section class="hero tone-dark" aria-labelledby="hero-title">
@@ -28,7 +28,7 @@ const seeAldo = '#aldo';
         <div class="hero__cta">
           <div class="hero__actions">
             <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
-            <Button href={seeAldo} variant="secondary" size="lg">See Aldo in action</Button>
+            <Button href={seeAldente} variant="secondary" size="lg">See Aldente in action</Button>
           </div>
           <p class="hero__note">
             Aldo comes with{' '}<a href={verify.href}>{verify.name}</a>{' '}or{' '}<a href={vision.href}>{vision.name}</a>.

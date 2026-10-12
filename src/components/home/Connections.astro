@@ -5,9 +5,9 @@ import Icon, { type IconName } from '../ui/Icon.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
 /**
- * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente products and the customer's
- * own systems feed Aldo, and Aldo answers in Slack with Q&A and
- * Playbooks. Wide screens draw the wires; the geometry is fixed (row heights below), so the SVG paths
+ * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente Verify, Dispute and Vision and
+ * the customer's own systems feed Aldo, and Aldo answers in Slack with Q&A and Playbooks. Dots of light run
+ * along the wires into Aldo and out to Slack, and the lit hub breathes (both still for reduced motion). Wide screens draw the wires; the geometry is fixed (row heights below), so the SVG paths
  * meet each row at its centre without measuring anything in the browser.
  */
 interface Props {
@@ -26,14 +26,15 @@ interface Source {
 }
 
 const products: Source[] = [
-  { name: 'Aldente Verify', detail: 'Orders and evidence', icon: 'check-check' },
+  { name: 'Aldente Verify', detail: 'Orders and photo evidence', icon: 'check-check' },
+  { name: 'Aldente Dispute', detail: 'Refund claims and evidence packs', icon: 'shield-check' },
   { name: 'Aldente Vision', detail: 'Camera events and metrics', icon: 'eye' },
 ];
 
 const systems: Source[] = [
   { name: 'POS', detail: 'Sales and orders', icon: 'receipt' },
   { name: 'HR and time clock', detail: 'Shifts and clock-outs', icon: 'clock' },
-  { name: 'Delivery', detail: 'Delivery orders and refunds', icon: 'truck' },
+  { name: 'Inventory and procurement', detail: 'Stock levels and purchasing', icon: 'package' },
   { name: 'Other customer systems', icon: 'database' },
 ];
 
@@ -68,6 +69,9 @@ const outputY = outputs.map((_, i) => RIGHT_TOP + LABEL + i * (CARD + CARD_GAP) 
 
 const wireIn = (y: number) => `M0 ${y} C55 ${y} 45 ${MID} 100 ${MID}`;
 const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
+// Each wire carries a dot of light, staggered so the dots never move as one.
+const inWires = [...productY, ...systemY];
+const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
 ---
 
 <section class:list={['connections', 'tone-dark', { 'connections--pad': padTop }]} aria-labelledby="connections-title">
@@ -76,9 +80,9 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
       product={product ?? undefined}
       label={product === 'aldo' ? 'Aldo in Slack' : undefined}
       id="connections-title"
-      title="Aldo, your AI Chief of Staff,"
-      muted="connected to your restaurant data."
-      lead="Aldente Verify and Aldente Vision give Aldo eyes in every location. Connect your POS, HR and delivery systems, and it answers with the whole picture."
+      title="Aldo works in Slack,"
+      muted="with data from Verify, Dispute, Vision and your systems."
+      lead="Aldente Verify, Dispute and Vision give Aldo eyes in every location. Connect your POS, HR and inventory systems, and it answers with the whole picture."
     />
 
     <div class="map" style={`--map-h:${HEIGHT}px;--right-top:${RIGHT_TOP}px`}>
@@ -116,12 +120,20 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
 
       <div class="map__wires map__wires--in" aria-hidden="true">
         <svg viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" focusable="false">
-          {[...productY, ...systemY].map((y) => <path class="wire wire--in" d={wireIn(y)} />)}
+          {inWires.map((y) => <path class="wire wire--in" d={wireIn(y)} />)}
+          {
+            inWires.map((y, i) => (
+              <path class="pulse" d={wireIn(y)} pathLength="100" style={`animation-delay:${delay(i, inWires.length)}`} />
+            ))
+          }
         </svg>
       </div>
 
       <div class="map__hub">
         <div class="hub">
+          <span class="hub__ring" aria-hidden="true"></span>
+          <span class="hub__ripple" aria-hidden="true"></span>
+          <span class="hub__ripple hub__ripple--late" aria-hidden="true"></span>
           <img src={mark.src} alt="" width="40" height="49" />
           <b>Aldo</b>
           <small>AI Chief of Staff</small>
@@ -131,6 +143,11 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
       <div class="map__wires map__wires--out" aria-hidden="true">
         <svg viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" focusable="false">
           {outputY.map((y) => <path class="wire wire--out" d={wireOut(y)} />)}
+          {
+            outputY.map((y, i) => (
+              <path class="pulse pulse--out" d={wireOut(y)} pathLength="100" style={`animation-delay:${delay(i, outputY.length)}`} />
+            ))
+          }
         </svg>
       </div>
 
@@ -297,9 +314,27 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
     justify-content: center;
     gap: 4px;
     border-radius: 50%;
-    background: radial-gradient(circle at 50% 35%, #1c1410 0%, var(--bg) 70%);
-    border: 1.5px solid var(--accent);
-    box-shadow: 0 0 80px 10px rgb(224 86 52 / 0.18);
+    background: radial-gradient(circle at 50% 0%, #4a2213 0%, var(--bg) 72%);
+    border: 2px solid var(--accent);
+    box-shadow:
+      0 0 64px rgb(224 86 52 / 0.38),
+      0 0 140px 20px rgb(224 86 52 / 0.12);
+  }
+
+  /* The design system's lit circle: a thin ring 18px out, and two ripples that leave it in turn. */
+  .hub__ring,
+  .hub__ripple {
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    border: 1px solid rgb(224 86 52 / 0.4);
+    pointer-events: none;
+  }
+
+  .hub__ripple {
+    inset: -2px;
+    border-color: rgb(224 86 52 / 0.5);
+    opacity: 0;
   }
 
   .hub img {
@@ -502,15 +537,99 @@ const wireOut = (y: number) => `M0 ${MID} C55 ${MID} 45 ${y} 100 ${y}`;
     stroke-width: 2;
   }
 
+  /* A dot of light on each wire: a zero-length dash with a round cap, walked along the path. */
+  .pulse {
+    display: none;
+    fill: none;
+    stroke: #ffb08f;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 0 100;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 4px rgb(224 86 52 / 0.9));
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .wire--in {
       animation: wire-flow 1.2s linear infinite;
+    }
+
+    .pulse {
+      display: inline;
+      animation: pulse-in 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite both;
+    }
+
+    .pulse--out {
+      animation-name: pulse-out;
+    }
+
+    .hub {
+      animation: hub-breathe 4.8s ease-in-out infinite;
+    }
+
+    .hub__ripple {
+      animation: hub-ripple 4.8s ease-out infinite;
+    }
+
+    .hub__ripple--late {
+      animation-delay: 2.4s;
     }
   }
 
   @keyframes wire-flow {
     to {
       stroke-dashoffset: -16;
+    }
+  }
+
+  @keyframes pulse-in {
+    0% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+    12%,
+    88% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -100;
+      opacity: 0;
+    }
+  }
+
+  /* Out of Aldo once the dots coming in have arrived. */
+  @keyframes pulse-out {
+    0%,
+    40% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+    50%,
+    92% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -100;
+      opacity: 0;
+    }
+  }
+
+  @keyframes hub-breathe {
+    50% {
+      box-shadow:
+        0 0 84px rgb(224 86 52 / 0.5),
+        0 0 160px 28px rgb(224 86 52 / 0.16);
+    }
+  }
+
+  @keyframes hub-ripple {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(1.45);
+      opacity: 0;
     }
   }
 </style>
