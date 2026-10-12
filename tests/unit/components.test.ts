@@ -643,7 +643,7 @@ describe('Aldente Verify', () => {
     expect([...doc.querySelectorAll('.dispute__copy b')].map((b) => b.textContent)).toEqual([
       'Claim comes in',
       'Proof found',
-      'Dispute sent',
+      'Evidence pack ready and submitted',
       'Money back',
     ]);
     const beats = doc.querySelector('scroll-beats')!;

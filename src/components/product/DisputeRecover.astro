@@ -7,7 +7,7 @@ import SectionHeader from '../ui/SectionHeader.astro';
 
 /**
  * Aldente Dispute, as on the decks' slide: four numbered steps beside a light dispute desk where one claim
- * plays out: the claim comes in, the packing clip proves the bag, the dispute goes to the app in its
+ * plays out: the claim comes in, the packing clip proves the bag, the evidence pack goes to the app in its
  * support chat, and the charge comes back. The order is #4821 from the rest of the page.
  *
  * <scroll-beats> reveals the desk step by step as it scrolls into view (data-beat 0-4). The markup ships at
@@ -16,7 +16,7 @@ import SectionHeader from '../ui/SectionHeader.astro';
 const steps = [
   { title: 'Claim comes in', text: 'Uber Eats charges $17.40 for a missing drink.' },
   { title: 'Proof found', text: 'Aldente pulls the packing clip: all 4 items in the bag.' },
-  { title: 'Dispute sent', text: 'The clip goes to the app in its support chat.' },
+  { title: 'Evidence pack ready and submitted', text: 'Clip, item check and handoff, sent to the app in its support chat.' },
   { title: 'Money back', text: 'The charge is reversed and $17.40 returns to the store.' },
 ];
 const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
@@ -29,7 +29,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
       product="dispute"
       title="When a refund still hits,"
       muted="Aldente disputes it with video proof."
-      lead="Delivery apps charge the store for refund claims, right or wrong. Aldente answers each one with the packing clip."
+      lead="Delivery apps charge the store for refund claims, right or wrong. Aldente Dispute builds the evidence pack for each claim."
     />
 
     <scroll-beats class="dispute__beats" data-beats="4" data-beat="4" data-start="0.05" data-end="0.55">
@@ -101,7 +101,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
 
             <div class="desk__chat">
               <p class="msg msg--app b1"><b>Uber Eats support</b>Guest reported a missing drink. $17.40 charged to the store.</p>
-              <p class="msg msg--us b3"><b>Aldente</b>All 4 items were packed. The clip from the packing station is attached.</p>
+              <p class="msg msg--us b3"><b>Aldente</b>All 4 items were packed. Evidence pack from Aldente attached.</p>
               <p class="msg msg--app b4"><b>Uber Eats support</b>Evidence reviewed. Charge reversed.</p>
             </div>
           </div>

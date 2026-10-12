@@ -7,8 +7,11 @@ import SectionHeader from '../ui/SectionHeader.astro';
 /**
  * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente Verify, Dispute and Vision and
  * the customer's own systems feed Aldo, and Aldo answers in Slack with Q&A and Playbooks. Dots of light run
- * along the wires into Aldo and out to Slack, and the lit hub breathes (both still for reduced motion). Wide screens draw the wires; the geometry is fixed (row heights below), so the SVG paths
- * meet each row at its centre without measuring anything in the browser.
+ * along the wires into Aldo and out to Slack, and the lit hub breathes (all still for reduced motion). Wide
+ * screens draw the wires; the geometry is fixed (row heights below), so the SVG paths meet each row at its
+ * centre without measuring anything in the browser. Stacked screens join the blocks with two short lines.
+ * The glow is a gradient that fades to nothing inside its own box, never a large box-shadow, which Safari
+ * clips to a visible square.
  */
 interface Props {
   /** Add top spacing when the section follows a different tone. */
@@ -130,14 +133,17 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
       </div>
 
       <div class="map__hub">
+        <span class="hub__glow" aria-hidden="true"></span>
+        <span class="hub__line hub__line--in" aria-hidden="true"><i></i></span>
         <div class="hub">
+          <span class="hub__halo" aria-hidden="true"></span>
           <span class="hub__ring" aria-hidden="true"></span>
           <span class="hub__ripple" aria-hidden="true"></span>
-          <span class="hub__ripple hub__ripple--late" aria-hidden="true"></span>
           <img src={mark.src} alt="" width="40" height="49" />
           <b>Aldo</b>
           <small>AI Chief of Staff</small>
         </div>
+        <span class="hub__line hub__line--out" aria-hidden="true"><i></i></span>
       </div>
 
       <div class="map__wires map__wires--out" aria-hidden="true">
@@ -278,35 +284,72 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     display: none;
   }
 
+  /* Stacked: a dashed line from the sources into Aldo, a solid one out to Slack, each ending in a port. */
   .map__hub {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding-block: 20px 12px;
+    margin-top: -8px;
   }
 
-  /* The stacked layout joins the blocks with short wires: dashed in, solid out. */
-  .map__hub::before,
-  .map__hub::after {
+  /* As wide as a phone at most, so tablets get a round glow rather than a flat band. */
+  .hub__glow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: min(100%, 380px);
+    translate: -50% 0;
+    background: radial-gradient(closest-side, rgb(224 86 52 / 0.24), rgb(224 86 52 / 0.08) 55%, transparent);
+    pointer-events: none;
+  }
+
+  .hub__line {
+    position: relative;
+    width: 2px;
+    height: 56px;
+    --port: 0;
+  }
+
+  .hub__line--in {
+    background: repeating-linear-gradient(to bottom, var(--accent) 0 5px, transparent 5px 10px);
+  }
+
+  .hub__line--out {
+    --port: 100%;
+    background: var(--accent);
+  }
+
+  .hub__line::before {
     content: '';
-    width: 0;
-    height: 24px;
+    position: absolute;
+    left: 50%;
+    top: var(--port);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    translate: -50% -50%;
   }
 
-  .map__hub::before {
-    order: -1;
-    border-left: 1.5px dashed var(--accent);
-  }
-
-  .map__hub::after {
-    border-left: 1.5px solid var(--accent);
+  /* The dot of light that runs down each line (motion only). */
+  .hub__line i {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: -3px;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: #ffb08f;
+    box-shadow: 0 0 8px 2px rgb(224 86 52 / 0.9);
   }
 
   .hub {
     position: relative;
-    width: 152px;
+    width: 148px;
     aspect-ratio: 1;
     display: flex;
     flex-direction: column;
@@ -317,23 +360,32 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     background: radial-gradient(circle at 50% 0%, #4a2213 0%, var(--bg) 72%);
     border: 2px solid var(--accent);
     box-shadow:
-      0 0 64px rgb(224 86 52 / 0.38),
-      0 0 140px 20px rgb(224 86 52 / 0.12);
+      0 0 28px rgb(224 86 52 / 0.4),
+      inset 0 0 22px rgb(224 86 52 / 0.14);
   }
 
-  /* The design system's lit circle: a thin ring 18px out, and two ripples that leave it in turn. */
+  /* The design system's lit circle: a ring close in, a fainter halo further out, and one ripple between. */
+  .hub__halo,
   .hub__ring,
   .hub__ripple {
     position: absolute;
-    inset: -18px;
     border-radius: 50%;
-    border: 1px solid rgb(224 86 52 / 0.4);
     pointer-events: none;
+  }
+
+  .hub__ring {
+    inset: -14px;
+    border: 1px solid rgb(224 86 52 / 0.45);
+  }
+
+  .hub__halo {
+    inset: -34px;
+    border: 1px solid rgb(224 86 52 / 0.18);
   }
 
   .hub__ripple {
     inset: -2px;
-    border-color: rgb(224 86 52 / 0.5);
+    border: 1px solid rgb(224 86 52 / 0.5);
     opacity: 0;
   }
 
@@ -461,17 +513,32 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
 
     .map__hub {
       justify-content: center;
-      padding: 0;
+      margin-top: 0;
     }
 
-    .map__hub::before,
-    .map__hub::after {
-      content: none;
+    .hub__line {
+      display: none;
+    }
+
+    .hub__glow {
+      top: 50%;
+      bottom: auto;
+      width: 520px;
+      aspect-ratio: 1;
+      translate: -50% -50%;
     }
 
     .hub {
       width: 208px;
       gap: 6px;
+    }
+
+    .hub__ring {
+      inset: -18px;
+    }
+
+    .hub__halo {
+      inset: -48px;
     }
 
     .hub img {
@@ -563,16 +630,26 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
       animation-name: pulse-out;
     }
 
-    .hub {
-      animation: hub-breathe 4.8s ease-in-out infinite;
+    .hub__glow {
+      animation: glow-breathe 4.8s ease-in-out infinite;
     }
 
     .hub__ripple {
       animation: hub-ripple 4.8s ease-out infinite;
     }
 
-    .hub__ripple--late {
-      animation-delay: 2.4s;
+    .hub__line--in {
+      animation: line-flow 1.2s linear infinite;
+    }
+
+    .hub__line i {
+      display: block;
+      animation: line-dot 2.4s linear infinite both;
+    }
+
+    /* Out of Aldo once the dot coming in has arrived. */
+    .hub__line--out i {
+      animation-delay: 1.2s;
     }
   }
 
@@ -614,21 +691,46 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     }
   }
 
-  @keyframes hub-breathe {
+  @keyframes glow-breathe {
+    0%,
+    100% {
+      opacity: 0.75;
+    }
     50% {
-      box-shadow:
-        0 0 84px rgb(224 86 52 / 0.5),
-        0 0 160px 28px rgb(224 86 52 / 0.16);
+      opacity: 1;
     }
   }
 
   @keyframes hub-ripple {
     0% {
       transform: scale(1);
-      opacity: 0.6;
+      opacity: 0.55;
     }
     100% {
-      transform: scale(1.45);
+      transform: scale(1.42);
+      opacity: 0;
+    }
+  }
+
+  @keyframes line-flow {
+    to {
+      background-position: 0 10px;
+    }
+  }
+
+  /* Each dot takes half the cycle, so the one going out leaves as the one coming in arrives. */
+  @keyframes line-dot {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    8%,
+    42% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      transform: translateY(56px);
       opacity: 0;
     }
   }
