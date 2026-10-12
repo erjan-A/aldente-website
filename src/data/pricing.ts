@@ -28,14 +28,14 @@ export const PLANS: Plan[] = [
   },
   {
     id: 'verification',
-    name: 'Aldente Verify',
-    summary: 'For delivery and drive-thru accuracy.',
+    name: 'Aldente Verify + Dispute',
+    summary: 'For delivery and drive-thru accuracy, and refunds won back.',
     cta: { label: 'Book a demo', href: `${LINKS.demo}?plan=verification` },
     features: [
       'Verification tablet and camera included',
       'Item and quantity checks against your POS',
       'Photo and clip for every order',
-      'Automatic delivery refund disputes',
+      'Aldente Dispute: automatic delivery refund disputes',
       'Accuracy dashboard by location',
     ],
     aldo: true,
@@ -47,9 +47,9 @@ export const PLANS: Plan[] = [
     summary: 'For chains with 50+ locations.',
     cta: { label: 'Talk to us', href: `${LINKS.demo}?plan=enterprise` },
     features: [
-      'Both products across every location',
+      'Every product across every location',
       'Custom integrations and SSO',
-      'SOC 2 Type II report and security review',
+      'Security review and questionnaire support',
       'Dedicated success manager and SLA',
       'Rollout support across regions',
     ],
@@ -104,7 +104,7 @@ export const PRICING_FAQ: { q: string; a: string }[] = [
   { q: 'Can we start with one location?', a: 'Yes. Many chains start with one or two locations and roll out after the first results.' },
   {
     q: 'What happens to our footage and records?',
-    a: 'Your footage and records stay in your account and are used to run your workspace. We’re SOC 2 Type II certified and GDPR compliant.',
+    a: 'Your footage and records stay in your account and are used to run your workspace. They are encrypted at rest and in transit, and we’re GDPR compliant.',
   },
   { q: 'Is there a contract?', a: 'Plans are monthly per location. Enterprise plans can be annual.' },
 ];

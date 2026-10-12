@@ -251,6 +251,7 @@ describe('Product pills', () => {
     expect([...doc.querySelectorAll('.product .pill')].map((p) => p.textContent?.trim())).toEqual([
       'Aldo',
       'Aldente Verify',
+      'Aldente Dispute',
       'Aldente Vision',
     ]);
   });
@@ -463,7 +464,7 @@ describe('PlanGrid', () => {
   it('lists the three plans, Aldo included in both products, with no price or badge', async () => {
     const doc = parse(await container.renderToString(PlanGrid));
     const names = [...doc.querySelectorAll('.plan__name')].map((n) => n.textContent);
-    expect(names).toEqual(['Aldente Vision', 'Aldente Verify', 'Enterprise']);
+    expect(names).toEqual(['Aldente Vision', 'Aldente Verify + Dispute', 'Enterprise']);
     expect([...doc.querySelectorAll('.plan')].map((p) => Boolean(p.querySelector('.plan__aldo')))).toEqual([true, true, false]);
     expect(doc.body.textContent).not.toContain('Most chosen');
     expect(doc.body.textContent).not.toMatch(/\$\d|per location \/ month|free/i);
@@ -615,7 +616,8 @@ describe('Footer', () => {
     const row = doc.querySelector('.footer__legal')!;
     expect(row.querySelectorAll('a')).toHaveLength(0);
     expect(row.querySelector('button[data-cookie-settings]')?.textContent).toBe('Cookie settings');
-    expect(row.textContent).toContain('SOC 2 Type II · GDPR');
+    expect(row.textContent).toContain('GDPR compliant');
+    expect(row.textContent).not.toContain('SOC 2');
     // The divider sits inside the container's padding, so it spans the text column only.
     expect(row.parentElement?.classList.contains('container')).toBe(true);
     expect(row.classList.contains('container')).toBe(false);
@@ -627,15 +629,17 @@ describe('Aldente Verify', () => {
     const { default: VerifyLoops } = await import('../../src/components/product/VerifyLoops.astro');
     const doc = parse(await container.renderToString(VerifyLoops));
     expect([...doc.querySelectorAll('.loop__title')].map((t) => t.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
-      '1. Check & Prevent',
-      '2. Dispute & Recover',
+      '1. Aldente Verify',
+      '2. Aldente Dispute',
     ]);
     expect([...doc.querySelectorAll('.loop__result b')].map((b) => b.textContent)).toEqual(['87%', 'Reversed']);
   });
 
-  it('tells Dispute & Recover in four steps and ships the finished story for no-JS and reduced motion', async () => {
+  it('tells Aldente Dispute in four steps under its own pill and ships the finished story for no-JS and reduced motion', async () => {
     const { default: DisputeRecover } = await import('../../src/components/product/DisputeRecover.astro');
     const doc = parse(await container.renderToString(DisputeRecover));
+    expect(doc.querySelector('section')?.id).toBe('dispute');
+    expect(doc.querySelector('.pill')?.textContent?.trim()).toBe('Aldente Dispute');
     expect([...doc.querySelectorAll('.dispute__copy b')].map((b) => b.textContent)).toEqual([
       'Claim comes in',
       'Proof found',
@@ -668,7 +672,7 @@ describe('Hero cards', () => {
     const cards = [...deck.querySelectorAll('.hd__card')];
     expect(cards.map((c) => c.querySelector('.pill')?.textContent?.trim())).toEqual([
       'Aldente Verify',
-      'Aldente Verify',
+      'Aldente Dispute',
       'Aldente Vision',
       'Aldo',
     ]);

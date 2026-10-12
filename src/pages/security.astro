@@ -7,16 +7,15 @@ import { SITE } from '../data/site';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const pillars = [
-  { title: 'SOC 2 Type II certified', text: 'Independently audited controls for security, availability and confidentiality.' },
-  { title: 'Encrypted at rest and in transit', text: 'Footage, records and credentials are encrypted end to end.' },
+  { title: 'Encrypted at rest and in transit', text: 'Footage, records and credentials are encrypted, in storage and on the way.' },
+  { title: 'Your footage stays yours', text: 'Camera footage and records stay in your account and are used to run your workspace.' },
   { title: 'Role-based access', text: 'Access follows roles, locations and regions. Every alert shows only what the recipient needs.' },
   { title: 'Retention you control', text: 'Set how long footage and records are kept, per location.' },
-  { title: 'Your footage stays yours', text: 'Camera footage and records stay in your account and are used to run your workspace.' },
   { title: 'GDPR compliant', text: 'Processing agreements and data-subject requests handled to GDPR standards.' },
 ];
 ---
 
-<BaseLayout title="Security" description="SOC 2 Type II certified and GDPR compliant. Encryption at rest and in transit, role-based access and retention you control.">
+<BaseLayout title="Security" description="GDPR compliant, with encryption at rest and in transit, role-based access and retention you control. Footage and records stay in your account.">
   <PageHero
     title="Security built for"
     muted="enterprise restaurant groups."
@@ -26,7 +25,6 @@ const pillars = [
   </PageHero>
   <section class="tone-dark section pillars-wrap" aria-labelledby="pillars-title">
     <h2 id="pillars-title" class="visually-hidden">Security controls</h2>
-    {/* The same bordered cards as the trust row on home. */}
     <ul class="container pillars" role="list">
       {
         pillars.map((p) => (
@@ -47,7 +45,7 @@ const pillars = [
   }
 
   /* margin-block only: the .container keeps its auto side margins, so the grid lines up with the hero.
-     One column on phones, two on tablets, three from 1024px: six cards, every row full. */
+     One column on phones, two on tablets; from 1024px two wide cards over three, so five cards fill every row. */
   .pillars {
     margin-block: 0;
     display: grid;
@@ -61,9 +59,24 @@ const pillars = [
     }
   }
 
+  /* Tablets: the fifth card spans the row. */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .pillars > :global(:last-child) {
+      grid-column: 1 / -1;
+    }
+  }
+
   @media (min-width: 1024px) {
     .pillars {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .pillars > :global(*) {
+      grid-column: span 2;
+    }
+
+    .pillars > :global(:nth-child(-n + 2)) {
+      grid-column: span 3;
     }
   }
 

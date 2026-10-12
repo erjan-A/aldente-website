@@ -1,7 +1,16 @@
 ---
 import Card from '../ui/Card.astro';
+import Icon, { type IconName } from '../ui/Icon.astro';
 import RolloutWeeks from '../ui/RolloutWeeks.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
+
+// What IT and operations ask before the first location goes live.
+const trust: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'lock', title: 'Encrypted, GDPR compliant', text: 'Footage and records are encrypted at rest and in transit.' },
+  { icon: 'users', title: 'Built for multi-location teams', text: 'Role-based access, regional views and central reporting.' },
+  { icon: 'shield-check', title: 'Privacy by design', text: 'Repeat-visit counts carry no names. You set who sees footage and how long it is kept.' },
+  { icon: 'user-check', title: 'White-glove rollout', text: 'A dedicated success manager and custom SLAs.' },
+];
 ---
 
 <section class="enterprise tone-dark section" aria-labelledby="enterprise-title">
@@ -15,13 +24,19 @@ import SectionHeader from '../ui/SectionHeader.astro';
     />
     <RolloutWeeks />
     <ul class="enterprise__trust" role="list">
-      <Card as="li" class="trust">
-        <span class="trust__badge" aria-hidden="true"><b>SOC 2</b><span>Type II</span></span>
-        <span><b>SOC 2 Type II certified</b><span>GDPR compliant. Encrypted at rest and in transit.</span></span>
-      </Card>
-      <Card as="li" class="trust"><span><b>Built for multi-location teams</b><span>Role-based access, regional views and central reporting.</span></span></Card>
-      <Card as="li" class="trust"><span><b>Privacy by design</b><span>Repeat-visit counts carry no names. Footage access follows roles, and you set retention.</span></span></Card>
-      <Card as="li" class="trust"><span><b>White-glove rollout</b><span>A dedicated success manager and custom SLAs.</span></span></Card>
+      {
+        trust.map((t) => (
+          <Card as="li" class="trust">
+            <span class="trust__icon" aria-hidden="true">
+              <Icon name={t.icon} size={18} />
+            </span>
+            <span class="trust__copy">
+              <b>{t.title}</b>
+              <span>{t.text}</span>
+            </span>
+          </Card>
+        ))
+      }
     </ul>
   </div>
 </section>
@@ -33,52 +48,53 @@ import SectionHeader from '../ui/SectionHeader.astro';
     gap: 56px;
   }
 
+  /* Four short answers to what IT and operations ask: one column on phones, two on tablets, four from 1024px. */
   .enterprise__trust {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
 
-  /* Card is a column by default; trust cards put the badge beside the text. Top-aligned, so every
-     card's title sits on the same line. */
-  .enterprise__trust :global(.trust) {
-    --card-gap: 20px;
-    flex: 1 1 280px;
-    flex-direction: row;
-    align-items: flex-start;
+  @media (min-width: 640px) {
+    .enterprise__trust {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
-  .trust > span:last-child {
+  @media (min-width: 1024px) {
+    .enterprise__trust {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .enterprise__trust :global(.trust) {
+    --card-gap: 16px;
+  }
+
+  .trust__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-s);
+    background: var(--card-2);
+    color: var(--fg);
+  }
+
+  .trust__copy {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .trust b {
+  .trust__copy b {
     font-size: var(--step-body);
+    font-weight: 600;
+    line-height: 1.3;
   }
 
-  .trust > span:last-child span {
+  .trust__copy span {
     font-size: var(--step-small);
-    color: var(--ink-3);
-  }
-
-  .trust__badge {
-    flex: none;
-    width: 76px;
-    height: 76px;
-    border-radius: 50%;
-    border: 2px solid var(--ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.05;
-  }
-
-  .trust__badge span {
-    font-size: var(--step-label);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    color: var(--fg-3);
   }
 </style>
