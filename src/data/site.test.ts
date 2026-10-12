@@ -11,11 +11,11 @@ describe('NAV_GROUPS', () => {
     expect(NAV_GROUPS.map(isNavMenu)).toEqual([true, true, false, false, false]);
   });
 
-  it('links the three products by their exact names and carries the product id', () => {
+  it('links the four products by their exact names and carries the product id', () => {
     const items = menu('Product').items;
     expect(items.map((i) => i.product)).toEqual([...PRODUCT_IDS]);
-    expect(items.map((i) => i.label)).toEqual(['Aldo', 'Aldente Verify', 'Aldente Vision']);
-    expect(items.map((i) => i.href)).toEqual(['/aldo', '/order-verification', '/analytics']);
+    expect(items.map((i) => i.label)).toEqual(['Aldo', 'Aldente Verify', 'Aldente Dispute', 'Aldente Vision']);
+    expect(items.map((i) => i.href)).toEqual(['/aldo', '/order-verification', '/order-verification#dispute', '/analytics']);
     expect(items.map((i) => i.note)).toEqual(PRODUCT_IDS.map((id) => PRODUCTS[id].note));
     expect(items.find((i) => i.product === 'aldo')?.icon).toBeUndefined();
   });
@@ -51,8 +51,8 @@ describe('LINKS', () => {
 
 describe('FOOTER', () => {
   it('links the products and solutions by their exact names', () => {
-    expect(FOOTER[0]!.links.map((l) => l.label)).toEqual(['Aldo', 'Aldente Verify', 'Aldente Vision', 'Pricing']);
-    expect(FOOTER[0]!.links.map((l) => l.href)).toEqual(['/aldo', '/order-verification', '/analytics', '/pricing']);
+    expect(FOOTER[0]!.links.map((l) => l.label)).toEqual(['Aldo', 'Aldente Verify', 'Aldente Dispute', 'Aldente Vision', 'Pricing']);
+    expect(FOOTER[0]!.links.map((l) => l.href)).toEqual(['/aldo', '/order-verification', '/order-verification#dispute', '/analytics', '/pricing']);
     expect(FOOTER[1]!.links).toEqual([
       { label: 'Operations', href: '/solutions/operations' },
       { label: 'HR', href: '/solutions/hr' },

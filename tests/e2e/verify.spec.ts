@@ -7,12 +7,12 @@ test.describe('Aldente Verify page', () => {
 
   test('leads with the decks’ claim and both loops', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Verify checks every bag before pickup and wins back refunds with video.',
+      'Verify checks every bag before pickup. Dispute wins back refunds with video.',
     );
-    await expect(page.locator('.loop__title')).toHaveText(['1. Check & Prevent', '2. Dispute & Recover']);
+    await expect(page.locator('.loop__title')).toHaveText(['1. Aldente Verify', '2. Aldente Dispute']);
   });
 
-  test('plays Dispute & Recover step by step as it scrolls into view, ending with the money back', async ({ page }) => {
+  test('plays Aldente Dispute step by step as it scrolls into view, ending with the money back', async ({ page }) => {
     const beats = page.locator('.dispute scroll-beats');
     await page.locator('.dispute').scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollBy(0, -window.innerHeight * 0.6));
