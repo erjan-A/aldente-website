@@ -134,7 +134,7 @@ describe('Playbooks', () => {
 });
 
 describe('Home hero and CTA band', () => {
-  it('Hero: audience line right above the H1, "See Aldente in action" to the products, and which products include Aldo', async () => {
+  it('Hero: audience line right above the H1, "See Aldente in action" to the products, and no Aldo before the visitor meets it', async () => {
     const { default: Hero } = await import('../../src/components/home/Hero.astro');
     const html = await container.renderToString(Hero);
     const doc = parse(html);
@@ -146,9 +146,10 @@ describe('Home hero and CTA band', () => {
       ['Book a demo', '/demo'],
       ['See Aldente in action', '#product'],
     ]);
-    const note = doc.querySelector('.hero__note')!;
-    expect(note.textContent?.replace(/\s+/g, ' ').trim()).toBe('Aldo comes with Aldente Verify or Aldente Vision.');
-    expect([...note.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual(['/order-verification', '/analytics']);
+    expect(doc.querySelector('.hero__note')).toBeNull();
+    expect(doc.querySelector('.hero__lead')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Aldente AI sees every location through your cameras, catches wrong orders before pickup, wins back refunds with evidence, and hands routine work to your AI employee in Slack.',
+    );
     expect(html).not.toContain('Get Aldo in Slack');
   });
 

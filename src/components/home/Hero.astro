@@ -1,5 +1,4 @@
 ---
-import { PRODUCTS } from '../../data/products';
 import { LINKS } from '../../data/site';
 import Button from '../ui/Button.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
@@ -7,7 +6,6 @@ import HeroCards from './HeroCards.astro';
 import HeroConsole from './HeroConsole.astro';
 import ProofBar from './ProofBar.astro';
 
-const { verify, vision } = PRODUCTS;
 // "See Aldente in action" scrolls to the four products on this page (Products, id="product").
 const seeAldente = '#product';
 ---
@@ -23,16 +21,11 @@ const seeAldente = '#product';
         </div>
         <p class="hero__lead">
           Aldente AI sees every location through your cameras, catches wrong orders before pickup, wins back refunds with evidence,
-          and hands routine work to Aldo in Slack.
+          and hands routine work to your AI employee in Slack.
         </p>
-        <div class="hero__cta">
-          <div class="hero__actions">
-            <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
-            <Button href={seeAldente} variant="secondary" size="lg">See Aldente in action</Button>
-          </div>
-          <p class="hero__note">
-            Aldo comes with{' '}<a href={verify.href}>{verify.name}</a>{' '}or{' '}<a href={vision.href}>{vision.name}</a>.
-          </p>
+        <div class="hero__actions">
+          <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
+          <Button href={seeAldente} variant="secondary" size="lg">See Aldente in action</Button>
         </div>
       </div>
     </div>
@@ -118,43 +111,11 @@ const seeAldente = '#product';
     color: var(--ink-2);
   }
 
-  .hero__cta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
-  }
-
-  .hero__note {
-    font-size: var(--step-small);
-    line-height: 1.5;
-    color: var(--fg-3);
-    text-wrap: balance;
-  }
-
-  /* Product names never break across lines. */
-  .hero__note a {
-    white-space: nowrap;
-    color: var(--fg-2);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--line-strong);
-    text-underline-offset: 4px;
-    transition:
-      color 0.2s ease,
-      text-decoration-color 0.2s ease;
-  }
-
-  .hero__note a:hover {
-    color: var(--fg);
-    text-decoration-color: currentColor;
   }
 
   /* Phones: stacked buttons share one width. */

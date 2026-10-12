@@ -13,7 +13,7 @@ test.describe('home page', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your AI Chief of Staff with eyes.');
     await expect(page.locator('.hero .eyebrow')).toHaveText('For restaurant chains and franchise operators');
     await expect(page.locator('.hero').getByRole('link', { name: 'See Aldente in action' })).toHaveAttribute('href', '#product');
-    await expect(page.locator('.hero__note')).toHaveText('Aldo comes with Aldente Verify or Aldente Vision.');
+    await expect(page.locator('.hero__note')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Get Aldo in Slack' })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
