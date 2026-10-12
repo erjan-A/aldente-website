@@ -104,7 +104,7 @@ export const PRICING_FAQ: { q: string; a: string }[] = [
   { q: 'Can we start with one location?', a: 'Yes. Many chains start with one or two locations and roll out after the first results.' },
   {
     q: 'What happens to our footage and records?',
-    a: 'Your footage and records stay in your account and are used to run your workspace. They are encrypted at rest and in transit, and we’re GDPR compliant.',
+    a: 'Your footage and records stay in your account and are used to run your workspace. They are encrypted at rest and in transit.',
   },
   { q: 'Is there a contract?', a: 'Plans are monthly per location. Enterprise plans can be annual.' },
 ];

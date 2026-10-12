@@ -616,8 +616,8 @@ describe('Footer', () => {
     const row = doc.querySelector('.footer__legal')!;
     expect(row.querySelectorAll('a')).toHaveLength(0);
     expect(row.querySelector('button[data-cookie-settings]')?.textContent).toBe('Cookie settings');
-    expect(row.textContent).toContain('GDPR compliant');
-    expect(row.textContent).not.toContain('SOC 2');
+    expect(row.textContent).toContain('Encrypted at rest and in transit');
+    expect(row.textContent).not.toMatch(/SOC 2|GDPR/);
     // The divider sits inside the container's padding, so it spans the text column only.
     expect(row.parentElement?.classList.contains('container')).toBe(true);
     expect(row.classList.contains('container')).toBe(false);

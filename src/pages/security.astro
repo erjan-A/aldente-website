@@ -11,11 +11,10 @@ const pillars = [
   { title: 'Your footage stays yours', text: 'Camera footage and records stay in your account and are used to run your workspace.' },
   { title: 'Role-based access', text: 'Access follows roles, locations and regions. Every alert shows only what the recipient needs.' },
   { title: 'Retention you control', text: 'Set how long footage and records are kept, per location.' },
-  { title: 'GDPR compliant', text: 'Processing agreements and data-subject requests handled to GDPR standards.' },
 ];
 ---
 
-<BaseLayout title="Security" description="GDPR compliant, with encryption at rest and in transit, role-based access and retention you control. Footage and records stay in your account.">
+<BaseLayout title="Security" description="Encryption at rest and in transit, role-based access and retention you control. Footage and records stay in your account.">
   <PageHero
     title="Security built for"
     muted="enterprise restaurant groups."
@@ -45,7 +44,7 @@ const pillars = [
   }
 
   /* margin-block only: the .container keeps its auto side margins, so the grid lines up with the hero.
-     One column on phones, two on tablets; from 1024px two wide cards over three, so five cards fill every row. */
+     One column on phones, two by two from 640px: four cards, every row full. */
   .pillars {
     margin-block: 0;
     display: grid;
@@ -56,27 +55,6 @@ const pillars = [
   @media (min-width: 640px) {
     .pillars {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  /* Tablets: the fifth card spans the row. */
-  @media (min-width: 640px) and (max-width: 1023px) {
-    .pillars > :global(:last-child) {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .pillars {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-
-    .pillars > :global(*) {
-      grid-column: span 2;
-    }
-
-    .pillars > :global(:nth-child(-n + 2)) {
-      grid-column: span 3;
     }
   }
 
