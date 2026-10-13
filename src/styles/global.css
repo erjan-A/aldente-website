@@ -86,18 +86,20 @@
    * same steps, so content sits at the same inset everywhere.
    *   --card-pad-s   16px       small tiles, compact rows
    *   --card-pad-m   20 -> 28px standard cards
-   *   --card-pad-l   24 -> 40px large cards, plan cards, panels
+   *   --card-pad-l   20 -> 32px large cards, plan cards, panels
    */
   --card-pad-s: 16px;
   --card-pad-m: clamp(20px, 1.2rem + 0.8vw, 28px);
-  --card-pad-l: clamp(24px, 1rem + 2vw, 40px);
+  --card-pad-l: clamp(20px, 0.9rem + 1.4vw, 32px);
 
   /* The sticky site header. Sticky elements and anchor jumps sit below it. */
   --header-h: 72px;
 
   --container: 1280px;
   --gutter: clamp(20px, 4vw, 48px);
-  --section-y: clamp(88px, 10vw, 144px);
+  --section-y: clamp(64px, 7.5vw, 112px);
+  /* From a section's heading to its content: one value everywhere. */
+  --section-gap: clamp(32px, 3.6vw, 48px);
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   color-scheme: dark;

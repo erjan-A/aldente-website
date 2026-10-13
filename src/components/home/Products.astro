@@ -54,10 +54,12 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
             </div>
           </div>
           <div class="product__copy">
-            <ProductPill product="aldo" />
+            <div class="product__top">
+              <ProductPill product="aldo" />
+              <span class="product__go" aria-hidden="true"><Icon name="arrow-right" size={16} strokeWidth={2} /></span>
+            </div>
             <h3>Your AI Chief of Staff</h3>
             <p>Answers in Slack and runs routine work. Ask once: a Playbook repeats the check and posts the result.</p>
-            <span class="product__link">Explore Aldo <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
       </li>
@@ -84,17 +86,19 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
             </div>
           </div>
           <div class="product__copy">
-            <ProductPill product="verify" />
+            <div class="product__top">
+              <ProductPill product="verify" />
+              <span class="product__go" aria-hidden="true"><Icon name="arrow-right" size={16} strokeWidth={2} /></span>
+            </div>
             <h3>Order verification</h3>
             <p>Checks every bag before pickup, with a photo and a clip for every order.</p>
-            <span class="product__link">Explore Aldente Verify <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
       </li>
       <li>
         <a class="product" data-loop href="/order-verification#dispute">
           {/* The dispute desk, as on the deck: what came back this month and the latest claims with their status. */}
-          <div class="product__art" aria-hidden="true">
+          <div class="product__art product__art--desk" aria-hidden="true">
             <div class="desk">
               <div class="desk__top">
                 <span class="desk__brand"><img src={mark.src} alt="" width="9" height="11" />Delivery disputes</span>
@@ -116,10 +120,12 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
             </div>
           </div>
           <div class="product__copy">
-            <ProductPill product="dispute" />
+            <div class="product__top">
+              <ProductPill product="dispute" />
+              <span class="product__go" aria-hidden="true"><Icon name="arrow-right" size={16} strokeWidth={2} /></span>
+            </div>
             <h3>Refund disputes</h3>
             <p>Builds the evidence pack for every delivery-app refund claim: the packing clip, the item check and the handoff time.</p>
-            <span class="product__link">Explore Aldente Dispute <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
       </li>
@@ -133,10 +139,12 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
             <div class="bars__axis"><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></div>
           </div>
           <div class="product__copy">
-            <ProductPill product="vision" />
+            <div class="product__top">
+              <ProductPill product="vision" />
+              <span class="product__go" aria-hidden="true"><Icon name="arrow-right" size={16} strokeWidth={2} /></span>
+            </div>
             <h3>Camera AI</h3>
             <p>Turns your cameras into traffic, queue, table and staff data, for every location, hour by hour.</p>
-            <span class="product__link">Explore Aldente Vision <Icon name="arrow-right" size={16} strokeWidth={2} /></span>
           </div>
         </a>
       </li>
@@ -148,14 +156,14 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
   .products__inner {
     display: flex;
     flex-direction: column;
-    gap: 56px;
+    gap: var(--section-gap);
   }
 
   /* One column on phones, a 2 × 2 grid from 640px. */
   .products__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    gap: 12px;
   }
 
   @media (min-width: 640px) {
@@ -182,9 +190,11 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     border-color: var(--line-strong);
   }
 
+  /* Compact: a 224px picture (every card the same, so the copy lines up across a row), then the label, the
+     title and one or two lines. The whole card is the link; the arrow beside the label says so. */
   .product__art {
-    height: 272px;
-    padding: var(--card-pad-m);
+    height: 224px;
+    padding: var(--card-pad-s) 20px;
     background: var(--bg);
     display: flex;
     flex-direction: column;
@@ -196,14 +206,51 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    padding: 20px 24px 24px;
+  }
+
+  .product__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    padding: var(--card-pad-m);
+    margin-bottom: 4px;
+  }
+
+  .product__go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--card-line);
+    color: var(--ink-2);
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .product__go :global(svg) {
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .product:hover .product__go {
+    color: var(--on-accent);
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .product:hover .product__go :global(svg) {
+    transform: translateX(2px);
   }
 
   .product h3 {
-    font-size: var(--step-h3);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    font-size: var(--step-h4);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
     font-weight: 600;
   }
 
@@ -211,21 +258,27 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     color: var(--ink-2);
   }
 
-  .product__link {
-    margin-top: auto;
-    padding-top: 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-  }
+  /* Phones: one card per row and tighter. The photo and the chart keep a short fixed picture; the Slack
+     answer and the dispute table take exactly their own height, so nothing is cropped. */
+  @media (max-width: 639px) {
+    .product__art {
+      height: 176px;
+      padding: 14px 16px;
+    }
 
-  .product__link :global(svg) {
-    transition: transform 0.2s var(--ease-out);
-  }
+    .product__art--slack,
+    .product__art--desk {
+      height: auto;
+    }
 
-  .product:hover .product__link :global(svg) {
-    transform: translateX(3px);
+    /* The packing-station photo keeps its shape (its boxes are placed on it), so it gets a little more height. */
+    .product__art.station {
+      height: 212px;
+    }
+
+    .product__copy {
+      padding: 16px 18px 20px;
+    }
   }
 
   /* Aldo card: a voice question and Aldo's answer in a Slack window, on the same dark ground and
@@ -233,8 +286,8 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
   .mini-window {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: var(--card-pad-s);
+    gap: 10px;
+    padding: 14px;
     border-radius: var(--radius-m);
     background: #ffffff;
   }
@@ -333,7 +386,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
 
   /* Verify: the packing-station screen. The camera keeps the photo's own shape, so the boxes stay on the items. */
   .station {
-    padding-block: 18px;
+    padding-block: 16px;
   }
 
   .station__screen {
@@ -474,8 +527,8 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
   .desk {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 14px;
+    gap: 10px;
+    padding: 12px;
     border-radius: var(--radius-m);
     background: #fafaf8;
     color: #141414;
@@ -532,7 +585,7 @@ const wave = [6, 12, 18, 9, 20, 14, 7, 16, 22, 11, 6, 13, 19, 10, 15, 8];
     grid-template-columns: 1fr 1.1fr 0.9fr 1.3fr;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-top: 1px solid #efefec;
     font-variant-numeric: tabular-nums;
   }

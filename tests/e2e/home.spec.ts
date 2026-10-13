@@ -12,16 +12,16 @@ test.describe('home page', () => {
     await page.reload();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your AI Chief of Staff with eyes.');
     await expect(page.locator('.hero .eyebrow')).toHaveText('For restaurant chains and franchise operators');
-    await expect(page.locator('.hero').getByRole('link', { name: 'See Aldente in action' })).toHaveAttribute('href', '#product');
+    await expect(page.locator('.hero').getByRole('link', { name: 'See Aldente in action' })).toHaveAttribute('href', '#verification');
     await expect(page.locator('.hero__note')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Get Aldo in Slack' })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
-  test('"See Aldente in action" scrolls to the products', async ({ page }) => {
+  test('"See Aldente in action" scrolls to the order story', async ({ page }) => {
     await page.locator('.hero').getByRole('link', { name: 'See Aldente in action' }).click();
-    await expect(page).toHaveURL(/#product$/);
-    await expect(page.locator('#product')).toBeInViewport();
+    await expect(page).toHaveURL(/#verification$/);
+    await expect(page.locator('#verification')).toBeInViewport();
   });
 
 

@@ -38,7 +38,6 @@ const year = 2026;
     <div class="footer__legal">
       <span>© {year} {SITE.name}</span>
       <button type="button" data-cookie-settings>Cookie settings</button>
-      <span class="footer__trust">Encrypted at rest and in transit</span>
     </div>
   </div>
   <div class="footer__mark" aria-hidden="true">
@@ -167,10 +166,6 @@ const year = 2026;
     transition: color 0.2s ease;
   }
 
-  .footer__trust {
-    margin-left: auto;
-  }
-
   .footer__mark {
     max-width: 1440px;
     margin: 48px auto 0;
@@ -209,9 +204,4 @@ const year = 2026;
     }
   }
 
-  @media (max-width: 600px) {
-    .footer__trust {
-      margin-left: 0;
-    }
-  }
 </style>

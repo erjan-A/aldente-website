@@ -384,6 +384,11 @@ const detections = [
     flex-direction: column;
   }
 
+  .console :global(.console__slack .slack-window__messages) {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 40px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 40px);
+  }
+
   .frame {
     align-self: flex-start;
     display: inline-flex;

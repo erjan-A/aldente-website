@@ -145,7 +145,7 @@ describe('Home hero and CTA band', () => {
     const actions = [...doc.querySelectorAll('.hero__actions a')].map((a) => [a.textContent?.trim(), a.getAttribute('href')]);
     expect(actions).toEqual([
       ['Book a demo', '/demo'],
-      ['See Aldente in action', '#product'],
+      ['See Aldente in action', '#verification'],
     ]);
     expect(doc.querySelector('.hero__note')).toBeNull();
     expect(doc.querySelector('.hero__lead')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
@@ -264,26 +264,28 @@ describe('Home sections consistency', () => {
     );
   });
 
-  it('CaseStudy: the decks’ figures, a customer’s words, and before/after as 16 dots of wrong orders a day', async () => {
+  it('CaseStudy: four numbers only (volume, error rate, wrong orders a day, money saved), then the quote', async () => {
     const { default: CaseStudy } = await import('../../src/components/home/CaseStudy.astro');
     const doc = parse(await container.renderToString(CaseStudy));
     expect(doc.querySelector('h2')?.textContent).toBe('87% fewer wrong orders.');
-    expect(doc.querySelector('.case__context')?.textContent).toContain('about 200 delivery and drive-thru orders a day and a $17 average check');
-    expect(doc.querySelector('.case__result')?.textContent).toBe('That’s 4,300+ fewer wrong orders and $74K+ saved a year.*');
-    expect(doc.querySelector('.case__quote blockquote')?.textContent).toContain('nobody wants to go back');
-    expect(doc.querySelector('.case__quote figcaption')?.textContent).toBe('Director of Operations · Regional QSR chain');
+    expect(doc.querySelector('.case__volume b')?.textContent).toBe('~200');
+    expect(doc.querySelector('.case__volume')?.textContent).toContain('delivery and drive-thru orders a day');
+    expect(doc.querySelector('.case__saved')?.textContent).toBe('$74K+ saved a year at this location.*');
+    expect(doc.querySelector('.case__facts')).toBeNull();
     const [before, after] = [...doc.querySelectorAll('.case__panel')];
-    expect(before!.querySelector('.case__figure')?.textContent).toBe('7–8%');
-    expect(before!.querySelector('p')?.textContent).toBe('14–16 wrong orders a day');
+    expect(before!.querySelector('.case__rate')?.textContent).toBe('7–8%error rate');
+    expect(before!.querySelector('.case__day')?.textContent).toBe('14–16 wrong orders a day');
     expect(before!.querySelectorAll('.dots i')).toHaveLength(16);
     expect(before!.querySelectorAll('.dots i.on')).toHaveLength(14);
     expect(before!.querySelectorAll('.dots i.maybe')).toHaveLength(2);
-    expect(after!.querySelector('.case__figure')?.textContent).toBe('~1%');
-    expect(after!.querySelector('p')?.textContent).toBe('~2 wrong orders a day');
+    expect(after!.querySelector('.case__rate')?.textContent).toBe('~1%error rate');
+    expect(after!.querySelector('.case__day')?.textContent).toBe('~2 wrong orders a day');
     expect(after!.querySelectorAll('.dots i.on')).toHaveLength(2);
     expect(doc.querySelector('.case__note')?.textContent).toBe(
       '* 12 fewer wrong orders a day × 365 days × $17 average check, with a full refund for each wrong order.',
     );
+    expect(doc.querySelector('.case__quote blockquote')?.textContent).toContain('nobody wants to go back');
+    expect(doc.querySelector('.case__quote figcaption')?.textContent).toBe('Director of Operations · Regional QSR chain');
   });
 
   it('uses SectionHeader for the problem statement', async () => {
@@ -661,7 +663,7 @@ describe('Header', () => {
 });
 
 describe('Footer', () => {
-  it('renders the Legal column and keeps only the cookie button and trust line in the legal row', async () => {
+  it('renders the Legal column and keeps only the copyright and the cookie button in the legal row', async () => {
     const { default: Footer } = await import('../../src/components/site/Footer.astro');
     const doc = parse(await container.renderToString(Footer));
     const cols = doc.querySelector('nav[aria-label="Footer"]')!;
@@ -671,8 +673,7 @@ describe('Footer', () => {
     const row = doc.querySelector('.footer__legal')!;
     expect(row.querySelectorAll('a')).toHaveLength(0);
     expect(row.querySelector('button[data-cookie-settings]')?.textContent).toBe('Cookie settings');
-    expect(row.textContent).toContain('Encrypted at rest and in transit');
-    expect(row.textContent).not.toMatch(/SOC 2|GDPR/);
+    expect(row.textContent).not.toMatch(/SOC 2|GDPR|Encrypted at rest/);
     // The divider sits inside the container's padding, so it spans the text column only.
     expect(row.parentElement?.classList.contains('container')).toBe(true);
     expect(row.classList.contains('container')).toBe(false);

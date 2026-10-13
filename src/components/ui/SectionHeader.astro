@@ -103,6 +103,18 @@ const products = product === undefined ? [] : Array.isArray(product) ? product :
     color: var(--fg-3);
   }
 
+  /* Wide screens: claim on line one, continuation on line two. Never a grey word hanging at the end of the
+     claim, and the block (and so the lead) is as wide as the longer line. */
+  @media (min-width: 1000px) {
+    .head__title:has(.head__muted) {
+      text-wrap: wrap;
+    }
+
+    .head__muted {
+      display: block;
+    }
+  }
+
   .head__lead {
     width: 0;
     min-width: 100%;

@@ -70,7 +70,7 @@ const hasExtra = Astro.slots.has('default');
 
 <style>
   .page-hero {
-    padding-block: clamp(64px, 9vw, 128px) clamp(48px, 6vw, 80px);
+    padding-block: clamp(56px, 7vw, 104px) clamp(40px, 5vw, 64px);
   }
 
   .page-hero__inner {
@@ -102,6 +102,17 @@ const hasExtra = Astro.slots.has('default');
 
   h1 span {
     color: var(--fg-3);
+  }
+
+  /* As in section headers: claim, then the muted continuation on its own line (hero titles are larger, so from 1200px). */
+  @media (min-width: 1200px) {
+    h1:has(span) {
+      text-wrap: wrap;
+    }
+
+    h1 span {
+      display: block;
+    }
   }
 
   /* Media below: a wider title (two lines at desktop) and a little less air above, so the visual starts

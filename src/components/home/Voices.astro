@@ -79,17 +79,38 @@ const quotes = [
   .voices__inner {
     display: flex;
     flex-direction: column;
-    gap: 56px;
+    gap: var(--section-gap);
   }
 
+  /* Three quotes in one row from 1024px (the featured one wider), so every card's attribution sits on one
+     baseline and no card stretches into empty space. Two columns on tablets, one on phones. */
   .voices__quotes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  @media (min-width: 720px) {
+    .voices__quotes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .quote--feature {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .voices__quotes {
+      grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+    }
+
+    .quote--feature {
+      grid-column: auto;
+    }
   }
 
   .quote {
-    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -102,7 +123,7 @@ const quotes = [
 
   .quote blockquote {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: var(--step-h4);
     line-height: 1.45;
     font-weight: 500;
   }
@@ -117,7 +138,6 @@ const quotes = [
   }
 
   .quote--feature {
-    flex: 1.6 1 460px;
     justify-content: flex-start;
     gap: 16px;
     padding: var(--card-pad-l);
@@ -174,10 +194,7 @@ const quotes = [
   }
 
   .voices__side {
-    flex: 1 1 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: contents;
   }
 
   .team {
