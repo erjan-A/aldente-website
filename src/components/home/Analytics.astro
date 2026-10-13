@@ -41,9 +41,9 @@ const leaders = [94, 81, 67];
         <SectionHeader
           product="vision"
           id="analytics-title"
-          title="AI that turns your cameras"
-          muted="into events, triggers and analytics."
-          lead="Computer vision and a vision-language model read the cameras you already have, recognise behaviours and events, and fire the rules you set. Compare locations, find the peak hours and let Aldo act."
+          title="Queues, tables and traffic by hour,"
+          muted="from the cameras you already have."
+          lead="Computer vision and a vision-language model recognise behaviours and events, and fire the rules you set. Compare locations, find the peak hours and let Aldo act."
         />
       )
     }
@@ -164,9 +164,11 @@ const leaders = [94, 81, 67];
     padding-top: 0;
   }
 
+  /* Equal rows (1fr), so a detail that wraps never makes one card taller than the rest. */
   .metric-chips {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
     gap: 8px;
     margin: 0;
   }

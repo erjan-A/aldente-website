@@ -1,28 +1,31 @@
 ---
 import SectionHeader from '../ui/SectionHeader.astro';
 
-// Word for word from the decks' "The problem" slide.
+// The delivery-refund problem (rewritten 2026-10-13): what goes wrong, what it costs, the hours it eats.
 const facts = [
-  { value: '7–8%', text: 'of delivery orders leave a typical location wrong.' },
-  { value: '2×', text: 'the loss on every wrong order: the refund, then the gift card to win the guest back.' },
-  { value: 'Hours', text: 'of a manager’s week go to pulling reports, searching footage and repeating the same checks.' },
+  { value: '7–8%', unit: '', text: 'of delivery orders left one chain location wrong.' },
+  { value: '$170', unit: 'a day', text: 'even 10 wrong orders at a $17 check, before the gift card.' },
+  { value: '1–2 hours', unit: 'a day', text: 'go to searching footage, collecting evidence and disputing refunds.' },
 ];
 ---
 
 <section class="problem tone-orange section" aria-labelledby="problem-title">
   <div class="container problem__inner">
-    <SectionHeader id="problem-title" label="The problem" layout="stack" title="Every restaurant already has cameras. Nobody has time to watch them." />
+    <SectionHeader id="problem-title" label="The problem" layout="stack" title="Delivery apps refund the guest first." muted="You have to prove it wasn’t you." />
     <dl class="problem__facts">
       {
         facts.map((fact) => (
           <div>
-            <dt>{fact.value}</dt>
+            <dt>
+              {fact.value}
+              {fact.unit && <span> {fact.unit}</span>}
+            </dt>
             <dd>{fact.text}</dd>
           </div>
         ))
       }
     </dl>
-    <p class="problem__turn">The answers are already in your cameras and systems. Today they are found too late, by hand, or not at all.</p>
+    <p class="problem__turn">Aldente puts every bag on record at the packing station, so a claim is settled with evidence, not an argument.</p>
   </div>
 </section>
 
@@ -53,6 +56,11 @@ const facts = [
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 1;
+  }
+
+  .problem__facts dt span {
+    font-size: var(--step-h4);
+    letter-spacing: -0.01em;
   }
 
   .problem__facts dd {

@@ -251,17 +251,26 @@ describe('Home sections consistency', () => {
     expect(analytics.querySelectorAll('.cams > li.cam')).toHaveLength(4);
   });
 
-  it('Problem: the decks’ wording, word for word', async () => {
+  it('Problem: the delivery-refund problem, its cost and the hours it eats, with no price', async () => {
     const { default: Problem } = await import('../../src/components/home/Problem.astro');
     const doc = parse(await container.renderToString(Problem));
+    expect(doc.querySelector('h2')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Delivery apps refund the guest first. You have to prove it wasn’t you.',
+    );
+    expect([...doc.querySelectorAll('.problem__facts dt')].map((d) => d.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      '7–8%',
+      '$170 a day',
+      '1–2 hours a day',
+    ]);
     expect([...doc.querySelectorAll('.problem__facts dd')].map((d) => d.textContent)).toEqual([
-      'of delivery orders leave a typical location wrong.',
-      'the loss on every wrong order: the refund, then the gift card to win the guest back.',
-      'of a manager’s week go to pulling reports, searching footage and repeating the same checks.',
+      'of delivery orders left one chain location wrong.',
+      'even 10 wrong orders at a $17 check, before the gift card.',
+      'go to searching footage, collecting evidence and disputing refunds.',
     ]);
     expect(doc.querySelector('.problem__turn')?.textContent).toBe(
-      'The answers are already in your cameras and systems. Today they are found too late, by hand, or not at all.',
+      'Aldente puts every bag on record at the packing station, so a claim is settled with evidence, not an argument.',
     );
+    expect(doc.body.textContent).not.toMatch(/\$7 a day|\$200/);
   });
 
   it('CaseStudy: four numbers only (volume, error rate, wrong orders a day, money saved), then the quote', async () => {
