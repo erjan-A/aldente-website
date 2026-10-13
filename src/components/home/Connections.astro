@@ -44,7 +44,7 @@ const systems: Source[] = [
 ];
 
 const outputs: { name: string; detail: string; icon: IconName; ask: string; answer: string }[] = [
-  { name: 'Q&A', detail: 'Ask for what you need', icon: 'message-square', ask: 'How many visitors yesterday?', answer: '3,499, up 4%.' },
+  { name: 'Q&A', detail: 'Ask for what you need', icon: 'message-square', ask: 'Which location was busiest at lunch?', answer: 'Location 03, 12:00–13:00.' },
   {
     name: 'Playbooks',
     detail: 'Repeat a task in the background',
@@ -183,6 +183,8 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
         </ul>
       </div>
     </div>
+    {/* Home: Aldo in Slack (ask, assign, alert) continues this section, under the map. */}
+    <slot />
   </div>
 </section>
 

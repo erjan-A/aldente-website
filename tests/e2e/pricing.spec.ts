@@ -4,7 +4,7 @@ import { ROUTES } from './routes';
 test.describe('plans', () => {
   test('lists the three plans, each with a way to start', async ({ page }) => {
     await page.goto('/pricing');
-    for (const name of ['Aldente Vision', 'Aldente Verify + Dispute', 'Enterprise']) {
+    for (const name of ['Aldente Verify + Dispute', 'Aldente Vision', 'Enterprise']) {
       // Plan names are h3 under a hidden "Plans" h2, as on the home preview.
       await expect(page.getByRole('heading', { level: 3, name, exact: true })).toBeVisible();
     }

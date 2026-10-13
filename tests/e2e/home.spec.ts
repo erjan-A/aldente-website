@@ -75,7 +75,7 @@ test.describe('home page', () => {
 
   test('runs the sections in the agreed order, and no two neighbours share a ground', async ({ page }) => {
     const sections = page.locator('main > section');
-    await expect(sections).toHaveCount(11);
+    await expect(sections).toHaveCount(10);
     const read = await sections.evaluateAll((els) =>
       els.map((el) => ({
         id: el.id || el.className.split(' ')[0],
@@ -92,7 +92,6 @@ test.describe('home page', () => {
       'customers',
       'analytics',
       'connections',
-      'aldo',
       'voices',
       'cta',
     ]);
@@ -108,13 +107,12 @@ test.describe('home page', () => {
     await expect(page.locator('#customers .pill')).toHaveText('Customer results');
     await expect(page.locator('#analytics .head .pill')).toHaveText('Aldente Vision');
     await expect(page.locator('.connections .pill')).toHaveText('Aldo');
-    await expect(page.locator('#aldo .head .pill')).toHaveText('Aldo');
     await expect(page.locator('.voices .pill')).toHaveText('From our customers');
   });
 
-  test('puts Aldo in Slack (ask, assign, alert) after the map, in a bare channel', async ({ page }) => {
-    const aldo = page.locator('#aldo');
-    await expect(aldo.locator('h2')).toHaveText('Aldo in Slack. Ask, assign, alert.');
+  test('puts Aldo in Slack (ask, assign, alert) under the map, in the same section and a bare channel', async ({ page }) => {
+    const aldo = page.locator('.connections #aldo');
+    await expect(aldo.locator('h3#aldo-title')).toHaveText('Aldo in Slack. Ask, assign, alert.');
     await expect(aldo.locator('.slack-window__sidebar')).toHaveCount(0);
     await expect(aldo.locator('[data-slack-channel]')).toHaveText('ops-leads');
   });

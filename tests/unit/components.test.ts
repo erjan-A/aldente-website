@@ -534,7 +534,7 @@ describe('PlanGrid', () => {
   it('lists the three plans, Aldo included in both products, with no price or badge', async () => {
     const doc = parse(await container.renderToString(PlanGrid));
     const names = [...doc.querySelectorAll('.plan__name')].map((n) => n.textContent);
-    expect(names).toEqual(['Aldente Vision', 'Aldente Verify + Dispute', 'Enterprise']);
+    expect(names).toEqual(['Aldente Verify + Dispute', 'Aldente Vision', 'Enterprise']);
     expect([...doc.querySelectorAll('.plan')].map((p) => Boolean(p.querySelector('.plan__aldo')))).toEqual([true, true, false]);
     expect(doc.body.textContent).not.toContain('Most chosen');
     expect(doc.body.textContent).not.toMatch(/\$\d|per location \/ month|free/i);

@@ -16,15 +16,26 @@ export class CookieConsent extends HTMLElement {
   connectedCallback(): void {
     this.consent = readConsent(read(), Date.now());
     if (this.consent) this.apply(this.consent);
-    else this.open(false);
+    // A page that asks in place (the demo page's calendar card, [data-consent-inline]) keeps the banner closed.
+    else if (!document.querySelector('[data-consent-inline]')) this.open(false);
     this.addEventListener('click', this.onClick);
     document.addEventListener('click', this.onPageClick);
+    window.addEventListener('consentchange', this.onConsentChange);
   }
 
   disconnectedCallback(): void {
     this.removeEventListener('click', this.onClick);
     document.removeEventListener('click', this.onPageClick);
+    window.removeEventListener('consentchange', this.onConsentChange);
   }
+
+  /** A choice saved elsewhere (the demo card): remember it and close. */
+  private onConsentChange = (event: Event): void => {
+    const consent = (event as CustomEvent<Consent>).detail;
+    if (!consent || consent === this.consent) return;
+    this.consent = consent;
+    this.hidden = true;
+  };
 
   private get settings(): HTMLElement | null {
     return this.querySelector('[data-consent-settings]');

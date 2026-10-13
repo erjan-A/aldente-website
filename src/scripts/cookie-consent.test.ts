@@ -34,6 +34,16 @@ describe('<cookie-consent>', () => {
     expect(banner().hidden).toBe(false);
   });
 
+  it('stays closed on a page that asks in place (the demo card), and closes when that choice is saved', () => {
+    // The marker comes first: on the real page the element upgrades once the whole document is parsed.
+    mount(`<div data-consent-inline hidden></div>${fixture}`);
+    expect(banner().hidden).toBe(true);
+    const consent = makeConsent({ marketing: true }, Date.now());
+    window.dispatchEvent(new CustomEvent('consentchange', { detail: consent }));
+    click('[data-cookie-settings]');
+    expect(document.querySelector<HTMLInputElement>('input[name="marketing"]')!.checked).toBe(true);
+  });
+
   it('stays out of the way once the visitor has chosen', () => {
     localStorage.setItem(CONSENT_KEY, JSON.stringify(makeConsent({ marketing: false }, Date.now())));
     mount(fixture);

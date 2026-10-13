@@ -12,7 +12,7 @@ import Products from '../components/home/Products.astro';
 import Voices from '../components/home/Voices.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-// Neighbouring sections never share a ground: dark, surface, orange, dark, surface, paper, dark, surface, dark, paper, orange.
+// Neighbouring sections never share a ground: dark, surface, orange, dark, surface, paper, dark, surface, paper, orange.
 ---
 
 <BaseLayout>
@@ -23,8 +23,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <OrderStory tone="surface" />
   <CaseStudy />
   <Analytics />
-  <Connections tone="surface" padTop />
-  <AldoDemo title="Aldo in Slack." muted="Ask, assign, alert." lead="Ask it anything. Give it the work you repeat. Pick a tab, or let it run." padTop />
+  <Connections tone="surface" padTop>
+    <AldoDemo bare title="Aldo in Slack." muted="Ask, assign, alert." lead="Ask it anything. Give it the work you repeat. Pick a tab, or let it run." />
+  </Connections>
   <Voices />
   <Cta />
 </BaseLayout>

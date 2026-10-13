@@ -43,6 +43,14 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
               <div class="sk__zone"><div></div><div></div></div>
             </div>
             <div class="cal__overlay">
+              {/* Asked once, here, before Calendly loads; the site's cookie banner stays closed on this page meanwhile. */}
+              <div class="cal__consent" data-cal-consent data-consent-inline hidden>
+                <p>The scheduler is run by Calendly, which sets its own cookies.</p>
+                <div class="cal__consent-actions">
+                  <button type="button" class="cal__load" data-cal-load>Show available times</button>
+                  <a href={SITE.calendly} target="_blank" rel="noopener">Open on Calendly</a>
+                </div>
+              </div>
               <p class="cal__status" role="status" aria-live="polite" data-cal-status></p>
               <p class="cal__slow" data-cal-slow hidden>
                 Taking longer than usual? <a href={SITE.calendly} target="_blank" rel="noopener">Open the scheduler on Calendly</a>.
@@ -296,6 +304,65 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     text-align: center;
     /* A soft pool of the card colour behind the status line, so the month grid stays visible around it. */
     background: radial-gradient(ellipse 50% 28% at 50% 50%, var(--card) 45%, color-mix(in srgb, var(--card) 0%, transparent));
+  }
+
+  .cal__consent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 34ch;
+  }
+
+  .cal__consent[hidden] {
+    display: none;
+  }
+
+  .cal__consent p {
+    font-size: var(--step-small);
+    line-height: 1.5;
+    color: var(--fg-2);
+  }
+
+  .cal__consent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 20px;
+  }
+
+  /* Shows the booking times: the page's one booking action, so it takes the orange of "Book a demo". */
+  .cal__load {
+    min-height: 48px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(180deg, #ec6a42 0%, #db4f2c 100%) border-box;
+    color: var(--on-accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+  }
+
+  /* The same fill and hover as the primary Button. */
+  .cal__load:hover {
+    background: linear-gradient(180deg, #f07650 0%, #e05634 100%) border-box;
+    box-shadow: 0 12px 28px -12px rgb(224 86 52 / 0.7);
+  }
+
+  .cal__consent-actions a {
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+  }
+
+  .cal__consent-actions a:hover {
+    text-decoration-color: currentColor;
   }
 
   .cal__status {

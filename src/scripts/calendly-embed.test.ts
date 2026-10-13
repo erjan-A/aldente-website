@@ -12,6 +12,10 @@ const fixture = `
 <calendly-embed data-url="${URL_BASE}">
   <div data-cal-stage>
     <div data-cal-skeleton aria-hidden="true"></div>
+    <div data-cal-consent data-consent-inline hidden>
+      <p>The scheduler is run by Calendly, which sets its own cookies.</p>
+      <button type="button" data-cal-load>Show available times</button>
+    </div>
     <p role="status" aria-live="polite" data-cal-status></p>
     <p data-cal-slow hidden>Taking longer than usual?</p>
   </div>
@@ -34,10 +38,13 @@ describe('<calendly-embed>', () => {
     settings.navigation.disableChildFrameNavigation = true;
   });
 
+  // Most cases follow a visitor who already accepted marketing cookies; the consent cases clear it.
   beforeEach(() => {
     localStorage.clear();
+    localStorage.setItem(CONSENT_KEY, JSON.stringify(makeConsent(ALL, Date.now())));
     queued.length = 0;
     window.history.replaceState(null, '', '/demo');
+    document.documentElement.removeAttribute('data-consent-marketing');
   });
 
   afterEach(() => {
@@ -45,7 +52,7 @@ describe('<calendly-embed>', () => {
     vi.useRealTimers();
   });
 
-  it('loads the scheduler with the page, tagged with the plan', () => {
+  it('with marketing consent: loads the scheduler with the page, tagged with the plan', () => {
     window.history.replaceState(null, '', '/demo?plan=vision');
     mount(fixture);
     const src = frame()!.getAttribute('src')!;
@@ -64,17 +71,44 @@ describe('<calendly-embed>', () => {
     expect(document.querySelectorAll('calendly-embed iframe')).toHaveLength(1);
   });
 
-  it('keeps Calendly’s own cookie question unless marketing cookies were accepted here', () => {
-    mount(fixture);
-    expect(new URL(frame()!.getAttribute('src')!).searchParams.has('hide_gdpr_banner')).toBe(false);
-
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(makeConsent(NONE, Date.now())));
-    mount(fixture);
-    expect(new URL(frame()!.getAttribute('src')!).searchParams.has('hide_gdpr_banner')).toBe(false);
-
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(makeConsent(ALL, Date.now())));
+  it('with marketing consent: tells Calendly not to ask again', () => {
     mount(fixture);
     expect(new URL(frame()!.getAttribute('src')!).searchParams.get('hide_gdpr_banner')).toBe('1');
+    expect(part('consent').hidden).toBe(true);
+  });
+
+  it('without marketing consent (none yet, or rejected): asks once in the card and loads nothing', () => {
+    for (const stored of [null, JSON.stringify(makeConsent(NONE, Date.now()))]) {
+      localStorage.clear();
+      if (stored) localStorage.setItem(CONSENT_KEY, stored);
+      mount(fixture);
+      expect(host().dataset.state).toBe('consent');
+      expect(part('consent').hidden).toBe(false);
+      expect(frame()).toBeNull();
+    }
+  });
+
+  it('"Show available times" saves the banner’s "Accept all", tells the page and loads without Calendly’s question', () => {
+    localStorage.clear();
+    const heard: unknown[] = [];
+    window.addEventListener('consentchange', (e) => heard.push((e as CustomEvent).detail), { once: true });
+    mount(fixture);
+    part('load').click();
+    expect(JSON.parse(localStorage.getItem(CONSENT_KEY)!).marketing).toBe(true);
+    expect(document.documentElement.getAttribute('data-consent-marketing')).toBe('granted');
+    expect(heard).toHaveLength(1);
+    expect(part('consent').hidden).toBe(true);
+    expect(host().dataset.state).toBe('loading');
+    expect(new URL(frame()!.getAttribute('src')!).searchParams.get('hide_gdpr_banner')).toBe('1');
+  });
+
+  it('loads when marketing cookies are accepted in the cookie settings while the card asks', () => {
+    localStorage.clear();
+    mount(fixture);
+    expect(frame()).toBeNull();
+    localStorage.setItem(CONSENT_KEY, JSON.stringify(makeConsent(ALL, Date.now())));
+    window.dispatchEvent(new CustomEvent('consentchange', { detail: makeConsent(ALL, Date.now()) }));
+    expect(frame()).not.toBeNull();
   });
 
   it('passes the campaign the visitor arrived with to Calendly', () => {

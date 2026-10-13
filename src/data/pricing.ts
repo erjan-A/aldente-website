@@ -13,20 +13,6 @@ export interface Plan {
 
 export const PLANS: Plan[] = [
   {
-    id: 'vision',
-    name: 'Aldente Vision',
-    summary: 'For seeing what happens inside every location.',
-    cta: { label: 'Book a demo', href: `${LINKS.demo}?plan=vision` },
-    features: [
-      'Works with the IP cameras you already have',
-      'Traffic, occupancy, queues and tables by hour',
-      'Staff presence and repeat visits',
-      'Heatmaps and leaderboards across locations',
-      'Rules that alert the right person',
-    ],
-    aldo: true,
-  },
-  {
     id: 'verification',
     name: 'Aldente Verify + Dispute',
     summary: 'For delivery and drive-thru accuracy, and refunds won back.',
@@ -40,6 +26,20 @@ export const PLANS: Plan[] = [
     ],
     aldo: true,
     featured: true,
+  },
+  {
+    id: 'vision',
+    name: 'Aldente Vision',
+    summary: 'For seeing what happens inside every location.',
+    cta: { label: 'Book a demo', href: `${LINKS.demo}?plan=vision` },
+    features: [
+      'Works with the IP cameras you already have',
+      'Traffic, occupancy, queues and tables by hour',
+      'Staff presence and repeat visits',
+      'Heatmaps and leaderboards across locations',
+      'Rules that alert the right person',
+    ],
+    aldo: true,
   },
   {
     id: 'enterprise',

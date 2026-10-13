@@ -2,19 +2,24 @@ import { ALL, CONSENT_KEY, makeConsent } from '../../src/lib/consent';
 import { expect, test } from './fixtures';
 
 test.describe('demo booking', () => {
-  test('embeds Calendly’s scheduler straight away, with no extra contact line above it', async ({ page }) => {
+  test('asks once in the card, then embeds Calendly’s scheduler on the page', async ({ page }) => {
     await page.goto('/demo');
     const schedule = page.locator('#schedule');
     await expect(schedule.getByRole('heading', { name: 'Pick a time' })).toBeVisible();
     await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
 
-    // No button to press: the scheduler loads with the page, behind a skeleton until Calendly has drawn it.
-    await expect(schedule.getByRole('link', { name: 'Show available times' })).toHaveCount(0);
+    // Marketing cookies not accepted: one line and two actions in the card, and no Calendly yet.
+    await expect(schedule.getByText('The scheduler is run by Calendly, which sets its own cookies.')).toBeVisible();
+    await expect(schedule.getByRole('link', { name: 'Open on Calendly' })).toHaveAttribute('href', 'https://calendly.com/aldenteai/30min');
     const calendar = page.locator('iframe[title="Book a time with Aldente on Calendly"]');
+    await expect(calendar).toHaveCount(0);
+
+    // Showing the times saves the banner’s "Accept all", so Calendly doesn’t ask again.
+    await schedule.getByRole('button', { name: 'Show available times' }).click();
     await expect(calendar).toHaveAttribute('src', /^https:\/\/calendly\.com\/aldenteai\/30min\?/);
     await expect(schedule.getByRole('status')).toHaveText('Loading available times…');
-    // Calendly asks for its own cookies unless the visitor accepted marketing cookies here.
-    expect(new URL((await calendar.getAttribute('src'))!).searchParams.has('hide_gdpr_banner')).toBe(false);
+    expect(new URL((await calendar.getAttribute('src'))!).searchParams.get('hide_gdpr_banner')).toBe('1');
+    expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)!).marketing, CONSENT_KEY)).toBe(true);
 
     // No "You can also open it on Calendly…" line, no How we start, and Aldente, not Aldo, in the heading.
     await expect(page.getByRole('link', { name: 'open it on Calendly' })).toHaveCount(0);
@@ -29,6 +34,7 @@ test.describe('demo booking', () => {
 
   test('passes the plan to Calendly', async ({ page }) => {
     await page.goto('/demo?plan=vision');
+    await page.getByRole('button', { name: 'Show available times' }).click();
     const src = await page.locator('#schedule iframe').getAttribute('src');
     const params = new URL(src!).searchParams;
     expect(params.get('utm_content')).toBe('vision');
@@ -37,6 +43,7 @@ test.describe('demo booking', () => {
 
   test('keeps the campaign a visitor arrived with', async ({ page }) => {
     await page.goto('/demo?plan=verification&utm_source=linkedin&utm_campaign=q4');
+    await page.getByRole('button', { name: 'Show available times' }).click();
     const params = new URL((await page.locator('#schedule iframe').getAttribute('src'))!).searchParams;
     expect(params.get('utm_source')).toBe('linkedin');
     expect(params.get('utm_campaign')).toBe('q4');
@@ -90,10 +97,22 @@ test.describe('demo booking', () => {
   });
 });
 
+test.describe('demo booking on a first visit', () => {
+  test.use({ consent: false });
+
+  test('shows one question, in the card: the site’s cookie banner stays closed', async ({ page }) => {
+    await page.goto('/demo');
+    await expect(page.getByText('The scheduler is run by Calendly, which sets its own cookies.')).toBeVisible();
+    await expect(page.locator('cookie-consent')).toBeHidden();
+    await page.goto('/');
+    await expect(page.locator('cookie-consent')).toBeVisible();
+  });
+});
+
 test.describe('demo booking with marketing cookies accepted', () => {
   test.use({ consent: false });
 
-  test('lets Calendly skip its own cookie question', async ({ page }) => {
+  test('loads the scheduler straight away and lets Calendly skip its own cookie question', async ({ page }) => {
     await page.addInitScript(([key, value]) => window.localStorage.setItem(key, value), [
       CONSENT_KEY,
       JSON.stringify(makeConsent(ALL, Date.now())),

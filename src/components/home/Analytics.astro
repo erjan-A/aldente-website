@@ -2,7 +2,6 @@
 import Icon, { type IconName } from '../ui/Icon.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 import VisionCameras from '../product/VisionCameras.astro';
-import VisionSteps from '../product/VisionSteps.astro';
 import LiveConsole from './LiveConsole.astro';
 
 interface Props {
@@ -51,9 +50,8 @@ const leaders = [94, 81, 67];
     {/* Without the visible heading, a hidden one keeps the card titles (h3) under an h2, as in Playbooks. */}
     {!heading && <h2 id="analytics-title" class="visually-hidden">Aldente Vision</h2>}
 
-    {/* Home: one camera live, posting to Slack as you scroll, then how it works. The Vision page shows four cameras. */}
+    {/* Home: one camera live, posting to Slack as you scroll. The Vision page shows four cameras and the pipeline. */}
     {heading ? <LiveConsole /> : <VisionCameras />}
-    {heading && <VisionSteps />}
 
     {/* Home: the eight metrics as one compact row of chips; the Vision page shows them with their charts. */}
     {
