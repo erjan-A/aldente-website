@@ -37,7 +37,7 @@ test.describe('home page', () => {
   });
 
   test('states the verified-orders figure until live stats exist', async ({ page }) => {
-    await expect(page.locator('.proof__line')).toContainText('2M+ orders verified across 200+ restaurant locations.');
+    await expect(page.locator('.proof__line')).toHaveText('2M+ orders verified across 200+ restaurant locations.');
     await expect(page.locator('live-counter')).toHaveCount(0);
   });
 
@@ -108,6 +108,7 @@ test.describe('home page', () => {
     await expect(page.locator('#customers .pill')).toHaveText('Customer results');
     await expect(page.locator('#analytics .head .pill')).toHaveText('Aldente Vision');
     await expect(page.locator('.connections .pill')).toHaveText('Aldo');
+    await expect(page.locator('#aldo .head .pill')).toHaveText('Aldo');
     await expect(page.locator('.voices .pill')).toHaveText('From our customers');
   });
 

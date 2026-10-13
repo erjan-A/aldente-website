@@ -1,10 +1,8 @@
 import { ALL, CONSENT_KEY, makeConsent } from '../../src/lib/consent';
 import { expect, test } from './fixtures';
 
-const CALENDLY = 'https://calendly.com/aldenteai/30min';
-
 test.describe('demo booking', () => {
-  test('embeds Calendly’s scheduler straight away, with a way around it', async ({ page }) => {
+  test('embeds Calendly’s scheduler straight away, with no extra contact line above it', async ({ page }) => {
     await page.goto('/demo');
     const schedule = page.locator('#schedule');
     await expect(schedule.getByRole('heading', { name: 'Pick a time' })).toBeVisible();
@@ -18,12 +16,11 @@ test.describe('demo booking', () => {
     // Calendly asks for its own cookies unless the visitor accepted marketing cookies here.
     expect(new URL((await calendar.getAttribute('src'))!).searchParams.has('hide_gdpr_banner')).toBe(false);
 
-    // The way around it sits above the calendar.
-    await expect(page.getByRole('link', { name: 'open it on Calendly' })).toHaveAttribute('href', CALENDLY);
-    await expect(page.locator('main').getByRole('link', { name: 'support@aldenteai.com' }).first()).toHaveAttribute(
-      'href',
-      'mailto:support@aldenteai.com',
-    );
+    // No "You can also open it on Calendly…" line, no How we start, and Aldente, not Aldo, in the heading.
+    await expect(page.getByRole('link', { name: 'open it on Calendly' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 2, name: 'How we start' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('See Aldente on your restaurants.');
+    await expect(page.getByText('Used by franchise operators of')).toHaveCount(0);
     // Every email address on the page is the support inbox.
     for (const href of await page.locator('a[href^="mailto:"]').evaluateAll((links) => links.map((a) => a.getAttribute('href')))) {
       expect(href).toMatch(/^mailto:support@aldenteai\.com/);

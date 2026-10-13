@@ -4,13 +4,14 @@ export interface DemoIntent {
   plan: string;
   /** The full heading. */
   title: string;
-  /** The end of the heading, drawn in the quieter ink like every page hero ("See Aldo" + "on your restaurants."). */
+  /** The end of the heading, drawn in the quieter ink like every page hero ("See Aldente" + "on your restaurants."). */
   muted: string;
   lead: string;
 }
 
+// Aldente, not Aldo, unless the visitor came from Aldo's own page (?plan=starter): first-time visitors don't know Aldo yet.
 const DEFAULT: Omit<DemoIntent, 'plan'> = {
-  title: 'See Aldo on your restaurants.',
+  title: 'See Aldente on your restaurants.',
   muted: 'on your restaurants.',
   lead: '30 minutes. We’ll show the workflows that matter to your team and estimate the result for your locations.',
 };
@@ -30,7 +31,7 @@ const COPY: Record<DemoPlan, Omit<DemoIntent, 'plan'>> = {
   vision: {
     title: 'See Aldente Vision on your cameras.',
     muted: 'on your cameras.',
-    lead: '30 minutes on what Aldente Vision reads from the cameras you already have, with Aldo answering in Slack.',
+    lead: '30 minutes on what Aldente Vision reads from the cameras you already have, with answers in Slack.',
   },
   verification: {
     title: 'See Aldente Verify on your menu.',

@@ -4,7 +4,7 @@ import ProductPill from './ProductPill.astro';
 
 /**
  * Section heading block. Title uses --step-h2 (or --step-h1 with as="h1"), lead uses --step-lead.
- * Layouts: split (title left, lead right, bottom-aligned; wraps on narrow screens), stack, center.
+ * Layouts: split and stack (the lead under the title, as wide as the title), center.
  */
 interface Props {
   /** Which product the section belongs to, shown as a pill above the title. Several share one section. */
@@ -48,24 +48,20 @@ const products = product === undefined ? [] : Array.isArray(product) ? product :
 </header>
 
 <style>
+  /* The title sets the block's width (fit-content); the lead takes exactly that width (width 0, min-width
+     100%), so title and subtitle line up on both edges. A short title still gives the lead at least 36rem. */
   .head {
     display: flex;
-    flex-wrap: wrap;
-    gap: 24px 64px;
-  }
-
-  .head--split {
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-
-  .head--stack {
     flex-direction: column;
+    gap: 24px;
+    width: fit-content;
+    min-width: min(100%, 36rem);
+    max-width: 100%;
   }
 
   .head--center {
-    flex-direction: column;
     align-items: center;
+    margin-inline: auto;
     text-align: center;
   }
 
@@ -108,14 +104,12 @@ const products = product === undefined ? [] : Array.isArray(product) ? product :
   }
 
   .head__lead {
-    max-width: 42ch;
+    width: 0;
+    min-width: 100%;
     font-size: var(--step-lead);
     line-height: 1.5;
     color: var(--fg-2);
     text-wrap: pretty;
   }
 
-  .head--center .head__lead {
-    max-width: 46ch;
-  }
 </style>

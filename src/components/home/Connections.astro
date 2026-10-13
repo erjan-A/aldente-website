@@ -93,7 +93,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
       <div class="map__in">
         {/* Group labels, not headings: they name the lists under them. */}
         <p class="map__label" id="map-products">Aldente products</p>
-        <ul class="map__list" role="list" aria-labelledby="map-products">
+        <ul class="map__list map__list--products" role="list" aria-labelledby="map-products">
           {
             products.map((s) => (
               <li class="node node--product">
@@ -107,7 +107,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
           }
         </ul>
         <p class="map__label map__label--gap" id="map-systems">Your systems</p>
-        <ul class="map__list" role="list" aria-labelledby="map-systems">
+        <ul class="map__list map__list--systems" role="list" aria-labelledby="map-systems">
           {
             systems.map((s) => (
               <li class="node">
@@ -238,10 +238,22 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     color: var(--accent);
   }
 
+  /* One column on phones. Tablets: the three products in one row and the four systems two by two, so no
+     card sits alone and every card in a row has the same shape. */
   .map__list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px;
+  }
+
+  @media (min-width: 720px) {
+    .map__list--products {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .map__list--systems {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   .node {

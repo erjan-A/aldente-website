@@ -32,11 +32,12 @@ test.describe('Aldente Verify page', () => {
   });
 });
 
-test('starts with "How we start" on the pricing and demo pages', async ({ page }) => {
-  await page.goto('/pricing');
-  await expect(page.locator('.start .pill')).toHaveText('How we start');
-  await expect(page.locator('.start .weeks__when')).toHaveText(['Week 1', 'Weeks 2–3', 'Week 4']);
+test('shows "How we start" on pricing, every product page and security, not on the demo page', async ({ page }) => {
+  for (const path of ['/pricing', '/order-verification', '/analytics', '/aldo', '/security']) {
+    await page.goto(path);
+    await expect(page.locator('.start .pill')).toHaveText('How we start');
+    await expect(page.locator('.start .weeks__when')).toHaveText(['Week 1', 'Weeks 2–3', 'Week 4']);
+  }
   await page.goto('/demo');
-  await expect(page.getByRole('heading', { level: 2, name: 'How we start' })).toBeVisible();
-  await expect(page.locator('.demo__start .weeks__title')).toHaveText(['Install and connect', 'Go live', 'Roll out']);
+  await expect(page.locator('.start, .demo__start')).toHaveCount(0);
 });

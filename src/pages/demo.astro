@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import Card from '../components/ui/Card.astro';
 import Icon from '../components/ui/Icon.astro';
-import RolloutWeeks from '../components/ui/RolloutWeeks.astro';
 import { CUSTOMER_LOGOS } from '../data/logos';
 import { retina } from '../lib/images';
 import { COUNTER, SITE } from '../data/site';
@@ -18,7 +17,7 @@ const days = Array.from({ length: 35 }, (_, i) => i);
 const weekdays = Array.from({ length: 7 }, (_, i) => i);
 ---
 
-<BaseLayout title="Book a demo" description="See Aldo on your restaurants in 30 minutes. Pick a time that suits you, and we’ll show the workflows that matter to your team.">
+<BaseLayout title="Book a demo" description="See Aldente on your restaurants in 30 minutes. Pick a time that suits you, and we’ll show the workflows that matter to your team.">
   <section class="demo tone-dark" aria-labelledby="demo-title">
     <demo-intent class="container demo__grid">
       <div class="demo__head">
@@ -32,10 +31,6 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
             <h2 id="schedule-title" class="cal__title">Pick a time</h2>
             <p class="cal__meta">A 30-minute demo with our team</p>
           </div>
-          <p class="cal__alt" data-cal-alt>
-            You can also <a href={SITE.calendly} target="_blank" rel="noopener">open it on Calendly</a>, write to{' '}
-            <a href={`mailto:${SITE.email}`}>{SITE.email}</a> or call <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a>.
-          </p>
 
           <div class="cal__stage" data-cal-stage data-artifact-calendar>
             <div class="cal__skeleton" data-cal-skeleton aria-hidden="true">
@@ -68,20 +63,14 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
       </Card>
 
       <div class="demo__details">
-        <section class="demo__start" aria-labelledby="start-title">
-          <h2 id="start-title" class="demo__start-title">How we start</h2>
-          <RolloutWeeks layout="list" />
-        </section>
-
         <figure class="demo__quote">
-          <blockquote>“Ask Slack to pull the camera footage from any restaurant? That changes everything.”</blockquote>
-          <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
+          <blockquote>“We used to eat most refund claims, because fighting one took twenty minutes. Now the evidence pack is ready before anyone asks.”</blockquote>
+          <figcaption><b>Head of Off-Premise</b> · QSR chain</figcaption>
         </figure>
 
         <div class="demo__proof">
           <p class="demo__proof-line">
-            <b>{COUNTER.label}</b> orders verified across 200+ restaurant locations.{' '}
-            <span>Used by franchise operators of</span>
+            <b>{COUNTER.label}</b> orders verified across 200+ restaurant locations.
           </p>
           <ul class="demo__logos" role="list">
             {
@@ -190,15 +179,6 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     color: var(--fg-2);
   }
 
-  .cal__alt {
-    margin-top: -10px;
-    padding: 0 var(--card-pad-m) 12px;
-    font-size: var(--step-label);
-    line-height: 1.5;
-    color: var(--fg-3);
-  }
-
-  .cal__alt a,
   .cal__slow a,
   .cal__next a {
     color: var(--fg);
@@ -208,7 +188,6 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     transition: text-decoration-color 0.2s ease;
   }
 
-  .cal__alt a:hover,
   .cal__slow a:hover,
   .cal__next a:hover {
     text-decoration-color: currentColor;
@@ -429,19 +408,6 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     margin-top: 12px;
   }
 
-  .demo__start {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    max-width: 46ch;
-  }
-
-  .demo__start-title {
-    font-size: var(--step-h4);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-
   .demo__quote {
     display: flex;
     flex-direction: column;
@@ -483,10 +449,6 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     color: var(--fg);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-  }
-
-  .demo__proof-line span {
-    color: var(--fg-3);
   }
 
   .demo__logos {

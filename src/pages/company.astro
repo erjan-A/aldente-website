@@ -2,6 +2,7 @@
 import Cta from '../components/home/Cta.astro';
 import Voices from '../components/home/Voices.astro';
 import PageHero from '../components/site/PageHero.astro';
+import Icon from '../components/ui/Icon.astro';
 import { SITE } from '../data/site';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
@@ -11,7 +12,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     title="We’re building the Chief of Staff"
     muted="every restaurant deserves."
     lead="Restaurant teams run on what managers can see. Aldente gives every location a colleague that sees everything, remembers it and turns it into finished work, so people can spend their time on guests and their team."
-  />
+  >
+    <p class="based"><Icon name="map-pin" size={18} />Based in Los Angeles</p>
+  </PageHero>
   <section class="tone-dark stats-wrap" aria-label="Aldente so far">
     <div class="container">
       <p class="stats">
@@ -30,6 +33,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <style>
+  .based {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--fg-2);
+  }
+
+  .based :global(svg) {
+    color: var(--accent);
+  }
+
   .stats-wrap {
     padding-bottom: var(--section-y);
   }

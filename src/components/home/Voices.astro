@@ -118,7 +118,8 @@ const quotes = [
 
   .quote--feature {
     flex: 1.6 1 460px;
-    gap: 32px;
+    justify-content: flex-start;
+    gap: 16px;
     padding: var(--card-pad-l);
     background: var(--bg);
     border-color: var(--bg);
@@ -136,6 +137,8 @@ const quotes = [
     display: flex;
     flex-direction: column;
     gap: 2px;
+    margin-top: auto;
+    padding-top: 16px;
     font-size: var(--step-small);
     color: var(--ink-3);
   }
@@ -157,6 +160,10 @@ const quotes = [
 
   .tone-dark .quote--feature figcaption b {
     color: var(--paper-ink);
+  }
+
+  .quote--feature .quote__mark {
+    margin-bottom: -12px;
   }
 
   .quote__mark {

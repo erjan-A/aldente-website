@@ -4,13 +4,21 @@ import { DEMO_PLANS, demoIntent, isDemoPlan, keepNames, titleParts } from './dem
 const ALL = ['', ...DEMO_PLANS];
 
 describe('demoIntent', () => {
-  it('defaults to a general demo', () => {
+  it('defaults to a general demo, naming Aldente: first-time visitors don’t know Aldo yet', () => {
     expect(demoIntent('')).toEqual({
       plan: '',
-      title: 'See Aldo on your restaurants.',
+      title: 'See Aldente on your restaurants.',
       muted: 'on your restaurants.',
       lead: expect.stringContaining('30 minutes'),
     });
+  });
+
+  it('names Aldo only for visitors from Aldo’s own page', () => {
+    for (const plan of ALL.filter((p) => p !== 'starter')) {
+      const { title, lead } = demoIntent(plan ? `?plan=${plan}` : '');
+      expect(`${title} ${lead}`).not.toMatch(/\bAldo\b/);
+    }
+    expect(demoIntent('?plan=starter').title).toContain('Aldo');
   });
 
   it('knows the plans the site links to', () => {
@@ -39,10 +47,10 @@ describe('demoIntent', () => {
     }
   });
 
-  it('uses the exact product names', () => {
+  it('uses the exact product names ("Aldente" alone is the company)', () => {
     for (const plan of ALL) {
       const { title, lead } = demoIntent(`?plan=${plan}`);
-      for (const text of [title, lead]) expect(text, plan).not.toMatch(/\bVerify\b(?<!Aldente Verify)|Aldente (?!Verify|Vision)\w/);
+      for (const text of [title, lead]) expect(text, plan).not.toMatch(/\bVerify\b(?<!Aldente Verify)|Aldente (?!Verify|Vision|Dispute)[A-Z]/);
     }
   });
 

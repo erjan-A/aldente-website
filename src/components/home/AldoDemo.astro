@@ -329,10 +329,10 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
   }
 
   /* The window's size never depends on the panel inside (contain: size), so stepping through the
-     tabs cannot move the page. Side by side it is at least 560px tall. */
+     tabs cannot move the page. Side by side it is 520px: the tallest panel (Assign, after Confirm). */
   .aldo__box :global(.aldo__slack) {
     flex: 2 1 480px;
-    min-height: 560px;
+    min-height: 520px;
     contain: size;
   }
 

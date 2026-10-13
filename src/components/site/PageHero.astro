@@ -140,6 +140,23 @@ const hasExtra = Astro.slots.has('default');
     }
   }
 
+  /* A hero without media: the lead runs as wide as the title, as in every section header. */
+  .page-hero:not(.page-hero--split, .page-hero--below) .page-hero__copy {
+    width: fit-content;
+    min-width: min(100%, 36rem);
+    max-width: 100%;
+  }
+
+  .page-hero--center:not(.page-hero--split, .page-hero--below) .page-hero__copy {
+    margin-inline: auto;
+  }
+
+  .page-hero:not(.page-hero--split, .page-hero--below) .page-hero__lead {
+    width: 0;
+    min-width: 100%;
+    max-width: none;
+  }
+
   .page-hero__lead {
     max-width: 44ch;
     font-size: var(--step-lead);

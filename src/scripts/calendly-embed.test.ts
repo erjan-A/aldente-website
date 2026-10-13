@@ -10,7 +10,6 @@ const URL_BASE = 'https://calendly.com/aldenteai/30min';
 
 const fixture = `
 <calendly-embed data-url="${URL_BASE}">
-  <p data-cal-alt>Calendar not loading?</p>
   <div data-cal-stage>
     <div data-cal-skeleton aria-hidden="true"></div>
     <p role="status" aria-live="polite" data-cal-status></p>
@@ -133,7 +132,6 @@ describe('<calendly-embed>', () => {
     expect(host().dataset.state).toBe('booked');
     expect(frame()).toBeNull();
     expect(part('stage').hidden).toBe(true);
-    expect(part('alt').hidden).toBe(true);
     expect(part('booked').hidden).toBe(false);
     expect(document.activeElement?.textContent).toBe('You’re booked.');
     expect(queued).toContainEqual(['Demo booked', { plan: 'enterprise' }]);

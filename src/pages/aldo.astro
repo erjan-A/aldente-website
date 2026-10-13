@@ -4,6 +4,7 @@ import Connections from '../components/home/Connections.astro';
 import Cta from '../components/home/Cta.astro';
 import Playbooks from '../components/home/Playbooks.astro';
 import AldoHeroMedia from '../components/product/AldoHeroMedia.astro';
+import HowWeStart from '../components/site/HowWeStart.astro';
 import PageHero from '../components/site/PageHero.astro';
 import Button from '../components/ui/Button.astro';
 import Faq from '../components/ui/Faq.astro';
@@ -63,6 +64,7 @@ const faq = [
   </section>
   <Playbooks product={null} />
   <Connections padTop product={null} />
+  <HowWeStart tone="surface" />
   <Faq items={faq} />
   <Cta
     title="Put Aldo on your next shift."

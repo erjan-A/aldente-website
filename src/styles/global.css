@@ -143,11 +143,12 @@
   color: var(--fg);
 }
 
-/* The dark ground a step up (--surface), so cards move up a step too. Hairlines mark its edges. */
+/* The dark ground a step up (--surface), hairlines at its edges. Cards sit a step down, on the dark ground,
+   so orange labels and muted ink keep AA on them (orange on --surface-2 would not). */
 .tone-surface {
-  --card: var(--surface-2);
-  --card-2: var(--line);
-  --tag-bg: var(--line);
+  --card: var(--bg);
+  --card-2: var(--surface-2);
+  --tag-bg: var(--surface-2);
   --tone-bg: var(--surface);
   background: var(--surface);
   border-block: 1px solid var(--line);

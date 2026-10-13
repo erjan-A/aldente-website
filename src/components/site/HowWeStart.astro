@@ -1,0 +1,33 @@
+---
+import RolloutWeeks from '../ui/RolloutWeeks.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+/** How we start: the rollout weeks under the shared heading (Pricing, the product pages and Security). */
+interface Props {
+  /** The section's ground, chosen so it never matches the section above it. */
+  tone?: 'dark' | 'surface' | 'paper';
+}
+
+const { tone = 'dark' } = Astro.props;
+---
+
+<section class:list={['start section', `tone-${tone}`]} aria-labelledby="start-title">
+  <div class="container start__inner">
+    <SectionHeader
+      id="start-title"
+      label="How we start"
+      title="Start with one location,"
+      muted="live in 2–3 weeks."
+      lead="We install, connect and tune it with your team, then plan the next locations from the first results."
+    />
+    <RolloutWeeks />
+  </div>
+</section>
+
+<style>
+  .start__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+</style>

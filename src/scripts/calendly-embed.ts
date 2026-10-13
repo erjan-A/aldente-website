@@ -18,7 +18,7 @@ type State = 'loading' | 'ready' | 'booked';
  * marketing cookies on this site isn't asked again (hide_gdpr_banner).
  *
  * Markup: data-url (Calendly event URL); inside, [data-cal-stage] (skeleton), [data-cal-status] (live
- * region), [data-cal-slow], [data-cal-alt] and [data-cal-booked] (hidden panel).
+ * region), [data-cal-slow] and [data-cal-booked] (hidden panel).
  * The host's data-state is 'loading' | 'ready' | 'booked' for styling.
  */
 export class CalendlyEmbed extends HTMLElement {
@@ -107,7 +107,6 @@ export class CalendlyEmbed extends HTMLElement {
     this.state = 'booked';
     this.frame?.remove();
     this.toggle('stage', false);
-    this.toggle('alt', false);
     this.toggle('booked', true);
     this.child('booked')?.querySelector<HTMLElement>('[tabindex="-1"]')?.focus();
   }
