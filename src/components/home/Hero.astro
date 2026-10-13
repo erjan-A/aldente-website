@@ -3,15 +3,13 @@ import { LINKS } from '../../data/site';
 import Button from '../ui/Button.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import HeroCards from './HeroCards.astro';
-import HeroConsole from './HeroConsole.astro';
-import ProofBar from './ProofBar.astro';
 
 // "See Aldente in action" scrolls to the four products on this page (Products, id="product").
 const seeAldente = '#product';
 ---
 
 <section class="hero tone-dark" aria-labelledby="hero-title">
-  <div class="container hero__inner">
+  <div class="container">
     <div class="hero__stage">
       <HeroCards />
       <div class="hero__copy">
@@ -29,15 +27,12 @@ const seeAldente = '#product';
         </div>
       </div>
     </div>
-    <HeroConsole />
-    <ProofBar />
   </div>
 </section>
 
 <style>
   .hero {
     padding-block: clamp(80px, 11vw, 160px) clamp(64px, 8vw, 112px);
-    /* clip, not hidden, so the pinned console can stick */
     overflow-x: clip;
   }
 
@@ -48,15 +43,8 @@ const seeAldente = '#product';
     }
   }
 
-  .hero__inner {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(48px, 6vw, 80px);
-  }
-
   .hero__stage {
     position: relative;
-    margin-bottom: clamp(64px, 11vw, 160px);
   }
 
   .hero__copy {

@@ -5,7 +5,7 @@ import SlackMessage from '../slack/SlackMessage.astro';
 import SlackWindow from '../slack/SlackWindow.astro';
 import Icon from '../ui/Icon.astro';
 
-// Each beat pairs what the camera sees with what Aldo posts about it.
+// Aldente Vision live: each beat pairs what the camera sees with what Aldo posts about it (home, Vision section).
 const detections = [
   { beat: 1, pin: 1, tone: 'alert', label: 'Table 6 · waiting to be cleared · 3:12', box: 'left:26%;top:64%;width:34%;height:28%' },
   { beat: 2, pin: 2, tone: 'neutral', label: 'Table 9 · seated 41 min · no check yet', box: 'left:61.5%;top:30%;width:16%;height:40%' },
@@ -29,8 +29,6 @@ const detections = [
             alt="Overhead camera view of a busy restaurant dining room"
             widths={[640, 960, 1280, 1600]}
             sizes="(min-width: 1280px) 820px, (min-width: 960px) 62vw, 100vw"
-            loading="eager"
-            fetchpriority="high"
           />
           <span class="console__scan" aria-hidden="true"></span>
           <div class="hud b3" aria-hidden="true">

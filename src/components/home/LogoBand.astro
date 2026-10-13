@@ -1,0 +1,23 @@
+---
+import ProofBar from './ProofBar.astro';
+
+/** The verified-orders line and the customer logos, as their own band right under the hero. */
+---
+
+<section class="logos tone-surface" aria-label="Customers">
+  <div class="container">
+    <ProofBar />
+  </div>
+</section>
+
+<style>
+  .logos {
+    padding-block: clamp(32px, 4vw, 48px);
+  }
+
+  /* The band draws its own edges, so the strip drops the rule it carries elsewhere. */
+  .logos :global(.proof) {
+    padding-top: 0;
+    border-top: 0;
+  }
+</style>

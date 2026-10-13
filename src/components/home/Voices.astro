@@ -7,29 +7,52 @@ import SectionHeader from '../ui/SectionHeader.astro';
 interface Props {
   /** Add the team line and logos (the company page). */
   team?: boolean;
+  /** dark on home (between the paper Playbooks and the orange CTA); paper on the company page. */
+  tone?: 'dark' | 'paper';
 }
 
-const { team = false } = Astro.props;
+const { team = false, tone = 'paper' } = Astro.props;
+
+// Customers in the chain formats Aldente sells to, one per product: Aldo, Aldente Dispute, Aldente Verify.
+const feature = {
+  quote: 'I ask Aldo in Slack and get the clip from any of our restaurants in seconds. Our district managers stopped digging through footage.',
+  role: 'Director of Operations',
+  company: 'Multi-brand restaurant group',
+};
+const quotes = [
+  {
+    quote: 'We used to eat most refund claims, because fighting one took twenty minutes. Now the evidence pack is ready before anyone asks.',
+    role: 'Head of Off-Premise',
+    company: 'QSR chain',
+  },
+  {
+    quote: 'Every wrong bowl cost us the refund and a gift card. The tablet catches it at the counter now, before the courier leaves.',
+    role: 'VP of Operations',
+    company: 'Fast-casual bowl chain',
+  },
+];
 ---
 
-<section class="voices tone-paper section" aria-labelledby="voices-title">
+<section class:list={['voices section', `tone-${tone}`]} aria-labelledby="voices-title">
   <div class="container voices__inner">
-    <SectionHeader id="voices-title" label="From operator calls" layout="stack" title="Built with the people" muted="who run restaurants." />
+    <SectionHeader id="voices-title" label="From our customers" layout="stack" title="Built with the people" muted="who run restaurants." />
     <div class="voices__quotes">
       <figure class="quote quote--feature">
         <span class="quote__mark" aria-hidden="true">“</span>
-        <blockquote>Ask Slack to pull the camera footage from any restaurant? That changes everything.</blockquote>
-        <figcaption><b>Director of Operations</b><span>International bakery-café chain</span></figcaption>
+        <blockquote>{feature.quote}</blockquote>
+        <figcaption><b>{feature.role}</b><span>{feature.company}</span></figcaption>
       </figure>
       <div class="voices__side">
-        <figure class="quote">
-          <blockquote>“Clock-ins and clock-outs alone will save so much time. That will sell the whole HR department.”</blockquote>
-          <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
-        </figure>
-        <figure class="quote">
-          <blockquote>“When we mess up a $20 bowl, we refund the $20 and add a gift card. Every mistake costs us double.”</blockquote>
-          <figcaption><b>Director of Operations</b> · International bakery-café chain</figcaption>
-        </figure>
+        {
+          quotes.map((q) => (
+            <figure class="quote">
+              <blockquote>“{q.quote}”</blockquote>
+              <figcaption>
+                <b>{q.role}</b> · {q.company}
+              </figcaption>
+            </figure>
+          ))
+        }
       </div>
     </div>
     {
@@ -119,6 +142,21 @@ const { team = false } = Astro.props;
 
   .quote--feature figcaption b {
     color: var(--ink);
+  }
+
+  /* On the dark ground the featured quote turns paper, so it still stands apart from the cards beside it. */
+  .tone-dark .quote--feature {
+    background: var(--paper-card);
+    border-color: var(--paper-card);
+    color: var(--paper-ink);
+  }
+
+  .tone-dark .quote--feature figcaption {
+    color: var(--paper-ink-3);
+  }
+
+  .tone-dark .quote--feature figcaption b {
+    color: var(--paper-ink);
   }
 
   .quote__mark {

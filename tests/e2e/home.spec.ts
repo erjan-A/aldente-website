@@ -24,31 +24,7 @@ test.describe('home page', () => {
     await expect(page.locator('#product')).toBeInViewport();
   });
 
-  test('walks through Aldo in Slack with the tabs', async ({ page }) => {
-    const demo = page.locator('aldo-demo');
-    await demo.getByRole('tab', { name: /Assign/ }).click();
-    await expect(demo.locator('[data-slack-channel]')).toHaveText('hr-ops');
-    await expect(demo.getByRole('tabpanel')).toContainText('Missing clock-out review');
-    await expect(demo.getByRole('tabpanel')).toContainText('Owner');
-    await expect(demo.getByText('Cancel', { exact: true })).toBeVisible();
 
-    await demo.getByRole('tab', { name: /Assign/ }).press('ArrowDown');
-    await expect(demo.getByRole('tab', { name: /Alert/ })).toHaveAttribute('aria-selected', 'true');
-    await expect(demo.getByRole('tab', { name: /Alert/ })).toBeFocused();
-    await expect(demo.locator('[data-slack-channel]')).toHaveText('district-west');
-    await expect(demo.getByRole('tabpanel')).toContainText('closest district manager');
-  });
-
-  test('filters Playbooks and draws the chosen one', async ({ page }) => {
-    const explorer = page.locator('playbook-explorer');
-    await explorer.getByRole('button', { name: 'HR', exact: true }).click();
-    await expect(explorer.locator('[data-team]:visible')).toHaveCount(1);
-
-    await explorer.getByRole('button', { name: 'All', exact: true }).click();
-    await explorer.getByRole('button', { name: /Long queues/ }).click();
-    await expect(explorer.locator('[data-graph-title]')).toHaveText('Long queues');
-    await expect(explorer.locator('[data-graph-step="send"]')).toHaveText('Nearest district manager');
-  });
 
   test('advances the order story as you scroll', async ({ page }) => {
     const story = page.locator('scroll-story');
@@ -78,6 +54,7 @@ test.describe('home page', () => {
 
   test('reveals camera detections and Aldo’s Slack posts together as you scroll', async ({ page, isMobile }) => {
     const beats = page.locator('scroll-beats');
+    await beats.evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 160));
     await expect(page.locator('.det.b1')).toBeVisible();
     await expect(page.locator('.msg.b1')).toBeVisible();
     if (!isMobile) {
@@ -95,21 +72,103 @@ test.describe('home page', () => {
     await expect(page.locator('.msg.b3')).toContainText('Location 03 is busy');
   });
 
-  test('steps through Aldo’s tabs on its own while on screen', async ({ page }) => {
-    const demo = page.locator('aldo-demo');
-    await demo.scrollIntoViewIfNeeded();
-    await expect(demo.getByRole('tab', { name: /Assign/ })).toHaveAttribute('aria-selected', 'true', { timeout: 8000 });
+
+  test('runs the sections in the agreed order, and no two neighbours share a ground', async ({ page }) => {
+    const sections = page.locator('main > section');
+    await expect(sections).toHaveCount(11);
+    const read = await sections.evaluateAll((els) =>
+      els.map((el) => ({
+        id: el.id || el.className.split(' ')[0],
+        tone: [...el.classList].find((c) => c.startsWith('tone-')),
+        ground: getComputedStyle(el).backgroundColor + getComputedStyle(el).backgroundImage,
+      })),
+    );
+    expect(read.map((r) => r.id)).toEqual([
+      'hero',
+      'logos',
+      'problem',
+      'product',
+      'verification',
+      'customers',
+      'analytics',
+      'connections',
+      'playbooks',
+      'voices',
+      'cta',
+    ]);
+    for (let i = 1; i < read.length; i++) expect(read[i]!.ground).not.toBe(read[i - 1]!.ground);
+    // How we start and the Slack demo left the home page (both live on other pages).
+    await expect(page.locator('.enterprise, aldo-demo')).toHaveCount(0);
   });
 
   test('labels each section the way the decks label their slides', async ({ page }) => {
     await expect(page.locator('.problem .pill')).toHaveText('The problem');
     await expect(page.locator('#product .head .pill')).toHaveText('Products');
-    await expect(page.locator('#aldo .pill')).toHaveText('Aldo');
-    await expect(page.locator('#playbooks .pill')).toHaveText('Aldo');
-    await expect(page.locator('#verification .pill')).toHaveText('Aldente Verify');
+    await expect(page.locator('#verification .head .pill')).toHaveText(['Aldente Verify', 'Aldente Dispute']);
     await expect(page.locator('#customers .pill')).toHaveText('Customer results');
-    await expect(page.locator('#analytics .pill')).toHaveText('Aldente Vision');
+    await expect(page.locator('#analytics .head .pill')).toHaveText('Aldente Vision');
     await expect(page.locator('.connections .pill')).toHaveText('Aldo in Slack');
+    await expect(page.locator('#playbooks .head .pill')).toHaveText('Aldo');
+    await expect(page.locator('.voices .pill')).toHaveText('From our customers');
+  });
+
+  test('shows four Playbooks, one per team, without filters', async ({ page }) => {
+    const explorer = page.locator('playbook-explorer');
+    await expect(explorer.locator('[data-filter]')).toHaveCount(0);
+    await expect(explorer.locator('.pb__title')).toHaveText(['Missing clock-outs', 'Long queues', 'Refund evidence', 'Table reset']);
+    await explorer.getByRole('button', { name: /Long queues/ }).click();
+    await expect(explorer.locator('[data-graph-title]')).toHaveText('Long queues');
+  });
+
+
+
+  test('shows Aldo between your data and Slack, as on the deck', async ({ page }) => {
+    const map = page.locator('.connections .map');
+    await expect(map.locator('.map__in li')).toHaveText([
+      /Aldente Verify/,
+      /Aldente Dispute/,
+      /Aldente Vision/,
+      /POS/,
+      /HR and time clock/,
+      /Inventory and procurement/,
+      /Other customer systems/,
+    ]);
+    await expect(map.locator('.hub')).toContainText('AI Chief of Staff');
+    await expect(map.locator('.hub__note')).toHaveCount(0);
+    await expect(map.locator('.out b').filter({ hasText: /^(Q&A|Playbooks)$/ })).toHaveText(['Q&A', 'Playbooks']);
+  });
+
+  test('keeps the team for the company page', async ({ page }) => {
+    await expect(page.locator('.team')).toHaveCount(0);
+    await page.goto('/company');
+    await expect(page.locator('.team')).toContainText('Restaurant operators and engineers');
+  });
+});
+
+test.describe('Aldo page: Slack demo and Playbooks', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/aldo');
+  });
+
+  test('walks through Aldo in Slack with the tabs', async ({ page }) => {
+    const demo = page.locator('aldo-demo');
+    await demo.getByRole('tab', { name: /Assign/ }).click();
+    await expect(demo.locator('[data-slack-channel]')).toHaveText('hr-ops');
+    await expect(demo.getByRole('tabpanel')).toContainText('Missing clock-out review');
+    await expect(demo.getByRole('tabpanel')).toContainText('Owner');
+    await expect(demo.getByText('Cancel', { exact: true })).toBeVisible();
+
+    await demo.getByRole('tab', { name: /Assign/ }).press('ArrowDown');
+    await expect(demo.getByRole('tab', { name: /Alert/ })).toHaveAttribute('aria-selected', 'true');
+    await expect(demo.getByRole('tab', { name: /Alert/ })).toBeFocused();
+    await expect(demo.locator('[data-slack-channel]')).toHaveText('district-west');
+    await expect(demo.getByRole('tabpanel')).toContainText('closest district manager');
+  });
+
+  test('steps through Aldo’s tabs on its own while on screen', async ({ page }) => {
+    const demo = page.locator('aldo-demo');
+    await demo.scrollIntoViewIfNeeded();
+    await expect(demo.getByRole('tab', { name: /Assign/ })).toHaveAttribute('aria-selected', 'true', { timeout: 8000 });
   });
 
   test('confirms a Playbook in Slack: the card locks and Aldo posts "Playbook created"', async ({ page }) => {
@@ -134,26 +193,15 @@ test.describe('home page', () => {
     await expect(assign).toBeFocused();
   });
 
-  test('shows Aldo between your data and Slack, as on the deck', async ({ page }) => {
-    const map = page.locator('.connections .map');
-    await expect(map.locator('.map__in li')).toHaveText([
-      /Aldente Verify/,
-      /Aldente Dispute/,
-      /Aldente Vision/,
-      /POS/,
-      /HR and time clock/,
-      /Inventory and procurement/,
-      /Other customer systems/,
-    ]);
-    await expect(map.locator('.hub')).toContainText('AI Chief of Staff');
-    await expect(map.locator('.hub__note')).toHaveCount(0);
-    await expect(map.locator('.out b').filter({ hasText: /^(Q&A|Playbooks)$/ })).toHaveText(['Q&A', 'Playbooks']);
-  });
+  test('filters Playbooks and draws the chosen one', async ({ page }) => {
+    const explorer = page.locator('playbook-explorer');
+    await explorer.getByRole('button', { name: 'HR', exact: true }).click();
+    await expect(explorer.locator('[data-team]:visible')).toHaveCount(1);
 
-  test('keeps the team for the company page', async ({ page }) => {
-    await expect(page.locator('.team')).toHaveCount(0);
-    await page.goto('/company');
-    await expect(page.locator('.team')).toContainText('Restaurant operators and engineers');
+    await explorer.getByRole('button', { name: 'All', exact: true }).click();
+    await explorer.getByRole('button', { name: /Long queues/ }).click();
+    await expect(explorer.locator('[data-graph-title]')).toHaveText('Long queues');
+    await expect(explorer.locator('[data-graph-step="send"]')).toHaveText('Nearest district manager');
   });
 });
 

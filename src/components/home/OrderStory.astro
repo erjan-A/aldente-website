@@ -13,16 +13,20 @@ interface Props {
   title?: string;
   muted?: string;
   lead?: string;
-  /** Product pill above the title; omit on the product's own page. */
-  product?: ProductId | null;
+  /** Product pills above the title; omit on the product's own page. */
+  product?: ProductId | ProductId[] | null;
+  /** The section's ground: surface where a dark section sits right above it (home). */
+  tone?: 'dark' | 'surface';
 }
 
+// Home: Aldente Verify and Aldente Dispute told as one order, from the ticket to the refund claim.
 const {
   heading = true,
-  title = 'Every order checked',
-  muted = 'before it leaves the counter.',
-  lead = 'Scroll through one order, from the ticket to the refund dispute.',
-  product = 'verify',
+  title = 'Every order checked before pickup,',
+  muted = 'every refund claim answered with proof.',
+  lead = 'Scroll through one order: Aldente Verify checks the bag, and Aldente Dispute answers the refund claim.',
+  product = ['verify', 'dispute'],
+  tone = 'dark',
 } = Astro.props;
 
 const steps = [
@@ -30,7 +34,7 @@ const steps = [
   { title: 'Bag is checked', time: '12:40', text: 'The tablet camera checks every item and quantity. One drink is in the bag. Two are required.' },
   { title: 'Fixed before pickup', time: '12:41', text: 'The team adds the second drink and checks again. Fixed before the courier arrives.' },
   { title: 'Evidence saved', time: '12:41', text: 'The photo, the detections and a 42-second clip are saved as one record for order #4821.' },
-  { title: 'Refund disputed', time: 'Day 2', text: 'Uber Eats reports a missing drink. Aldente sends the packing clip and disputes the charge for you.' },
+  { title: 'Refund disputed', time: 'Day 2', text: 'Uber Eats reports a missing drink. Aldente Dispute submits the evidence pack, and the charge is reversed.' },
 ];
 
 // Counts per state: before the check, after the check, after the fix.
@@ -41,7 +45,7 @@ const items = [
 ];
 ---
 
-<section class="story tone-dark section" id="verification" aria-labelledby="story-title">
+<section class:list={['story section', `tone-${tone}`]} id="verification" aria-labelledby="story-title">
   <div class="container story__inner">
     {
       heading && (
@@ -615,7 +619,7 @@ const items = [
       z-index: 2;
       height: auto;
       padding: 20px 0 12px;
-      background: var(--bg);
+      background: var(--tone-bg);
     }
 
     /* Outgoing step text fades under the visual instead of being sliced mid-line. It ends where the
@@ -627,7 +631,7 @@ const items = [
       right: 0;
       top: 100%;
       height: 16px;
-      background: linear-gradient(var(--bg), rgb(11 11 11 / 0));
+      background: linear-gradient(var(--tone-bg), transparent);
       pointer-events: none;
     }
 

@@ -126,6 +126,14 @@ describe('Playbooks', () => {
     expect(doc.querySelector('.playbooks__cta')).toBeNull();
   });
 
+  it('home: four examples, one per team, and no team filters', async () => {
+    const doc = parse(await container.renderToString(Playbooks, { props: { compact: true } }));
+    const ids = [...doc.querySelectorAll<HTMLElement>('[data-playbook]')].map((b) => JSON.parse(b.dataset.playbook!).id);
+    expect(ids).toEqual(['missing-clock-outs', 'long-queues', 'refund-evidence', 'table-reset']);
+    expect(doc.querySelector('[data-filter]')).toBeNull();
+    expect(doc.querySelector('.playbooks__teams')).not.toBeNull();
+  });
+
   it('ends on the explorer, with no "comes with" band under it', async () => {
     const doc = parse(await container.renderToString(Playbooks));
     expect(doc.querySelector('.playbooks__cta')).toBeNull();
@@ -151,11 +159,23 @@ describe('Home hero and CTA band', () => {
       'Aldente AI sees every location through your cameras, catches wrong orders before pickup, wins back refunds with evidence, and hands routine work to your AI employee in Slack.',
     );
     expect(html).not.toContain('Get Aldo in Slack');
+    // The live camera moved to the Aldente Vision section and the logos to their own band.
+    expect(doc.querySelector('scroll-beats')).toBeNull();
+    expect(doc.querySelector('.proof')).toBeNull();
   });
 
-  it('HeroConsole: no live clock, and Aldo’s posts keep fixed lunch-time stamps', async () => {
-    const { default: HeroConsole } = await import('../../src/components/home/HeroConsole.astro');
-    const html = await container.renderToString(HeroConsole);
+  it('LogoBand: the verified-orders line and the logos as their own surface band', async () => {
+    const { default: LogoBand } = await import('../../src/components/home/LogoBand.astro');
+    const doc = parse(await container.renderToString(LogoBand));
+    const band = doc.querySelector('section')!;
+    expect(band.classList.contains('tone-surface')).toBe(true);
+    expect(band.getAttribute('aria-label')).toBe('Customers');
+    expect(band.querySelector('.proof__line')?.textContent).toContain('orders verified across 200+ restaurant locations.');
+  });
+
+  it('LiveConsole: no live clock, and Aldo’s posts keep fixed lunch-time stamps', async () => {
+    const { default: LiveConsole } = await import('../../src/components/home/LiveConsole.astro');
+    const html = await container.renderToString(LiveConsole);
     const doc = parse(html);
     expect(html).not.toContain('live-clock');
     expect(doc.querySelector('.console__time')).toBeNull();
@@ -181,6 +201,19 @@ describe('Analytics', () => {
     const doc = parse(await container.renderToString(Analytics));
     expect([...doc.querySelectorAll('.metric-chips .chip b')].map((b) => b.textContent)).toHaveLength(8);
     expect(doc.querySelectorAll('.metric')).toHaveLength(0);
+  });
+
+  it('home: the live camera on top in place of the four camera shots, which stay on the Vision page', async () => {
+    const home = parse(await container.renderToString(Analytics));
+    const live = home.querySelector('scroll-beats .console')!;
+    expect(live).not.toBeNull();
+    expect(home.querySelector('.cams')).toBeNull();
+    // Right under the heading: before the steps and the chips.
+    const order = [...home.querySelectorAll('.head, scroll-beats, .metric-chips')].map((el) => el.tagName.toLowerCase() === 'scroll-beats' ? 'live' : el.className.split(' ')[0]);
+    expect(order).toEqual(['head', 'live', 'metric-chips']);
+    const page = parse(await container.renderToString(Analytics, { props: { heading: false } }));
+    expect(page.querySelectorAll('.cams > li.cam')).toHaveLength(4);
+    expect(page.querySelector('scroll-beats')).toBeNull();
   });
 
   it('gives every metric an icon and a preview that screen readers skip (Vision page)', async () => {
@@ -221,12 +254,37 @@ describe('Home sections consistency', () => {
   });
 
   it('builds card-like blocks from the shared Card', async () => {
-    const { default: Enterprise } = await import('../../src/components/home/Enterprise.astro');
-    const enterprise = parse(await container.renderToString(Enterprise));
-    expect(enterprise.querySelectorAll('.weeks > li.card')).toHaveLength(3);
-    expect(enterprise.querySelectorAll('.enterprise__trust > li.card.trust')).toHaveLength(4);
-    const analytics = parse(await container.renderToString(Analytics));
+    const analytics = parse(await container.renderToString(Analytics, { props: { heading: false } }));
     expect(analytics.querySelectorAll('.cams > li.cam')).toHaveLength(4);
+  });
+
+  it('Problem: the decks’ wording, word for word', async () => {
+    const { default: Problem } = await import('../../src/components/home/Problem.astro');
+    const doc = parse(await container.renderToString(Problem));
+    expect([...doc.querySelectorAll('.problem__facts dd')].map((d) => d.textContent)).toEqual([
+      'of delivery orders leave a typical location wrong.',
+      'the loss on every wrong order: the refund, then the gift card to win the guest back.',
+      'of a manager’s week go to pulling reports, searching footage and repeating the same checks.',
+    ]);
+    expect(doc.querySelector('.problem__turn')?.textContent).toBe(
+      'The answers are already in your cameras and systems. Today they are found too late, by hand, or not at all.',
+    );
+  });
+
+  it('CaseStudy: the claim, a customer’s words, and before/after as 16 dots of wrong orders a day', async () => {
+    const { default: CaseStudy } = await import('../../src/components/home/CaseStudy.astro');
+    const doc = parse(await container.renderToString(CaseStudy));
+    expect(doc.querySelector('h2')?.textContent).toBe('87% fewer wrong orders at one location.');
+    expect(doc.querySelector('.case__quote blockquote')?.textContent).toContain('nobody wants to go back');
+    expect(doc.querySelector('.case__quote figcaption')?.textContent).toBe('Director of Operations · Regional QSR chain');
+    const [before, after] = [...doc.querySelectorAll('.case__panel')];
+    expect(before!.querySelector('.case__figure')?.textContent).toBe('14–16');
+    expect(before!.querySelectorAll('.dots i')).toHaveLength(16);
+    expect(before!.querySelectorAll('.dots i.on')).toHaveLength(14);
+    expect(before!.querySelectorAll('.dots i.maybe')).toHaveLength(2);
+    expect(after!.querySelector('.case__figure')?.textContent).toBe('~2');
+    expect(after!.querySelectorAll('.dots i.on')).toHaveLength(2);
+    expect(doc.querySelector('.case__note')?.textContent).toContain('$74K+ a year at one');
   });
 
   it('uses SectionHeader for the problem statement', async () => {
@@ -281,7 +339,7 @@ describe('Product pills', () => {
     };
     expect(await label('../../src/components/home/Problem.astro')).toBe('The problem');
     expect(await label('../../src/components/home/CaseStudy.astro')).toBe('Customer results');
-    expect(await label('../../src/components/home/Enterprise.astro')).toBe('How we start');
+    expect(await label('../../src/components/home/Voices.astro')).toBe('From our customers');
   });
 });
 
@@ -458,6 +516,16 @@ describe('Voices', () => {
     const doc = parse(await container.renderToString(Voices));
     expect(doc.querySelectorAll('blockquote')).toHaveLength(3);
     expect(doc.querySelector('.voices__side')?.querySelectorAll('figure')).toHaveLength(2);
+  });
+
+  it('quotes customers from different chain formats, never by name', async () => {
+    const doc = parse(await container.renderToString(Voices, { props: { tone: 'dark' } }));
+    expect(doc.querySelector('section')?.classList.contains('tone-dark')).toBe(true);
+    expect([...doc.querySelectorAll('figcaption')].map((f) => f.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      'Director of OperationsMulti-brand restaurant group',
+      'Head of Off-Premise · QSR chain',
+      'VP of Operations · Fast-casual bowl chain',
+    ]);
   });
 });
 

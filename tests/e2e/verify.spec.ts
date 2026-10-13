@@ -28,7 +28,7 @@ test.describe('Aldente Verify page', () => {
     const study = page.locator('#customers');
     await expect(study.locator('.pill')).toHaveText('Customer results');
     await expect(study).toContainText('~1%');
-    await expect(study).toContainText('12 fewer wrong orders a day × 365 days × $17 average check');
+    await expect(study).toContainText('12 fewer wrong orders × 365 days × $17 = $74K+ a year');
   });
 });
 

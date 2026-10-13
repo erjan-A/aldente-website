@@ -18,9 +18,11 @@ interface Props {
   padTop?: boolean;
   /** The product pill over the heading; null on Aldo's own page. */
   product?: ProductId | null;
+  /** The section's ground: surface where a dark section sits right above it (home). */
+  tone?: 'dark' | 'surface';
 }
 
-const { padTop = false, product = 'aldo' } = Astro.props;
+const { padTop = false, product = 'aldo', tone = 'dark' } = Astro.props;
 
 interface Source {
   name: string;
@@ -77,7 +79,7 @@ const inWires = [...productY, ...systemY];
 const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
 ---
 
-<section class:list={['connections', 'tone-dark', { 'connections--pad': padTop }]} aria-labelledby="connections-title">
+<section class:list={['connections', `tone-${tone}`, { 'connections--pad': padTop }]} aria-labelledby="connections-title">
   <div class="container connections__inner">
     <SectionHeader
       product={product ?? undefined}
@@ -251,8 +253,8 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     min-height: 56px;
     padding: 8px 16px;
     border-radius: var(--radius-m);
-    background: var(--surface);
-    border: 1px solid var(--line-card);
+    background: var(--card);
+    border: 1px solid var(--card-line);
     color: var(--ink-2);
   }
 
@@ -357,7 +359,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     justify-content: center;
     gap: 4px;
     border-radius: 50%;
-    background: radial-gradient(circle at 50% 0%, #4a2213 0%, var(--bg) 72%);
+    background: radial-gradient(circle at 50% 0%, #4a2213 0%, var(--tone-bg) 72%);
     border: 2px solid var(--accent);
     box-shadow:
       0 0 28px rgb(224 86 52 / 0.4),
