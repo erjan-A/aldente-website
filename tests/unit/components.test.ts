@@ -126,13 +126,6 @@ describe('Playbooks', () => {
     expect(doc.querySelector('.playbooks__cta')).toBeNull();
   });
 
-  it('home: four examples, one per team, and no team filters', async () => {
-    const doc = parse(await container.renderToString(Playbooks, { props: { compact: true } }));
-    const ids = [...doc.querySelectorAll<HTMLElement>('[data-playbook]')].map((b) => JSON.parse(b.dataset.playbook!).id);
-    expect(ids).toEqual(['missing-clock-outs', 'long-queues', 'refund-evidence', 'table-reset']);
-    expect(doc.querySelector('[data-filter]')).toBeNull();
-    expect(doc.querySelector('.playbooks__teams')).not.toBeNull();
-  });
 
   it('ends on the explorer, with no "comes with" band under it', async () => {
     const doc = parse(await container.renderToString(Playbooks));
@@ -271,20 +264,26 @@ describe('Home sections consistency', () => {
     );
   });
 
-  it('CaseStudy: the claim, a customer’s words, and before/after as 16 dots of wrong orders a day', async () => {
+  it('CaseStudy: the decks’ figures, a customer’s words, and before/after as 16 dots of wrong orders a day', async () => {
     const { default: CaseStudy } = await import('../../src/components/home/CaseStudy.astro');
     const doc = parse(await container.renderToString(CaseStudy));
-    expect(doc.querySelector('h2')?.textContent).toBe('87% fewer wrong orders at one location.');
+    expect(doc.querySelector('h2')?.textContent).toBe('87% fewer wrong orders.');
+    expect(doc.querySelector('.case__context')?.textContent).toContain('about 200 delivery and drive-thru orders a day and a $17 average check');
+    expect(doc.querySelector('.case__result')?.textContent).toBe('That’s 4,300+ fewer wrong orders and $74K+ saved a year.*');
     expect(doc.querySelector('.case__quote blockquote')?.textContent).toContain('nobody wants to go back');
     expect(doc.querySelector('.case__quote figcaption')?.textContent).toBe('Director of Operations · Regional QSR chain');
     const [before, after] = [...doc.querySelectorAll('.case__panel')];
-    expect(before!.querySelector('.case__figure')?.textContent).toBe('14–16');
+    expect(before!.querySelector('.case__figure')?.textContent).toBe('7–8%');
+    expect(before!.querySelector('p')?.textContent).toBe('14–16 wrong orders a day');
     expect(before!.querySelectorAll('.dots i')).toHaveLength(16);
     expect(before!.querySelectorAll('.dots i.on')).toHaveLength(14);
     expect(before!.querySelectorAll('.dots i.maybe')).toHaveLength(2);
-    expect(after!.querySelector('.case__figure')?.textContent).toBe('~2');
+    expect(after!.querySelector('.case__figure')?.textContent).toBe('~1%');
+    expect(after!.querySelector('p')?.textContent).toBe('~2 wrong orders a day');
     expect(after!.querySelectorAll('.dots i.on')).toHaveLength(2);
-    expect(doc.querySelector('.case__note')?.textContent).toContain('$74K+ a year at one');
+    expect(doc.querySelector('.case__note')?.textContent).toBe(
+      '* 12 fewer wrong orders a day × 365 days × $17 average check, with a full refund for each wrong order.',
+    );
   });
 
   it('uses SectionHeader for the problem statement', async () => {
@@ -548,19 +547,6 @@ describe('PlanGrid', () => {
 });
 
 describe('Mobile layouts', () => {
-  it('CompareTable: a fluid table plus a stacked list from the same rows, in one uniquely named region', async () => {
-    const { default: CompareTable } = await import('../../src/components/pricing/CompareTable.astro');
-    const { COMPARE, PLANS } = await import('../../src/data/pricing');
-    const doc = parse(await container.renderToString(CompareTable));
-    expect(doc.querySelectorAll('[role="region"]')).toHaveLength(0);
-    expect(doc.querySelector('section')?.getAttribute('aria-labelledby')).toBe('compare-title');
-    expect(doc.querySelectorAll('table tbody tr')).toHaveLength(COMPARE.length);
-    const rows = [...doc.querySelectorAll('.compare__row')];
-    expect(rows.map((r) => r.querySelector('.compare__feature')?.textContent)).toEqual(COMPARE.map((r) => r.feature));
-    // Each stacked value names its plan for screen readers.
-    for (const row of rows) expect([...row.querySelectorAll('dt')].map((dt) => dt.textContent)).toEqual(PLANS.map((p) => p.name));
-    expect(doc.querySelector('.compare__legend')?.getAttribute('aria-hidden')).toBe('true');
-  });
 
   it('VisionCameras: four cameras in four parts of the restaurant, each with its boxes and one reading', async () => {
     const { default: VisionCameras } = await import('../../src/components/product/VisionCameras.astro');

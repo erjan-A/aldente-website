@@ -92,13 +92,13 @@ test.describe('home page', () => {
       'customers',
       'analytics',
       'connections',
-      'playbooks',
+      'aldo',
       'voices',
       'cta',
     ]);
     for (let i = 1; i < read.length; i++) expect(read[i]!.ground).not.toBe(read[i - 1]!.ground);
-    // How we start and the Slack demo left the home page (both live on other pages).
-    await expect(page.locator('.enterprise, aldo-demo')).toHaveCount(0);
+    // How we start and the Playbook explorer left the home page (both live on other pages).
+    await expect(page.locator('.enterprise, playbook-explorer')).toHaveCount(0);
   });
 
   test('labels each section the way the decks label their slides', async ({ page }) => {
@@ -107,17 +107,15 @@ test.describe('home page', () => {
     await expect(page.locator('#verification .head .pill')).toHaveText(['Aldente Verify', 'Aldente Dispute']);
     await expect(page.locator('#customers .pill')).toHaveText('Customer results');
     await expect(page.locator('#analytics .head .pill')).toHaveText('Aldente Vision');
-    await expect(page.locator('.connections .pill')).toHaveText('Aldo in Slack');
-    await expect(page.locator('#playbooks .head .pill')).toHaveText('Aldo');
+    await expect(page.locator('.connections .pill')).toHaveText('Aldo');
     await expect(page.locator('.voices .pill')).toHaveText('From our customers');
   });
 
-  test('shows four Playbooks, one per team, without filters', async ({ page }) => {
-    const explorer = page.locator('playbook-explorer');
-    await expect(explorer.locator('[data-filter]')).toHaveCount(0);
-    await expect(explorer.locator('.pb__title')).toHaveText(['Missing clock-outs', 'Long queues', 'Refund evidence', 'Table reset']);
-    await explorer.getByRole('button', { name: /Long queues/ }).click();
-    await expect(explorer.locator('[data-graph-title]')).toHaveText('Long queues');
+  test('puts Aldo in Slack (ask, assign, alert) after the map, in a bare channel', async ({ page }) => {
+    const aldo = page.locator('#aldo');
+    await expect(aldo.locator('h2')).toHaveText('Aldo in Slack. Ask, assign, alert.');
+    await expect(aldo.locator('.slack-window__sidebar')).toHaveCount(0);
+    await expect(aldo.locator('[data-slack-channel]')).toHaveText('ops-leads');
   });
 
 
@@ -155,7 +153,8 @@ test.describe('Aldo page: Slack demo and Playbooks', () => {
     await demo.getByRole('tab', { name: /Assign/ }).click();
     await expect(demo.locator('[data-slack-channel]')).toHaveText('hr-ops');
     await expect(demo.getByRole('tabpanel')).toContainText('Missing clock-out review');
-    await expect(demo.getByRole('tabpanel')).toContainText('Owner');
+    await expect(demo.getByRole('tabpanel')).toContainText('Send to');
+    await expect(demo.getByRole('tabpanel')).not.toContainText('Owner');
     await expect(demo.getByText('Cancel', { exact: true })).toBeVisible();
 
     await demo.getByRole('tab', { name: /Assign/ }).press('ArrowDown');

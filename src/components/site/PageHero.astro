@@ -6,8 +6,8 @@ import ProductPill from '../ui/ProductPill.astro';
  * Page hero for every page except home. Title uses --step-h1, lead --step-lead.
  * Slots:
  *   default  the CTA row (Buttons), shown under the lead
- *   media    optional visual. With it, >=1024px becomes a split: copy left (6/12), media right (6/12),
- *            vertically centred. Below 1024px it stacks: copy first, then media at full width.
+ *   media    optional visual. With it, >=1024px becomes a split: the title across the full width, then the
+ *            lead and buttons left (6/12) beside the media (6/12). Below 1024px it stacks: copy, then media.
  *            Use align="left" with media. With mediaLayout="below" the media runs full width under the copy
  *            instead (for wide explainers such as the Aldente Vision pipeline), and the title may run wider.
  */
@@ -26,15 +26,37 @@ interface Props {
 const { product, title, muted, lead, align = 'left', tone = 'dark', mediaLayout = 'split' } = Astro.props;
 const hasMedia = Astro.slots.has('media');
 const below = hasMedia && mediaLayout === 'below';
+const split = hasMedia && !below;
+const hasExtra = Astro.slots.has('default');
 ---
 
-<section class:list={['page-hero', `tone-${tone}`, `page-hero--${align}`, { 'page-hero--split': hasMedia && !below, 'page-hero--below': below }]}>
+<section class:list={['page-hero', `tone-${tone}`, `page-hero--${align}`, { 'page-hero--split': split, 'page-hero--below': below }]}>
   <div class="container page-hero__inner">
     <div class="page-hero__copy">
       {product && <ProductPill product={product} />}
       <h1>{title}{muted && <> <span>{muted}</span></>}</h1>
-      {lead && <p class="page-hero__lead">{lead}</p>}
-      {Astro.slots.has('default') && <div class="page-hero__extra"><slot /></div>}
+      {/* Split: the lead and the buttons stay one block beside the media, so the buttons follow the lead. */}
+      {
+        split ? (
+          <div class="page-hero__body">
+            {lead && <p class="page-hero__lead">{lead}</p>}
+            {hasExtra && (
+              <div class="page-hero__extra">
+                <slot />
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            {lead && <p class="page-hero__lead">{lead}</p>}
+            {hasExtra && (
+              <div class="page-hero__extra">
+                <slot />
+              </div>
+            )}
+          </>
+        )
+      }
     </div>
     {
       hasMedia && (
@@ -70,7 +92,7 @@ const below = hasMedia && mediaLayout === 'below';
   }
 
   h1 {
-    max-width: 16ch;
+    max-width: 15em;
     font-size: var(--step-h1);
     line-height: 1;
     letter-spacing: -0.04em;
@@ -86,10 +108,6 @@ const below = hasMedia && mediaLayout === 'below';
      inside the first screen. */
   .page-hero--below {
     padding-top: clamp(48px, 7vw, 104px);
-  }
-
-  .page-hero--below h1 {
-    max-width: 22ch;
   }
 
   .page-hero--below .page-hero__lead {
@@ -144,21 +162,34 @@ const below = hasMedia && mediaLayout === 'below';
     min-width: 0;
   }
 
+  .page-hero__body {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* Wide screens: the title runs across the full width, two lines at most; the lead and the buttons share
+     the row under it with the media (6/12 each), right under the title. */
   @media (min-width: 1024px) {
     .page-hero--split .page-hero__inner {
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      align-items: center;
       column-gap: clamp(32px, 4vw, 64px);
+      row-gap: 28px;
+      align-items: start;
     }
 
     .page-hero--split .page-hero__copy {
-      grid-column: 1 / span 6;
+      display: contents;
     }
 
-    /* The title shares the row with media, so it scales with the half column (49px at 1024, 68px at 1440). */
-    .page-hero--split h1 {
-      font-size: var(--step-h1-split);
+    .page-hero--split .page-hero__copy > :global(*) {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+
+    .page-hero--split .page-hero__copy > .page-hero__body {
+      grid-column: 1 / span 6;
     }
 
     .page-hero--split .page-hero__media {

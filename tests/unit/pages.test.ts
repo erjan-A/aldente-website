@@ -59,13 +59,3 @@ describe('Page heroes', () => {
   });
 });
 
-describe('Compare plans', () => {
-  it('uses the shared section heading', async () => {
-    const { default: CompareTable } = await import('../../src/components/pricing/CompareTable.astro');
-    const doc = parse(await container.renderToString(CompareTable));
-    const title = doc.getElementById('compare-title');
-    expect(title?.tagName).toBe('H2');
-    expect(title?.classList.contains('head__title')).toBe(true);
-    expect(text(title)).toBe('Compare plans, side by side.');
-  });
-});

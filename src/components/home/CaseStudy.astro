@@ -2,9 +2,9 @@
 import ProductPill from '../ui/ProductPill.astro';
 
 /**
- * Customer results, laid out like the decks' slide: the claim and the operator's words on the left, before and
- * after as wrong orders a day on the right. Each card holds 16 dots, one per wrong order: 14 to 16 before (the
- * last two lighter, the range), about 2 with Aldente. The numbers and the footnote match the slide.
+ * Customer results: the decks' figures and footnote, the operator's words, and before/after cards. Each card
+ * holds 16 dots, one per wrong order a day: 14 to 16 before (the last two lighter, the range), about 2 with
+ * Aldente.
  */
 const SLOTS = 16;
 const before = Array.from({ length: SLOTS }, (_, i) => (i < 14 ? 'on' : 'maybe'));
@@ -15,7 +15,9 @@ const after = Array.from({ length: SLOTS }, (_, i) => (i < 2 ? 'on' : ''));
   <div class="container case__inner">
     <div class="case__story">
       <ProductPill label="Customer results" />
-      <h2 id="case-title" class="case__title"><span class="case__accent">87% fewer</span> wrong orders at one location.</h2>
+      <h2 id="case-title" class="case__title"><span class="case__accent">87% fewer</span> wrong orders.</h2>
+      <p class="case__context">At one location of a regional restaurant chain, with about 200 delivery and drive-thru orders a day and a $17 average check.</p>
+      <p class="case__result">That’s <b>4,300+ fewer wrong orders</b> and <b>$74K+ saved</b> a year.*</p>
       <figure class="case__quote">
         <blockquote>
           “We had 14 to 16 wrong delivery and drive-thru orders a day, and every one meant a full refund. Aldente put a tablet at the
@@ -29,25 +31,22 @@ const after = Array.from({ length: SLOTS }, (_, i) => (i < 2 ? 'on' : ''));
       <div class="case__compare">
         <figure class="case__panel">
           <figcaption>Before Aldente</figcaption>
-          <b class="case__figure">14–16</b>
+          <b class="case__figure">7–8%</b>
           <div class="dots" role="img" aria-label="14 to 16 wrong orders a day before Aldente">
             {before.map((state) => <i class={state} />)}
           </div>
-          <p>wrong orders a day (7–8%)</p>
+          <p>14–16 wrong orders a day</p>
         </figure>
         <figure class="case__panel case__panel--after">
           <figcaption>With Aldente</figcaption>
-          <b class="case__figure">~2</b>
+          <b class="case__figure">~1%</b>
           <div class="dots" role="img" aria-label="About 2 wrong orders a day with Aldente">
             {after.map((state) => <i class={state || undefined} />)}
           </div>
-          <p>wrong orders a day (~1%)</p>
+          <p>~2 wrong orders a day</p>
         </figure>
       </div>
-      <p class="case__note">
-        About 200 delivery and drive-thru orders a day, $17 average check. 12 fewer wrong orders × 365 days × $17 = $74K+ a year at one
-        store, with a full refund for each wrong order.
-      </p>
+      <p class="case__note">* 12 fewer wrong orders a day × 365 days × $17 average check, with a full refund for each wrong order.</p>
     </div>
   </div>
 </section>
@@ -75,7 +74,7 @@ const after = Array.from({ length: SLOTS }, (_, i) => (i < 2 ? 'on' : ''));
 
   /* The section H2 step (as SectionHeader), with the figure in orange. */
   .case__title {
-    max-width: 13ch;
+    max-width: 12ch;
     font-size: var(--step-h2);
     line-height: 1.04;
     letter-spacing: -0.035em;
@@ -85,6 +84,18 @@ const after = Array.from({ length: SLOTS }, (_, i) => (i < 2 ? 'on' : ''));
 
   .case__accent {
     color: var(--accent);
+  }
+
+  .case__context {
+    max-width: 40ch;
+    font-size: 1.125rem;
+    color: var(--fg-2);
+  }
+
+  .case__result {
+    max-width: 40ch;
+    font-size: 1.25rem;
+    line-height: 1.45;
   }
 
   .case__quote {

@@ -85,18 +85,16 @@ const products = product === undefined ? [] : Array.isArray(product) ? product :
     align-items: center;
   }
 
+  /* Two lines at most from about 1000px: wide enough for the longest titles, and balanced, so a short
+     title still breaks into two even lines instead of one long one. */
   .head__title {
-    max-width: 15ch;
+    max-width: 18em;
     font-size: var(--step-h2);
     line-height: 1.04;
     letter-spacing: -0.035em;
     font-weight: 700;
     color: var(--fg);
     text-wrap: balance;
-  }
-
-  .head--center .head__title {
-    max-width: 16ch;
   }
 
   .head__title--page {

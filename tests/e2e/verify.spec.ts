@@ -7,7 +7,7 @@ test.describe('Aldente Verify page', () => {
 
   test('leads with the decks’ claim and both loops', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Verify checks every bag before pickup. Dispute wins back refunds with video.',
+      'Verify checks every bag. Dispute wins back refunds.',
     );
     await expect(page.locator('.loop__title')).toHaveText(['1. Aldente Verify', '2. Aldente Dispute']);
   });
@@ -28,7 +28,7 @@ test.describe('Aldente Verify page', () => {
     const study = page.locator('#customers');
     await expect(study.locator('.pill')).toHaveText('Customer results');
     await expect(study).toContainText('~1%');
-    await expect(study).toContainText('12 fewer wrong orders × 365 days × $17 = $74K+ a year');
+    await expect(study).toContainText('12 fewer wrong orders a day × 365 days × $17 average check');
   });
 });
 

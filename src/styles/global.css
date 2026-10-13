@@ -45,7 +45,7 @@
    * Type scale (phone -> desktop). One step per role; do not invent sizes in components.
    *   --step-display  48 -> 96px  home hero H1 only
    *   --step-h1       44 -> 80px  page hero H1 (PageHero, SectionHeader as="h1")
-   *   --step-h1-split 49 -> 68px  page H1 sharing its row with media from 1024px (split PageHero, /demo)
+   *   --step-h1-split 49 -> 68px  page H1 sharing its row with media from 1024px (/demo)
    *   --step-h2       36 -> 64px  section H2 (SectionHeader, FAQ, CTA band)
    *   --step-h3       22 -> 28px  sub-section titles, large card titles (plan names, panels), big quotes
    *   --step-h4       20 -> 22px  card titles (feature cards, list items, FAQ questions)
@@ -55,9 +55,9 @@
    *   --step-label    13px        labels, tags, chips, metadata
    */
   --step-display: clamp(3rem, 1.4rem + 6vw, 6rem);
-  --step-h1: clamp(2.75rem, 1.5rem + 4.4vw, 5rem);
+  --step-h1: clamp(2.75rem, 0.6rem + 4.9vw, 5rem);
   --step-h1-split: min(var(--step-h1), 4.75vw);
-  --step-h2: clamp(2.25rem, 1.35rem + 3.3vw, 4rem);
+  --step-h2: clamp(2.25rem, 0.9rem + 3.4vw, 4rem);
   --step-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
   --step-h4: clamp(1.25rem, 1.15rem + 0.3vw, 1.375rem);
   --step-lead: clamp(1.125rem, 1rem + 0.45vw, 1.375rem);

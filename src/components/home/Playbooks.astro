@@ -20,15 +20,10 @@ interface Props {
   lead?: string;
   /** The product pill over the heading; null on Aldo's own page, where the hero already names it. */
   product?: ProductId | null;
-  /** Home: four examples, one per team, and no team filters. The full explorer stays on /aldo. */
-  compact?: boolean;
 }
-
-const COMPACT_IDS = ['missing-clock-outs', 'long-queues', 'refund-evidence', 'table-reset'];
 
 const {
   product = 'aldo',
-  compact = false,
   team = 'All',
   exclude = [],
   asker = { role: 'District manager', initials: 'DM', color: '#2b6cb0' },
@@ -36,12 +31,10 @@ const {
   muted = 'Aldo handles it every shift.',
   lead = 'A Playbook is a saved task: what to check, when to run, and where to send the result. Say it in a sentence, or say it out loud. Aldo confirms the details and starts working.',
 } = Astro.props;
-const playbooks: Playbook[] = filterByTeam(PLAYBOOKS, team).filter(
-  (p) => !exclude.includes(p.id) && (!compact || COMPACT_IDS.includes(p.id)),
-);
+const playbooks: Playbook[] = filterByTeam(PLAYBOOKS, team).filter((p) => !exclude.includes(p.id));
 // The links to the solution pages belong on the overview (home, /aldo), not on a solution page itself.
 const overview = team === 'All';
-const teams = team === 'All' && !compact ? teamsOf(PLAYBOOKS) : [];
+const teams = team === 'All' ? teamsOf(PLAYBOOKS) : [];
 const first = playbooks[0]!;
 const steps = graphSteps(first);
 ---
