@@ -578,9 +578,9 @@ describe('Mobile layouts', () => {
     const doc = parse(await container.renderToString(CookieConsent));
     const region = doc.querySelector('cookie-consent section');
     expect(doc.getElementById(region?.getAttribute('aria-labelledby') ?? '')?.textContent).toBe('Cookies');
-    // The site sets no cookies of its own; Calendly does, once the visitor allows it.
+    // RB2B always runs; Calendly sets its cookies once the visitor allows it.
     expect(doc.querySelector('.consent__text')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
-      'We set no cookies. Calendly does, only if you allow it. Cookie policy',
+      'RB2B uses cookies to recognise visitors for marketing. Calendly sets its own, only if you allow it. Cookie policy',
     );
     expect([...doc.querySelectorAll('.consent__actions button')].map((b) => b.getAttribute('data-consent'))).toEqual([
       'reject',
@@ -588,7 +588,7 @@ describe('Mobile layouts', () => {
       'save',
       'settings',
     ]);
-    // Visit counting is cookieless, so marketing (Calendly) is the only choice.
+    // Marketing (Calendly) is the only choice.
     expect([...doc.querySelectorAll('[data-consent-settings] input[name]')].map((i) => i.getAttribute('name'))).toEqual(['marketing']);
   });
 

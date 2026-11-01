@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { ANALYTICS } from '../../src/data/analytics';
+import { ANALYTICS, RB2B } from '../../src/data/analytics';
 import { SITE } from '../../src/data/site';
 import { securityHeaders } from '../../deploy/headers';
 
@@ -26,7 +26,7 @@ describe('server configuration', () => {
     expect(headers['X-Frame-Options']).toBe('DENY');
   });
 
-  it('lets the CSP load what the site uses: Umami and Calendly’s scheduler, nothing else', () => {
+  it('lets the CSP load what the site uses: Umami, RB2B and Calendly’s scheduler, nothing else', () => {
     const csp = Object.fromEntries(
       headers['Content-Security-Policy']!.split(';').map((d) => {
         const [name, ...values] = d.trim().split(/\s+/);
@@ -37,7 +37,7 @@ describe('server configuration', () => {
     const umamiEndpoint = new URL(ANALYTICS.endpoint).origin;
     const calendly = new URL(SITE.calendly).origin;
     expect(csp['default-src']).toEqual(["'self'"]);
-    expect(csp['script-src']).toEqual(["'self'", umamiScript]);
+    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin]);
     expect(csp['connect-src']).toEqual(["'self'", umamiEndpoint]);
     expect(csp['frame-src']).toEqual([calendly]);
     expect(csp['frame-ancestors']).toEqual(["'none'"]);

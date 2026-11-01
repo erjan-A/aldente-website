@@ -13,6 +13,13 @@ export const ANALYTICS = {
   hosts: ['aldenteai.com', 'www.aldenteai.com'],
 } as const;
 
+const RB2B_KEY = '1N5W0HJLDLO5';
+
+/** RB2B visitor identification (see src/scripts/visitor-id.ts). The key is not a secret: it appears in every page. */
+export const RB2B = {
+  script: `https://ddwl4m2hdecbv.cloudfront.net/b/${RB2B_KEY}/${RB2B_KEY}.js.gz`,
+} as const;
+
 /** Funnel events, as they appear in Umami (Events; usable as steps in Goals and Funnels). */
 export const EVENTS = {
   /** A click on any link to /demo or #schedule. Props: label, section, path, plan. */

@@ -2,7 +2,8 @@
 import { LINKS } from '../../data/site';
 
 // Optional categories start unticked; necessary storage only remembers this choice. Visit counting
-// (Umami) is cookieless and stores nothing in the browser, so it is not offered as a choice.
+// (Umami) is cookieless and stores nothing in the browser, so it is not offered as a choice. RB2B
+// always runs on the production site (src/scripts/visitor-id.ts), so it is not a choice either.
 const categories = [
   { name: 'marketing', label: 'Marketing', text: 'Lets Calendly’s booking calendar on the demo page set its cookies without asking you again.' },
 ];
@@ -17,7 +18,7 @@ const categories = [
   <section class="consent__card" aria-labelledby="consent-title">
     <h2 id="consent-title" class="visually-hidden">Cookies</h2>
     <p class="consent__text">
-      We set no cookies. Calendly does, only if you allow it.{' '}
+      RB2B uses cookies to recognise visitors for marketing. Calendly sets its own, only if you allow it.{' '}
       <a href={LINKS.cookies}>Cookie policy</a>
     </p>
     <div class="consent__settings" data-consent-settings hidden>
