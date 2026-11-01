@@ -26,7 +26,7 @@ describe('server configuration', () => {
     expect(headers['X-Frame-Options']).toBe('DENY');
   });
 
-  it('lets the CSP load what the site uses: Umami, RB2B and Calendly’s scheduler, nothing else', () => {
+  it('lets the CSP run scripts from Umami and RB2B only, frame Calendly only, and send requests and images to any https host', () => {
     const csp = Object.fromEntries(
       headers['Content-Security-Policy']!.split(';').map((d) => {
         const [name, ...values] = d.trim().split(/\s+/);
@@ -34,11 +34,11 @@ describe('server configuration', () => {
       }),
     );
     const umamiScript = new URL(ANALYTICS.script).origin;
-    const umamiEndpoint = new URL(ANALYTICS.endpoint).origin;
     const calendly = new URL(SITE.calendly).origin;
     expect(csp['default-src']).toEqual(["'self'"]);
     expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin]);
-    expect(csp['connect-src']).toEqual(["'self'", umamiEndpoint]);
+    expect(csp['connect-src']).toEqual(["'self'", 'https:']);
+    expect(csp['img-src']).toEqual(["'self'", 'data:', 'https:']);
     expect(csp['frame-src']).toEqual([calendly]);
     expect(csp['frame-ancestors']).toEqual(["'none'"]);
     expect(csp['object-src']).toEqual(["'none'"]);
