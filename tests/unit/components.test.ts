@@ -457,6 +457,18 @@ describe('Home sections consistency', () => {
       '1–2 hours a day saved',
       '8% more orders at peak',
     ]);
+    // Each result is one short line of the same kind, and none names where it was measured.
+    const lines = tiles.map((t) => text(t.querySelector('.tile__text'))!);
+    expect(lines).toEqual([
+      'Wrong orders went from 14–16 a day to about 2.',
+      'No more searching footage for each refund claim.',
+      'In the peak hour, at a 225-store serving-line chain.',
+    ]);
+    expect(doc.body.textContent).not.toMatch(/one location of a regional/i);
+    // The quotes are short and close in length, so the three cards end level.
+    const said = tiles.map((t) => text(t.querySelector('blockquote'))!.length);
+    expect(Math.max(...said)).toBeLessThanOrEqual(100);
+    expect(Math.max(...said) - Math.min(...said)).toBeLessThanOrEqual(24);
     // No money footnote under the first result: the three results read the same.
     expect(doc.querySelector('.results__note')).toBeNull();
     expect(doc.body.textContent).not.toMatch(/\$74K/);

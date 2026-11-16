@@ -5,40 +5,41 @@ import ProductPill from '../ui/ProductPill.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
 /**
- * Customer results: one card per lead product, its measured number on top and its operator's words under it. Quotes are signed by role and chain type, never by name.
+ * Customer results: one card per lead product, its measured number on top and its operator's words under it.
+ * The three cards are equal: one short line under each number, quotes of about the same length. Quotes are
+ * signed by role and chain type, never by name.
  */
 const results: { product: ProductId; value: string; unit: string; text: string }[] = [
   {
     product: 'verify',
     value: '87%',
     unit: 'fewer wrong orders',
-    text: 'At one location of a regional restaurant chain, about 200 delivery and drive-thru orders a day. Wrong orders went from 14–16 a day to about 2.',
+    text: 'Wrong orders went from 14–16 a day to about 2.',
   },
   {
     product: 'dispute',
     value: '1–2 hours',
     unit: 'a day saved',
-    text: 'No more searching footage for each refund claim. The evidence pack is built from the packing clip.',
+    text: 'No more searching footage for each refund claim.',
   },
   {
     product: 'tab',
     value: '8%',
     unit: 'more orders at peak',
-    text: 'In the peak hour, at a serving-line chain with 225 stores.',
+    text: 'In the peak hour, at a 225-store serving-line chain.',
   },
 ];
 
 const quotes: { product: ProductId; quote: string; role: string; company: string }[] = [
   {
     product: 'verify',
-    quote:
-      'Every wrong order meant a full refund. Aldente put a camera at the packing station and trained it on our menu. Now every bag is checked before the courier takes it, and nobody wants to go back.',
+    quote: 'Every wrong order meant a full refund. Now every bag is checked before the courier takes it.',
     role: 'Director of Operations',
     company: 'Regional QSR chain',
   },
   {
     product: 'dispute',
-    quote: 'We used to eat most refund claims, because fighting one took twenty minutes. Now the evidence pack is ready before anyone asks.',
+    quote: 'We used to eat most refund claims. Now the evidence pack is ready before anyone asks.',
     role: 'Head of Off-Premise',
     company: 'QSR chain',
   },
@@ -98,7 +99,7 @@ const quotes: { product: ProductId; quote: string; role: string; company: string
   }
 
   /* Each card is two zones that share the grid's two rows, so the line between result and quote runs level
-     across all three. The first card leads (the measured case and its operator's words): it is wider. */
+     across all three. Three equal columns. */
   /* Two classes, so this wins over the Card's own rules whatever order the stylesheets load in. */
   .results__pairs > .tile {
     display: grid;
@@ -108,7 +109,7 @@ const quotes: { product: ProductId; quote: string; role: string; company: string
 
   @media (min-width: 900px) {
     .results__pairs {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-template-rows: auto auto;
     }
 
@@ -122,7 +123,7 @@ const quotes: { product: ProductId; quote: string; role: string; company: string
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
     padding: var(--card-pad-l);
   }
 
@@ -160,7 +161,7 @@ const quotes: { product: ProductId; quote: string; role: string; company: string
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 24px;
+    gap: 20px;
     padding: var(--card-pad-l);
     border-top: 1px solid var(--card-line);
     background: var(--tone-bg);

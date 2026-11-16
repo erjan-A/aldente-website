@@ -159,6 +159,17 @@ test('white text on the orange hero keeps its contrast against what is painted b
   }
 });
 
+test('the customer result cards are three equal, compact cards', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The cards stack on a phone.');
+  await page.goto('/');
+  const cards = await page.locator('#results .tile').evaluateAll((els) => els.map((el) => el.getBoundingClientRect()).map((r) => ({ width: Math.round(r.width), height: Math.round(r.height), top: Math.round(r.top) })));
+  expect(cards).toHaveLength(3);
+  expect(new Set(cards.map((c) => c.width)).size).toBe(1);
+  expect(new Set(cards.map((c) => c.top)).size).toBe(1);
+  expect(new Set(cards.map((c) => c.height)).size).toBe(1);
+  expect(cards[0]!.height).toBeLessThanOrEqual(480);
+});
+
 test('the product tabs under the hero buttons match them: the same height and the same type size', async ({ page }) => {
   await page.goto('/');
   const sizes = await page.evaluate(() => {

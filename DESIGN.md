@@ -37,7 +37,7 @@ Rules:
 - Selected text on an orange ground is white with deep orange letters; elsewhere it is the accent.
 - No coloured left bar on cards. No colour gradients on text. No coloured glows on controls.
 - Text keeps WCAG AA on its ground (4.5:1, large text 3:1).
-- The home hero stands on the orange ground. White text needs a deep ground there: the hero uses the deep end of the orange alone (`--accent-deep`, without the lighter wash other orange sections carry), and the glow uses no shade lighter than `#c94016`. `node tools/contrast.mjs` measures the real contrast over the moving glow; `tests/e2e/rhythm.spec.ts` guards a still frame.
+- The home hero stands on the orange ground. White text needs a deep ground there: the hero uses the deep end of the orange alone (`--accent-deep`, without the lighter wash other orange sections carry), and the glow is a slow, low-contrast drift and uses no shade lighter than `#c43a12`. `node tools/contrast.mjs` measures the real contrast over the moving glow; `tests/e2e/rhythm.spec.ts` guards a still frame.
 - The accent and the green are written once, in the tokens. A component never repeats their values, in hex or in rgb.
 - A gradient keeps a plain shape: no `min()`, `max()`, `calc()` or `clamp()` in its size or position. Chromium drops such a declaration without a warning, and the page then differs between browsers.
 
@@ -108,6 +108,7 @@ An inner corner is the outer radius minus the padding between them: `calc(var(--
 | `Card` | Every boxed surface. `as` div, li, article, section or figure; `pad` s, m, l or none; `radius` l or xl. Recolour it through the roles (`--card`, `--card-line`, `--fg`). Never nest a Card in a Card. |
 | `SectionHeader` | Every section title: a pill, the claim, a muted second line, an optional lead. |
 | `ProductPill` | Names the product a section belongs to, or a plain topic. A plain pill may carry an icon (`icon`), as "For restaurant chains" does in the home hero. On orange the pill is a dark chip and its icon takes the ink. |
+| Customer results | Three equal cards, one per product: the pill, the figure with its unit, one short line, then the operator's words on the section's ground. The lines and the quotes are kept close in length so the cards end level. |
 | `Faq` | Questions as native `details`, under a `SectionHeader`. |
 | Home hero copy | A pill for the audience, the headline, then one plain line per product (Verify, Dispute, Tab), without icons. Everything is centred. The pill sits a step closer to the headline than the headline does to the lines under it. |
 | Customer logos | A moving row in one light tone (`ProofBar`), six customers, the larger chains mixed with the newer ones. A colour logo is first made into one-tone artwork on a transparent ground. On phones the orders line rides in the same row. Still and wrapped with reduced motion. |

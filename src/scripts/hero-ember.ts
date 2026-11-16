@@ -8,15 +8,16 @@ import {
 
 /**
  * "Ember": the hero's background glow. Paper Shaders' mesh gradient (Apache-2.0), moving through the deep end
- * of the hero's orange ground. No shade is lighter than #c94016: white text keeps 4.5:1 on every one of them
+ * of the hero's orange ground, slowly and with little contrast between the shades, so it reads as a quiet
+ * drift and not as an effect. No shade is lighter than #c43a12: white text keeps 4.5:1 on every one of them
  * (the light corners belong to the ground, off the text). Paper's ShaderMount owns the canvas: it sizes it to
  * the layer, pauses it off screen and frees it on dispose.
  */
-const COLORS = ['#c43a12', '#b52c0b', '#c94016', '#a92a0a', '#8f2206', '#c43a12'];
+const COLORS = ['#be3610', '#b52c0b', '#c43a12', '#ab2a0a', '#9d2607', '#be3610'];
 
 /** At most a 1080p frame's worth of pixels: a background never needs more. */
 const MAX_PIXELS = 1920 * 1080;
-const SPEED = 0.35;
+const SPEED = 0.16;
 /** The frame a still (reduced-motion) glow shows: a few seconds in, where the shapes have formed. */
 const STILL_FRAME = 6000;
 
@@ -28,10 +29,10 @@ export function mountEmber(host: HTMLElement, { still }: { still: boolean }): ()
     {
       u_colors: colors,
       u_colorsCount: colors.length,
-      u_distortion: 0.85,
-      u_swirl: 0.35,
-      u_grainMixer: 0.1,
-      u_grainOverlay: 0.18,
+      u_distortion: 0.6,
+      u_swirl: 0.22,
+      u_grainMixer: 0.06,
+      u_grainOverlay: 0.1,
       u_fit: ShaderFitOptions.cover,
       u_scale: 1.25,
       u_rotation: defaultObjectSizing.rotation,
