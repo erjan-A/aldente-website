@@ -5,7 +5,7 @@ import Icon from '../ui/Icon.astro';
 
 /**
  * One link in a header dropdown or the mobile menu: an icon tile, the label and its one-line note.
- * Products and solutions show their icon; Aldo, which has none, shows the Aldente mark (its Slack avatar).
+ * Products and solutions show their icon; a link without one shows the Aldente mark.
  * The current page gets aria-current="page" and the accent underline under its label.
  */
 interface Props {
@@ -18,7 +18,7 @@ const { item, current = false } = Astro.props;
 
 <a class="nav-row" href={item.href} aria-current={current ? 'page' : undefined}>
   <span class="nav-row__tile" aria-hidden="true">
-    {item.icon ? <Icon name={item.icon} size={18} strokeWidth={2} /> : <img src={mark.src} alt="" width="12" height="15" />}
+    {item.icon ? <Icon name={item.icon} size={18} /> : <img src={mark.src} alt="" width="12" height="15" />}
   </span>
   <span class="nav-row__text">
     <span class="nav-row__label">{item.label}</span>
@@ -31,9 +31,9 @@ const { item, current = false } = Astro.props;
   .nav-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
     min-height: 60px;
-    padding: 10px 12px;
+    padding: 12px 12px;
     border-radius: var(--radius-s);
     color: var(--ink);
     transition: background-color 0.15s ease;

@@ -12,6 +12,7 @@ const playbooks: Playbook[] = [
     action: 'Find the departure clip',
     destination: '#hr-ops',
     result: 'A case summary with the clip.',
+    shot: 'exit',
   },
   {
     id: 'queues',
@@ -23,6 +24,7 @@ const playbooks: Playbook[] = [
     action: 'Attach the camera view',
     destination: 'District manager',
     result: 'An alert with the frame.',
+    shot: 'exit',
   },
   {
     id: 'monday',
@@ -34,6 +36,7 @@ const playbooks: Playbook[] = [
     action: 'Rank lunch peaks',
     destination: '#ops-leads',
     result: 'A ranked summary.',
+    shot: 'exit',
   },
 ];
 

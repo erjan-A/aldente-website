@@ -10,10 +10,10 @@ import { formatNumber } from '../../lib/format';
 const live = Boolean(COUNTER.endpoint);
 const initial = formatNumber(valueAt({ ...COUNTER, baseTime: Date.parse(COUNTER.baseTime) }, Date.now()));
 
-// The strip loops by sliding exactly half its length, so it holds two identical halves,
-// each long enough to fill the widest row. Only the first set is announced.
-const COPIES = 4;
-const strip = Array.from({ length: COPIES }, () => CUSTOMER_LOGOS).flat();
+// The row loops by sliding exactly half its length, so it holds two identical sets. Only the first is announced.
+const sets = [0, 1];
+const line = 'orders served across 200+ restaurant locations.';
+
 ---
 
 <div class="proof" data-loop>
@@ -32,20 +32,27 @@ const strip = Array.from({ length: COPIES }, () => CUSTOMER_LOGOS).flat();
         <b class="proof__count">{COUNTER.label}</b>
       )
     }{' '}
-    orders verified across 200+ restaurant locations.
+    {line}
   </p>
   <div class="marquee">
     <ul class="marquee__track" role="list">
       {
-        strip.map((logo, i) => {
-          const repeat = i >= CUSTOMER_LOGOS.length;
-          const height = Math.round(logo.height * 0.66);
-          return (
-            <li class:list={{ marquee__repeat: repeat }} aria-hidden={repeat ? 'true' : undefined}>
-              <Image src={logo.mono ?? logo.src} alt={repeat ? '' : logo.name} height={height} densities={retina(logo.mono ?? logo.src)} style={`height:${height}px`} />
+        sets.map((set) => (
+          <>
+            {/* Phones only: the orders line rides in the row, so text and logos are one line. */}
+            <li class="marquee__text" aria-hidden={set ? 'true' : undefined}>
+              <b>{live ? initial : COUNTER.label}</b> {line}
             </li>
-          );
-        })
+            {CUSTOMER_LOGOS.map((logo) => {
+              const height = Math.round(logo.height * 0.66);
+              return (
+                <li class="marquee__logo" aria-hidden={set ? 'true' : undefined}>
+                  <Image src={logo.mono ?? logo.src} alt={set ? '' : logo.name} height={height} densities={retina(logo.mono ?? logo.src)} style={`height:${height}px`} loading="eager" />
+                </li>
+              );
+            })}
+          </>
+        ))
       }
     </ul>
   </div>
@@ -83,6 +90,7 @@ const strip = Array.from({ length: COPIES }, () => CUSTOMER_LOGOS).flat();
     overflow: hidden;
   }
 
+  /* Without motion: one set, wrapped, standing still. */
   .marquee__track {
     display: flex;
     flex-wrap: wrap;
@@ -98,8 +106,21 @@ const strip = Array.from({ length: COPIES }, () => CUSTOMER_LOGOS).flat();
     opacity: 0.55;
   }
 
-  .marquee__repeat {
+  .marquee__track li[aria-hidden='true'],
+  .marquee__text {
     display: none;
+  }
+
+  .marquee__text {
+    font-size: var(--step-small);
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+
+  .marquee__text b {
+    font-weight: 700;
+    color: var(--ink);
   }
 
   @media (min-width: 900px) {
@@ -113,26 +134,51 @@ const strip = Array.from({ length: COPIES }, () => CUSTOMER_LOGOS).flat();
   /* With motion allowed, the logos drift by in a loop that fades out at both edges. */
   @media (prefers-reduced-motion: no-preference) {
     .marquee {
-      mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
     }
 
     .marquee__track {
       flex-wrap: nowrap;
       gap: 0;
       width: max-content;
-      animation: marquee 48s linear infinite;
+      animation: marquee 56s linear infinite;
     }
 
     .marquee__track li {
-      padding-inline: clamp(28px, 3.5vw, 52px);
+      padding-inline: clamp(24px, 3vw, 44px);
     }
 
-    .marquee__repeat {
+    .marquee__track li[aria-hidden='true'].marquee__logo {
       display: block;
     }
 
     .marquee:hover .marquee__track {
       animation-play-state: paused;
+    }
+
+    /* Phones: the orders line leaves its own row and rides with the logos, so the band is one line. */
+    @media (max-width: 719px) {
+      .proof {
+        gap: 0;
+      }
+
+      .proof__line {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .marquee__text,
+      .marquee__track li[aria-hidden='true'].marquee__text {
+        display: block;
+      }
+
+      .marquee__track {
+        animation-duration: 44s;
+      }
     }
   }
 

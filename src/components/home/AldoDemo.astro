@@ -13,29 +13,17 @@ import SectionHeader from '../ui/SectionHeader.astro';
 interface Props {
   /** Render the section heading (off when a page supplies its own). */
   heading?: boolean;
-  /** The heading text. Override where the page hero already says "Meet Aldo." (/aldo). */
-  title?: string;
+  /** The heading text. */
+  title: string;
   muted?: string;
   lead?: string;
   /** Product pill above the title; omit on Aldo's own page. */
   product?: ProductId | null;
-  /** Top padding for pages where a page hero, not another section, comes before it (/aldo). */
+  /** Top padding for pages where a page hero, not another section, comes before it (/playbooks). */
   padTop?: boolean;
-  /** Inside another section (home: under the Slack map in Connections): no section of its own, and the
-      heading drops to an h3 sub-heading. */
-  bare?: boolean;
 }
 
-const {
-  heading = true,
-  title = 'Meet Aldo.',
-  muted = 'Your 24/7 Chief of Staff in Slack.',
-  lead = 'Aldo watches every location through your cameras, joins what it sees with orders, staff and your other systems, and works with your team in Slack. Ask it anything. Give it the work you repeat.',
-  product = 'aldo',
-  padTop = false,
-  bare = false,
-} = Astro.props;
-const Wrapper = bare ? 'div' : 'section';
+const { heading = true, title, muted, lead, product = 'playbooks', padTop = false } = Astro.props;
 
 const tabs: { id: string; label: string; desc: string; channel: string; icon: IconName }[] = [
   { id: 'ask', label: 'Ask', desc: 'Answers with the source attached.', channel: 'ops-leads', icon: 'message-square' },
@@ -45,25 +33,15 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
 ];
 ---
 
-<Wrapper
-  class:list={['aldo', bare ? 'aldo--bare' : 'tone-dark', { 'aldo--pad': padTop && !bare }]}
+<section
+  class:list={['aldo', 'tone-dark', { 'aldo--pad': padTop }]}
   id="aldo"
-  aria-labelledby={!bare && heading ? 'aldo-title' : undefined}
-  aria-label={!bare && !heading ? 'Aldo in Slack' : undefined}
+  aria-labelledby={heading ? 'aldo-title' : undefined}
+  aria-label={!heading ? 'Aldo in Slack' : undefined}
 >
-  <div class:list={['aldo__inner', { container: !bare }]}>
+  <div class="aldo__inner container">
     {/* The heading spans the section, as everywhere else, so it keeps to two lines; the tabs sit beside Slack. */}
-    {heading && !bare && <SectionHeader product={product ?? undefined} id="aldo-title" title={title} muted={muted} lead={lead} />}
-    {
-      heading && bare && (
-        <div class="aldo__sub">
-          <h3 id="aldo-title">
-            {title} <span>{muted}</span>
-          </h3>
-          {lead && <p>{lead}</p>}
-        </div>
-      )
-    }
+    {heading && <SectionHeader product={product ?? undefined} id="aldo-title" title={title} muted={muted} lead={lead} />}
     <aldo-demo class="aldo__box" data-autoplay="5000">
       <div class="aldo__copy">
         <div class="aldo__tabs" role="tablist" aria-label="What Aldo does in Slack" aria-orientation="vertical">
@@ -93,8 +71,8 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
         </p>
       </div>
 
-      {/* A bare channel: no sidebar, and each panel keeps one message and one card, so the point reads at a glance. */}
-      <SlackWindow active="ops-leads" sidebar={false} class="aldo__slack">
+      {/* Each panel keeps one message and one card, so the point reads at a glance. */}
+      <SlackWindow active="ops-leads" class="aldo__slack">
         <div role="tabpanel" id="aldo-panel-ask" aria-labelledby="aldo-tab-ask" tabindex="0">
           <SlackMessage author="Area manager" avatar="AM" avatarColor="#2b6cb0" time="9:02 AM">
             <p class="slack-text">Hey <span class="slack-mention">@Aldo</span>, how many visitors did each location have yesterday, and when was each busiest?</p>
@@ -111,7 +89,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
               </table>
             </SlackCard>
             <p class="slack-text">3,499 visitors in total, up 4%. Location 03 had the busiest hour.</p>
-            <p class="slack-muted">Source: Aldente Vision · 3 locations</p>
+            <p class="slack-muted">Source: cameras · 3 locations</p>
             <div class="slack-actions"><button type="button" class="slack-btn slack-btn--primary" data-goto="assign">Send this every Monday</button></div>
           </SlackMessage>
         </div>
@@ -135,7 +113,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
               <div class="slack-actions aldo__decide">
                 <button type="button" class="slack-btn slack-btn--primary" data-confirm>Confirm</button><span class="slack-btn">Edit</span><span class="slack-btn">Cancel</span>
               </div>
-              <p class="aldo__locked"><Icon name="check" size={14} strokeWidth={2.5} />Playbook created</p>
+              <p class="aldo__locked"><Icon name="check" size={14} />Playbook created</p>
             </SlackCard>
           </SlackMessage>
           <SlackMessage author="Aldo" time="6:06 PM" class="aldo__created">
@@ -151,7 +129,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
               <span class="slack-media__box" style="left:32%;top:18%;width:44%;height:56%"></span>
               <span class="slack-media__label">Cam 02 · Queue · 6:02</span>
             </div>
-            <p class="slack-muted">Source: Aldente Vision · Location 03, Cam 02</p>
+            <p class="slack-muted">Source: Location 03, Cam 02</p>
             <div class="slack-actions"><span class="slack-btn slack-btn--primary">On my way</span><span class="slack-btn">Call the store</span></div>
           </SlackMessage>
         </div>
@@ -170,7 +148,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
                   <div><dt>Employee</dt><dd>EMP-07</dd></div>
                   <div><dt>Shift</dt><dd>13:00–21:00</dd></div>
                   <div><dt>Clock-out</dt><dd class="aldo__missing">Missing</dd></div>
-                  <div><dt>Departure</dt><dd>21:14 · Aldente Vision</dd></div>
+                  <div><dt>Departure</dt><dd>21:14 · Cam 02</dd></div>
                 </dl>
               </div>
             </SlackCard>
@@ -194,7 +172,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
       </SlackWindow>
     </aldo-demo>
   </div>
-</Wrapper>
+</section>
 
 <script>
   import '../../scripts/aldo-demo';
@@ -207,34 +185,6 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
 
   .aldo--pad {
     padding-top: var(--section-y);
-  }
-
-  /* Inside the Slack-map section: a ruled sub-section, no padding of its own. */
-  .aldo--bare {
-    padding: var(--section-gap) 0 0;
-    border-top: 1px solid var(--line);
-  }
-
-  .aldo__sub {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .aldo__sub h3 {
-    font-size: var(--step-h3);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    font-weight: 600;
-  }
-
-  .aldo__sub h3 span {
-    color: var(--fg-3);
-  }
-
-  .aldo__sub p {
-    font-size: var(--step-body);
-    color: var(--fg-2);
   }
 
   /* No panel around the section: the heading lines up with every other section's (quick win: alignment). */
@@ -272,7 +222,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
     align-items: center;
     gap: 16px;
     width: 100%;
-    padding: 14px 18px;
+    padding: 12px 16px;
     border-radius: var(--radius-m);
     border: 1px solid var(--card-line);
     background: transparent;
@@ -350,12 +300,12 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
   }
 
   .aldo__tab-label {
-    font-size: 1.125rem;
+    font-size: var(--step-body);
     font-weight: 600;
   }
 
   .aldo__tab-desc {
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     opacity: 0.75;
   }
 
@@ -512,7 +462,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
 
   .aldo__locked {
     color: var(--slack-green);
-    font-size: 14px;
+    font-size: var(--step-small);
     font-weight: 700;
   }
 
@@ -582,7 +532,7 @@ const tabs: { id: string; label: string; desc: string; channel: string; icon: Ic
   .aldo__timeline {
     display: grid;
     gap: 2px;
-    font-size: 14px;
+    font-size: var(--step-small);
   }
 
   .aldo__timeline b {

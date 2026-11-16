@@ -10,7 +10,7 @@ describe('<nav-menu>', () => {
         <ul>
           <li id="product">
             <button type="button" aria-expanded="false" aria-controls="menu-product">Product</button>
-            <div id="menu-product"><a href="/aldo">Aldo</a><a href="/order-verification">Aldente Verify</a><a href="/analytics">Aldente Vision</a></div>
+            <div id="menu-product"><a href="/playbooks">Aldente Playbooks</a><a href="/order-verification">Aldente Verify</a><a href="/tab">Aldente Tab</a></div>
           </li>
           <li id="solutions">
             <button type="button" aria-expanded="false" aria-controls="menu-solutions">Solutions</button>

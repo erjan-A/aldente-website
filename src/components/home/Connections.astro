@@ -5,7 +5,7 @@ import Icon, { type IconName } from '../ui/Icon.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
 /**
- * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente Verify, Dispute and Vision and
+ * Aldo in the middle of the restaurant's data, as on the sales deck: Aldente Verify, Aldente Dispute, the cameras and
  * the customer's own systems feed Aldo, and Aldo answers in Slack with Q&A and Playbooks. Dots of light run
  * along the wires into Aldo and out to Slack, and the lit hub breathes (all still for reduced motion). Wide
  * screens draw the wires; the geometry is fixed (row heights below), so the SVG paths meet each row at its
@@ -22,7 +22,7 @@ interface Props {
   tone?: 'dark' | 'surface';
 }
 
-const { padTop = false, product = 'aldo', tone = 'dark' } = Astro.props;
+const { padTop = false, product = 'playbooks', tone = 'dark' } = Astro.props;
 
 interface Source {
   name: string;
@@ -33,7 +33,7 @@ interface Source {
 const products: Source[] = [
   { name: 'Aldente Verify', detail: 'Orders and photo evidence', icon: 'check-check' },
   { name: 'Aldente Dispute', detail: 'Refund claims and evidence packs', icon: 'shield-check' },
-  { name: 'Aldente Vision', detail: 'Camera events and metrics', icon: 'eye' },
+  { name: 'Your cameras', detail: 'Events and metrics', icon: 'eye' },
 ];
 
 const systems: Source[] = [
@@ -84,9 +84,9 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     <SectionHeader
       product={product ?? undefined}
       id="connections-title"
-      title="Your AI Chief of Staff works in Slack,"
+      title="Aldo works in Slack,"
       muted="with data from all your systems."
-      lead="Aldente Verify, Dispute and Vision give Aldo eyes in every location. Connect your POS, HR and inventory systems, and it answers with the whole picture."
+      lead="Your cameras, Aldente Verify and Aldente Dispute give Aldo eyes in every location. Connect your POS, HR and inventory systems, and it answers with the whole picture."
     />
 
     <div class="map" style={`--map-h:${HEIGHT}px;--right-top:${RIGHT_TOP}px`}>
@@ -142,7 +142,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
           <span class="hub__ripple" aria-hidden="true"></span>
           <img src={mark.src} alt="" width="40" height="49" />
           <b>Aldo</b>
-          <small>AI Chief of Staff</small>
+          <small>Slack assistant</small>
         </div>
         <span class="hub__line hub__line--out" aria-hidden="true"><i></i></span>
       </div>
@@ -159,7 +159,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
       </div>
 
       <div class="map__out">
-        <p class="map__label map__label--slack" id="map-slack"><Icon name="hash" size={18} strokeWidth={2} />In Slack</p>
+        <p class="map__label map__label--slack" id="map-slack"><Icon name="hash" size={18} />In Slack</p>
         <ul class="map__cards" role="list" aria-labelledby="map-slack">
           {
             outputs.map((o) => (
@@ -272,7 +272,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
   }
 
   .node--product {
-    border-color: rgb(224 86 52 / 0.6);
+    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
     color: var(--accent);
   }
 
@@ -283,7 +283,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
   }
 
   .node b {
-    font-size: 1.0625rem;
+    font-size: var(--step-body);
     font-weight: 600;
     line-height: 1.25;
     color: var(--ink);
@@ -316,7 +316,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     left: 50%;
     width: min(100%, 380px);
     translate: -50% 0;
-    background: radial-gradient(closest-side, rgb(224 86 52 / 0.24), rgb(224 86 52 / 0.08) 55%, transparent);
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent) 8%, transparent) 55%, transparent);
     pointer-events: none;
   }
 
@@ -359,7 +359,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     margin-left: -3px;
     border-radius: 50%;
     background: #ffb08f;
-    box-shadow: 0 0 8px 2px rgb(224 86 52 / 0.9);
+    box-shadow: 0 0 8px 2px color-mix(in srgb, var(--accent) 90%, transparent);
   }
 
   .hub {
@@ -375,8 +375,8 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     background: radial-gradient(circle at 50% 0%, #4a2213 0%, var(--tone-bg) 72%);
     border: 2px solid var(--accent);
     box-shadow:
-      0 0 28px rgb(224 86 52 / 0.4),
-      inset 0 0 22px rgb(224 86 52 / 0.14);
+      0 0 28px color-mix(in srgb, var(--accent) 40%, transparent),
+      inset 0 0 22px color-mix(in srgb, var(--accent) 14%, transparent);
   }
 
   /* The design system's lit circle: a ring close in, a fainter halo further out, and one ripple between. */
@@ -390,17 +390,17 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
 
   .hub__ring {
     inset: -14px;
-    border: 1px solid rgb(224 86 52 / 0.45);
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
   }
 
   .hub__halo {
     inset: -34px;
-    border: 1px solid rgb(224 86 52 / 0.18);
+    border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   .hub__ripple {
     inset: -2px;
-    border: 1px solid rgb(224 86 52 / 0.5);
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
     opacity: 0;
   }
 
@@ -411,7 +411,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
   }
 
   .hub b {
-    font-size: 1.25rem;
+    font-size: var(--step-h4);
     font-weight: 600;
     line-height: 1.2;
   }
@@ -435,8 +435,8 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     gap: 14px;
     padding: 18px 18px 18px 20px;
     border-radius: var(--radius-l);
-    background: rgb(224 86 52 / 0.08);
-    border: 1px solid rgb(224 86 52 / 0.6);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
   }
 
   .out__head {
@@ -486,7 +486,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
   }
 
   .out__answer {
-    font-size: 1.0625rem;
+    font-size: var(--step-body);
   }
 
   /* ---------- Wired (wide screens): sources → Aldo → Slack, like the deck ---------- */
@@ -561,7 +561,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     }
 
     .hub b {
-      font-size: 1.5rem;
+      font-size: var(--step-h4);
     }
 
     .hub small {
@@ -628,7 +628,7 @@ const delay = (i: number, n: number) => `${(-(i / n) * 2.4).toFixed(2)}s`;
     stroke-linecap: round;
     stroke-dasharray: 0 100;
     vector-effect: non-scaling-stroke;
-    filter: drop-shadow(0 0 4px rgb(224 86 52 / 0.9));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 90%, transparent));
   }
 
   @media (prefers-reduced-motion: no-preference) {

@@ -1,0 +1,252 @@
+---
+import { getImage } from 'astro:assets';
+import clipDispute from '../../assets/images/clip-dispute.jpg';
+import clipTab from '../../assets/images/clip-tab.jpg';
+import clipVerify from '../../assets/images/clip-verify.jpg';
+import { EVENTS } from '../../data/analytics';
+import { PRODUCTS } from '../../data/products';
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+
+/**
+ * The home hero's one product object: the product at work, one clip per vision product, switched by the tabs
+ * above the panel. Verify and Dispute are footage of the product at work (a packing station, then the dashboard with the packing
+ * video); Tab shows the serving line from above. <media-tabs> plays each clip while its view shows and moves to the
+ * next when it ends; the current tab draws the time left. Verify shows first and needs no script: every clip
+ * ships with controls, which the script takes away when it does the playing.
+ */
+const views = [
+  {
+    id: 'verify',
+    src: '/media/verify.mp4',
+    poster: clipVerify,
+    ms: 13800,
+    alt: 'Aldente Verify at a packing station: each item of an order is checked off under the camera, a wrong item is flagged, and the order is verified.',
+  },
+  {
+    id: 'dispute',
+    src: '/media/dispute.mp4',
+    poster: clipDispute,
+    ms: 10800,
+    alt: 'The Aldente dashboard after pickup: an order with a refund claim, a photo of every item with its time, and the packing video matched to the order.',
+  },
+  {
+    id: 'tab',
+    src: '/media/tab.mp4',
+    poster: clipTab,
+    ms: 14800,
+    alt: 'Aldente Tab: an overhead camera on a serving line follows one box, logs each scoop, and the ticket is on the register before the guest pays.',
+  },
+] as const;
+
+const posters = await Promise.all(views.map((view) => getImage({ src: view.poster, width: 1280, format: 'webp' })));
+---
+
+<media-tabs class="hm" data-track={EVENTS.heroView} data-autoplay={views[0].ms}>
+  <div class="hm__tabs" role="tablist" aria-label="Product views">
+    {
+      views.map((view, i) => (
+        <button
+          type="button"
+          class="hm__tab"
+          id={`hero-tab-${view.id}`}
+          role="tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`hero-view-${view.id}`}
+          tabindex={i === 0 ? 0 : -1}
+          style={`--loop:${view.ms}ms`}
+        >
+          <Icon name={PRODUCTS[view.id].icon} size={18} />
+          {PRODUCTS[view.id].short}
+        </button>
+      ))
+    }
+  </div>
+  <Card pad="s" class="hm__panel">
+    {
+      views.map((view, i) => (
+        <figure
+          class="hm__view"
+          id={`hero-view-${view.id}`}
+          role="tabpanel"
+          aria-labelledby={`hero-tab-${view.id}`}
+          hidden={i !== 0}
+          data-duration={view.ms}
+        >
+          <video
+            class="hm__video"
+            src={view.src}
+            poster={posters[i]!.src}
+            width="1280"
+            height="658"
+            muted
+            loop
+            playsinline
+            controls
+            preload={i === 0 ? 'metadata' : 'none'}
+            aria-label={view.alt}
+          />
+        </figure>
+      ))
+    }
+  </Card>
+</media-tabs>
+
+<script>
+  import '../../scripts/media-tabs';
+</script>
+
+<style>
+  .hm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  /* The design system's Card (16px pad), lifted off the page. */
+  .hm .hm__panel {
+    width: 100%;
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.8);
+  }
+
+  .hm__view {
+    display: grid;
+    gap: 12px;
+  }
+
+  /* The clips share one shape (1280 × 658), so the panel never jumps between views. The whole frame shows on
+     every screen: a product screen with a side cut off reads as broken. */
+  .hm__video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1280 / 658;
+    /* Outer radius minus the padding around it. */
+    border-radius: calc(var(--radius-l) - var(--card-pad-s));
+    background: var(--bg);
+    object-fit: contain;
+  }
+
+  /* Phones: the panel runs almost to the screen's edges, so the whole frame is as large as the screen allows. */
+  @media (max-width: 639px) {
+    .hm .hm__panel {
+      width: calc(100% + var(--gutter) * 2 - 16px);
+      padding: 8px;
+      border-radius: var(--radius-m);
+    }
+
+    .hm__video {
+      border-radius: calc(var(--radius-m) - 8px);
+    }
+  }
+
+  /* The bar is as tall as the hero buttons above it and set in their type size: 44px on phones, 48px from
+     720px (the buttons' own steps). */
+  .hm__tabs {
+    display: inline-flex;
+    max-width: 100%;
+    height: 44px;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--line-card);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+  }
+
+  .hm__tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--ink-3);
+    font-size: var(--step-small);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  /* The tap target is the bar's full height, though the tab is drawn inside its padding. */
+  .hm__tab::before {
+    content: '';
+    position: absolute;
+    inset: -5px 0;
+  }
+
+  @media (min-width: 720px) {
+    .hm__tabs {
+      height: 48px;
+    }
+
+    .hm__tab {
+      padding: 0 20px;
+      font-size: var(--step-ui);
+    }
+  }
+
+  .hm__tab:hover {
+    color: var(--ink);
+  }
+
+  /* The focus ring sits inside the tab, so it never crosses the edge of the capsule around the tabs. */
+  .hm__tab:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .hm__tab[aria-selected='true'] {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .hm__tab[aria-selected='true'] :global(svg) {
+    color: var(--accent);
+  }
+
+  /* The current tab fills as its clip plays, and holds with it while the panel is off screen. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hm[data-playing] .hm__tab[aria-selected='true']::after {
+      content: '';
+      position: absolute;
+      inset: auto 16px 4px;
+      height: 2px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      transform-origin: left;
+      animation: hm-progress var(--loop) linear both;
+    }
+
+    /* After the rule above and as specific as it is: the animation shorthand there resets the play state. */
+    .hm[data-playing][data-waiting] .hm__tab[aria-selected='true']::after {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes hm-progress {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  /* Phones: the three tabs share the row. */
+  @media (max-width: 479px) {
+    .hm__tabs {
+      display: flex;
+      width: 100%;
+    }
+
+    .hm__tab {
+      flex: 1;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 8px;
+    }
+  }
+</style>

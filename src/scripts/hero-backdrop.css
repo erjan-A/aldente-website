@@ -1,0 +1,31 @@
+/*
+ * The hero's decorative backdrop (hero-backdrop.ts): one layer holding the "Ember" glow. It fades in once it
+ * draws at full strength behind the headline and fades to the plain ground before the product panel. Its mask
+ * keeps a plain shape: Chromium drops a gradient whose size uses max() or calc().
+ */
+hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hb__layer {
+  position: absolute;
+  inset: 0 0 auto;
+  height: min(100%, 780px);
+  opacity: 0;
+  mask-image: radial-gradient(115% 88% at 50% 0%, #000 25%, transparent 76%);
+  transition: opacity 0.9s ease;
+}
+
+.hb__layer.is-on {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb__layer {
+    transition: none;
+  }
+}

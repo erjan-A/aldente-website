@@ -24,11 +24,13 @@ const playbook = solutionPlaybook(solution);
 // The hero already shows this team's main Playbook; the section below shows only the others, if any.
 const morePlaybooks = filterByTeam(PLAYBOOKS, solution.team).filter((p) => p.id !== playbook.id).length > 0;
 const pointsId = `points-${solution.slug}`;
+// The closing band names what this team looks at; the delivery page keeps the site's own line, about orders.
+const closing: Record<string, string | undefined> = { operations: 'See it on your locations.', hr: 'See it on your shifts.' };
 ---
 
 <BaseLayout title={`Aldente for ${solution.name}`} description={solution.description}>
   <PageHero title={solution.title} muted={solution.muted} lead={solution.lead}>
-    <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
+    <Button href={LINKS.demo} size="lg" arrow>Book a live demo</Button>
     <Button href={LINKS.seeAldo} variant="secondary" size="lg">See Aldo in action</Button>
     <PlaybookHeroMedia slot="media" playbook={playbook} asker={solution.asker} />
   </PageHero>
@@ -58,7 +60,7 @@ const pointsId = `points-${solution.slug}`;
       />
     )
   }
-  <Cta />
+  <Cta title={closing[solution.slug]} text="A 30-minute demo with our team, on the questions your team asks every week." />
 </BaseLayout>
 
 <style>
@@ -71,10 +73,31 @@ const pointsId = `points-${solution.slug}`;
     padding-bottom: 0;
   }
 
+  /* One column on phones; two from 600px, where the third card takes the whole row; three from 1024px. */
   .points__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+  }
+
+  @media (min-width: 600px) {
+    .points__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .points__grid > :global(:last-child:nth-child(odd)) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .points__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .points__grid > :global(:last-child:nth-child(odd)) {
+      grid-column: auto;
+    }
   }
 
   .points__grid h3 {

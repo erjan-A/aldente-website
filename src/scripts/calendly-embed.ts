@@ -1,28 +1,26 @@
 import { EVENTS } from '../data/analytics';
 import { calendlyEmbedUrl, calendlyHeight, calendlyMessage, calendlyShowsContent, incomingUtm } from '../lib/calendly';
-import { ALL, CONSENT_KEY, makeConsent, readConsent, type Consent } from '../lib/consent';
+import { CONSENT_KEY, readConsent } from '../lib/consent';
 import { demoIntent } from '../lib/demo';
 import { track } from './analytics';
 import { define } from './define';
+import { trackDemoConversion } from './linkedin-insight';
 
 /** How long "Loading available times…" may show before the page offers Calendly's own page instead. */
 export const SLOW_MS = 15_000;
 
-type State = 'consent' | 'loading' | 'ready' | 'booked';
+type State = 'loading' | 'ready' | 'booked';
 
 /**
- * Calendly's scheduler, embedded inline on the demo page, booked without leaving it.
- * Calendly sets its own cookies, so the visitor is asked once, inside the card: a visitor who already
- * accepted marketing cookies sees the scheduler straight away; anyone else sees one line ("run by Calendly,
- * which sets its own cookies") with "Show available times" and "Open on Calendly". Showing the times saves
- * the same choice the site's cookie banner would (marketing on), so Calendly doesn't ask again
- * (hide_gdpr_banner) and the banner stays away. While the card asks, the site banner doesn't open on this
- * page ([data-consent-inline]). Then a quiet calendar skeleton and "Loading available times…" until
- * Calendly has drawn it; the iframe follows Calendly's height, and a booking swaps the card to "You're booked".
+ * Calendly's scheduler, embedded inline on the demo page, booked without leaving it. It loads with the page,
+ * so the times show at once, on a first visit too. Calendly sets its own cookies: a visitor who already
+ * accepted marketing cookies on this site is not asked again (hide_gdpr_banner); anyone else gets Calendly's
+ * own cookie question inside the scheduler. Until Calendly has drawn it, a quiet calendar skeleton and
+ * "Loading available times…" show; the iframe follows Calendly's height, and a booking swaps the card to
+ * "You're booked".
  *
- * Markup: data-url (Calendly event URL); inside, [data-cal-stage] (skeleton), [data-cal-consent] with a
- * [data-cal-load] button, [data-cal-status] (live region), [data-cal-slow] and [data-cal-booked] (hidden panel).
- * The host's data-state is 'consent' | 'loading' | 'ready' | 'booked' for styling.
+ * Markup: data-url (Calendly event URL); inside, [data-cal-stage] (skeleton), [data-cal-status] (live region),
+ * [data-cal-slow] and [data-cal-booked] (hidden panel). The host's data-state is 'loading' | 'ready' | 'booked'.
  */
 export class CalendlyEmbed extends HTMLElement {
   private frame: HTMLIFrameElement | null = null;
@@ -32,42 +30,19 @@ export class CalendlyEmbed extends HTMLElement {
   connectedCallback(): void {
     this.plan = demoIntent(location.search).plan || 'general';
     window.addEventListener('message', this.onMessage);
-    window.addEventListener('consentchange', this.onConsent);
-    this.addEventListener('click', this.onClick);
-    if (marketingAllowed()) this.load();
-    else this.ask();
+    this.load();
   }
 
   disconnectedCallback(): void {
     window.removeEventListener('message', this.onMessage);
-    window.removeEventListener('consentchange', this.onConsent);
-    this.removeEventListener('click', this.onClick);
     clearTimeout(this.slowTimer);
   }
-
-  /** No marketing consent yet: the card asks, over the skeleton. */
-  private ask(): void {
-    this.state = 'consent';
-    this.toggle('consent', true);
-  }
-
-  private onClick = (event: Event): void => {
-    if (!(event.target as Element).closest('[data-cal-load]')) return;
-    grantMarketing();
-    this.load();
-  };
-
-  /** Marketing cookies accepted elsewhere (the cookie settings) while the card was asking. */
-  private onConsent = (event: Event): void => {
-    if (this.state === 'consent' && (event as CustomEvent<Consent>).detail?.marketing) this.load();
-  };
 
   /** Inserts Calendly's iframe once. */
   load(): void {
     if (this.frame || this.state === 'booked') return;
     const stage = this.child('stage');
     if (!stage || !this.dataset.url) return;
-    this.toggle('consent', false);
     const frame = document.createElement('iframe');
     frame.className = 'cal__frame';
     frame.title = 'Book a time with Aldente on Calendly';
@@ -130,6 +105,7 @@ export class CalendlyEmbed extends HTMLElement {
 
   private booked(): void {
     track(EVENTS.booked, { plan: this.plan });
+    trackDemoConversion();
     this.state = 'booked';
     this.frame?.remove();
     this.toggle('stage', false);
@@ -149,18 +125,6 @@ function readStored(): string | null {
 
 function marketingAllowed(): boolean {
   return readConsent(readStored(), Date.now())?.marketing === true;
-}
-
-/** Saves "marketing on" exactly as the cookie banner's "Accept all" does, and tells the page. */
-function grantMarketing(): void {
-  const consent = makeConsent(ALL, Date.now());
-  try {
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
-  } catch {
-    // Blocked storage: Calendly will ask for its own consent this time.
-  }
-  document.documentElement.setAttribute('data-consent-marketing', 'granted');
-  window.dispatchEvent(new CustomEvent('consentchange', { detail: consent }));
 }
 
 define('calendly-embed', CalendlyEmbed);

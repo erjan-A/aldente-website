@@ -5,26 +5,26 @@ import { LINKS } from '../../data/site';
 // (Umami) is cookieless and stores nothing in the browser, so it is not offered as a choice. RB2B
 // always runs on the production site (src/scripts/visitor-id.ts), so it is not a choice either.
 const categories = [
-  { name: 'marketing', label: 'Marketing', text: 'Lets Calendly’s booking calendar on the demo page set its cookies without asking you again.' },
+  { name: 'marketing', label: 'Marketing', text: 'Helps us measure our marketing and saves a step when you book a demo.' },
 ];
 ---
 
 <!--
   One compact panel: a line of text and one row of choices. Phones: a full-width strip at the
-  bottom (under 120px, safe-area aware). From 640px: a small card at the bottom left.
+  bottom (under 120px, safe-area aware). From 640px: a small card in the bottom right corner.
   "Settings" opens the per-category choices inside the same panel.
 -->
 <cookie-consent class="consent" hidden>
   <section class="consent__card" aria-labelledby="consent-title">
     <h2 id="consent-title" class="visually-hidden">Cookies</h2>
     <p class="consent__text">
-      RB2B uses cookies to recognise visitors for marketing. Calendly sets its own, only if you allow it.{' '}
+      We use cookies to run this site and for marketing.{' '}
       <a href={LINKS.cookies}>Cookie policy</a>
     </p>
     <div class="consent__settings" data-consent-settings hidden>
       <label class="consent__option">
         <input type="checkbox" checked disabled />
-        <span><b>Necessary</b><small>Remembers this choice. Always on.</small></span>
+        <span><b>Necessary</b><small>Needed for the site to work. Always on.</small></span>
       </label>
       {
         categories.map((c) => (
@@ -65,7 +65,7 @@ const categories = [
   .consent__card {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     max-height: calc(100dvh - var(--header-h) - 16px);
     overflow-y: auto;
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
@@ -103,7 +103,7 @@ const categories = [
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 10px 0;
+    padding: 12px 0;
     border-bottom: 1px solid var(--line);
     cursor: pointer;
   }
@@ -143,7 +143,7 @@ const categories = [
     flex: 1 1 0;
     min-width: 0;
     min-height: 44px;
-    padding: 0 14px;
+    padding: 0 16px;
     border-radius: var(--radius-pill);
     border: 1px solid var(--line-strong);
     background: transparent;
@@ -171,7 +171,7 @@ const categories = [
   .consent__more {
     flex: none;
     min-height: 44px;
-    padding: 0 6px;
+    padding: 0 8px;
     border: 0;
     border-radius: var(--radius-s);
     background: none;
@@ -191,11 +191,11 @@ const categories = [
     display: none;
   }
 
-  /* From 640px: a small card at the bottom left. */
+  /* From 640px: a small card in the bottom right corner. */
   @media (min-width: 640px) {
     .consent {
-      left: 24px;
-      right: auto;
+      left: auto;
+      right: 24px;
       bottom: 24px;
       width: min(420px, calc(100vw - 48px));
     }
@@ -226,7 +226,7 @@ const categories = [
     }
 
     .consent__card {
-      gap: 10px;
+      gap: 12px;
       padding: 12px 16px;
     }
   }

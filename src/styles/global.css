@@ -20,6 +20,9 @@
   --accent: #e05634;
   --accent-soft: rgb(224 86 52 / 0.14);
   --on-accent: #0b0b0b;
+  /* The primary button's fill: a soft top-lit gradient on the accent, and its hover a step lighter. */
+  --accent-fill: linear-gradient(180deg, #ec6a42 0%, #db4f2c 100%);
+  --accent-fill-hover: linear-gradient(180deg, #f07650 0%, #e05634 100%);
   /* Large orange grounds: a deep red-orange lit by a warm glow from the top corners. Text on it is white. */
   --accent-deep: #b52c0b;
   --surface-orange:
@@ -29,6 +32,7 @@
     linear-gradient(165deg, #d9491f 0%, #c43a12 48%, #a92a0a 100%);
   --ok: #4fbf85;
   --ok-soft: rgb(79 191 133 / 0.14);
+  --ok-deep: #147a43; /* green text on white product UI */
 
   --paper: #f1f1f1;
   --paper-card: #ffffff;
@@ -40,30 +44,50 @@
 
   /* One family everywhere, machine data included: times and counts use tabular figures, not a mono face. */
   --font: 'Onest Variable', 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Mono, for the camera readouts only (order numbers, times, counts beside a camera frame). */
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /*
-   * Type scale (phone -> desktop). One step per role; do not invent sizes in components.
-   *   --step-display  48 -> 96px  home hero H1 only
-   *   --step-h1       44 -> 80px  page hero H1 (PageHero, SectionHeader as="h1")
-   *   --step-h1-split 49 -> 68px  page H1 sharing its row with media from 1024px (/demo)
-   *   --step-h2       36 -> 64px  section H2 (SectionHeader, FAQ, CTA band)
-   *   --step-h3       22 -> 28px  sub-section titles, large card titles (plan names, panels), big quotes
-   *   --step-h4       20 -> 22px  card titles (feature cards, list items, FAQ questions)
-   *   --step-lead     18 -> 22px  hero and section leads
-   *   --step-body     17px        body copy
-   *   --step-small    15px        secondary copy, nav links, captions, eyebrows
-   *   --step-label    13px        labels, tags, chips, metadata
+   * Type scale (phone -> desktop). One step per role; components never write a size of their own
+   * (tests/unit/design-system.test.ts fails if one does).
+   *   --step-h1        44 -> 72px  every page's H1: the home hero, PageHero
+   *   --step-h1-split  49 -> 68px  a page H1 sharing its row with media from 1024px (/demo)
+   *   --step-h2        32 -> 52px  section H2 (SectionHeader, CTA band)
+   *   --step-stat      28 -> 40px  every figure: result tiles, the problem's numbers, the calculator
+   *   --step-statement 24 -> 40px  one large sentence that carries a page (company figures)
+   *   --step-h3        22 -> 28px  sub-section titles, large card titles (plan names, panels), big quotes
+   *   --step-h4        20 -> 22px  card titles (feature cards, list items, FAQ questions)
+   *   --step-lead      18 -> 22px  hero and section leads
+   *   --step-body      17px        body copy
+   *   --step-ui        16px        buttons and form controls
+   *   --step-small     15px        secondary copy, nav links, captions
+   *   --step-label     13px        labels, tags, chips, metadata
+   *   --step-mock      12px        text inside drawings of the product's screens, and nowhere else
+   *   --step-mock-s    11px        the smallest text inside those drawings (axis labels, badges)
+   * Weights: 400 body, 500 secondary copy, 600 labels and controls, 700 headings and numbers. Nothing else.
    */
-  --step-display: clamp(3rem, 1.4rem + 6vw, 6rem);
-  --step-h1: clamp(2.75rem, 0.6rem + 4.9vw, 5rem);
+  --step-h1: clamp(2.75rem, 0.8rem + 4.4vw, 4.5rem);
   --step-h1-split: min(var(--step-h1), 4.75vw);
-  --step-h2: clamp(2.25rem, 0.9rem + 3.4vw, 4rem);
+  --step-h2: clamp(2rem, 1rem + 2.6vw, 3.25rem);
+  --step-stat: clamp(1.75rem, 1.2rem + 1.4vw, 2.5rem);
+  --step-statement: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
   --step-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
   --step-h4: clamp(1.25rem, 1.15rem + 0.3vw, 1.375rem);
   --step-lead: clamp(1.125rem, 1rem + 0.45vw, 1.375rem);
   --step-body: 1.0625rem;
+  --step-ui: 1rem;
   --step-small: 0.9375rem;
   --step-label: 0.8125rem;
+  --step-mock: 0.75rem;
+  --step-mock-s: 0.6875rem;
+
+  /*
+   * Spacing. There are no spacing tokens: layout uses the 4px grid directly.
+   *   4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96
+   * 1px and 2px are for hairlines and optical nudges. Offsets that centre or overlap things are computed
+   * (calc, negative values). Drawings of the product's screens keep the product's own denser spacing.
+   * Section rhythm comes from the tokens below: --section-y, --section-gap, --gutter, --card-pad-*.
+   */
 
   /*
    * Radii. Usage rule:
@@ -97,9 +121,9 @@
 
   --container: 1280px;
   --gutter: clamp(20px, 4vw, 48px);
-  --section-y: clamp(64px, 7.5vw, 112px);
+  --section-y: clamp(72px, 10vw, 152px);
   /* From a section's heading to its content: one value everywhere. */
-  --section-gap: clamp(32px, 3.6vw, 48px);
+  --section-gap: clamp(40px, 4.4vw, 64px);
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   color-scheme: dark;
@@ -123,7 +147,7 @@
  * Section tones set local roles that components read:
  *   --fg / --fg-2 / --fg-3   ink: primary, secondary, muted
  *   --fg-accent              orange text that keeps AA on this tone (link hovers, inline marks)
- *   --card / --card-2        card fill, and a step up inside a card
+ *   --card                   card fill
  *   --card-line              card edge (visible on every tone)
  *   --tag-bg / --tag-fg      tags and chips
  *   --tone-bg                the section's own ground, for fades and panels that must match it
@@ -136,7 +160,6 @@
   --fg-3: var(--ink-3);
   --fg-accent: var(--accent);
   --card: var(--surface);
-  --card-2: var(--surface-2);
   --card-line: var(--line-card);
   --tag-bg: var(--surface-2);
   --tag-fg: var(--ink-2);
@@ -149,7 +172,6 @@
    so orange labels and muted ink keep AA on them (orange on --surface-2 would not). */
 .tone-surface {
   --card: var(--bg);
-  --card-2: var(--surface-2);
   --tag-bg: var(--surface-2);
   --tone-bg: var(--surface);
   background: var(--surface);
@@ -162,7 +184,6 @@
   --fg-3: var(--paper-ink-3);
   --fg-accent: var(--accent-deep);
   --card: var(--paper-card);
-  --card-2: var(--paper);
   --card-line: var(--paper-line);
   --tag-bg: #e2e2e2;
   --tag-fg: var(--paper-ink-2);
@@ -174,10 +195,9 @@
 .tone-orange {
   --fg: #ffffff;
   --fg-2: rgb(255 255 255 / 0.9);
-  --fg-3: rgb(255 255 255 / 0.78);
+  --fg-3: rgb(255 255 255 / 0.86); /* muted ink on orange; 0.86 keeps a 36px muted headline above 3:1 on phones */
   --fg-accent: #ffffff;
   --card: var(--bg);
-  --card-2: var(--surface);
   --card-line: rgb(255 255 255 / 0.45);
   --tag-bg: rgb(255 255 255 / 0.16);
   --tag-fg: #ffffff;
@@ -188,6 +208,12 @@
 
 .tone-orange :focus-visible {
   outline-color: #ffffff;
+}
+
+/* Selected text on orange: the accent would vanish into the ground, so the selection is white. */
+.tone-orange ::selection {
+  background: #ffffff;
+  color: var(--accent-deep);
 }
 
 *,
@@ -204,7 +230,7 @@ html {
 /*
  * Anchor jumps (#schedule, #aldo, legal sections) land below the sticky header. The offset sits on the
  * targets, not on html as scroll-padding: that would also scroll the page whenever a control inside the
- * sticky header (menu toggle, dropdowns, Book a demo) gets focus. Tabs are left out: on phones they sit
+ * sticky header (menu toggle, dropdowns, Book a live demo) gets focus. Tabs are left out: on phones they sit
  * in a sticky bar, and focusing one must not move the page.
  */
 main [id]:not([role='tab']) {
@@ -351,4 +377,75 @@ textarea {
   *::after {
     transition-duration: 0.01ms !important;
   }
+}
+
+/*
+ * Sequenced scenes ([data-seq]): product UI that plays as a short story and loops. Elements marked .r1 to .r5
+ * appear one after another over --loop; .until-N elements show until step N and then leave (a status that
+ * changes). Everything is drawn in its final state, so without motion the finished scene shows.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-seq] :is(.r1, .r2, .r3, .r4, .r5) {
+    animation: var(--seq-name) var(--loop, 11s) var(--ease-out) infinite both;
+  }
+
+  [data-seq] .r1 {
+    --seq-name: seq-1;
+  }
+
+  [data-seq] .r2 {
+    --seq-name: seq-2;
+  }
+
+  [data-seq] .r3 {
+    --seq-name: seq-3;
+  }
+
+  [data-seq] .r4 {
+    --seq-name: seq-4;
+  }
+
+  [data-seq] .r5 {
+    --seq-name: seq-5;
+  }
+
+  [data-seq] .until-5 {
+    animation: seq-until-5 var(--loop, 11s) linear infinite both;
+  }
+}
+
+@keyframes seq-1 {
+  0%, 6% { opacity: 0; transform: translateY(6px); }
+  10%, 96% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+@keyframes seq-2 {
+  0%, 18% { opacity: 0; transform: translateY(6px); }
+  22%, 96% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+@keyframes seq-3 {
+  0%, 30% { opacity: 0; transform: translateY(6px); }
+  34%, 96% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+@keyframes seq-4 {
+  0%, 42% { opacity: 0; transform: translateY(6px); }
+  46%, 96% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+@keyframes seq-5 {
+  0%, 54% { opacity: 0; transform: translateY(6px); }
+  58%, 96% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+@keyframes seq-until-5 {
+  0%, 54% { opacity: 1; }
+  57%, 97% { opacity: 0; }
+  100% { opacity: 1; }
 }

@@ -1,10 +1,13 @@
 ---
 import '@fontsource-variable/onest';
+import '@fontsource-variable/geist-mono';
 import onestLatin from '@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url';
 import '../styles/global.css';
+import AnnounceBar from '../components/site/AnnounceBar.astro';
 import CookieConsent from '../components/site/CookieConsent.astro';
 import Footer from '../components/site/Footer.astro';
 import Header from '../components/site/Header.astro';
+import WatchDialog from '../components/site/WatchDialog.astro';
 import { SITE } from '../data/site';
 import { pagePath } from '../lib/paths';
 
@@ -12,9 +15,11 @@ interface Props {
   /** Page name; the site name is appended. Omit on the home page. */
   title?: string;
   description?: string;
+  /** The page has a "Watch it work" button (the home hero): ship the dialog it opens. */
+  watch?: boolean;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, watch = false } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
 const canonical = new URL(pagePath(Astro.url.pathname), Astro.site);
 const ogImage = new URL('/og.jpg', Astro.site);
@@ -53,17 +58,22 @@ const organization = {
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    {/* Before the header, so a keyboard reaches the question first; it is drawn at the bottom of the screen. */}
+    <CookieConsent />
+    <AnnounceBar />
     <Header />
     <main id="main">
       <slot />
     </main>
     <Footer />
-    <CookieConsent />
+    {watch && <WatchDialog />}
     <script>
       // Cookieless visit counting (Umami); loads on aldenteai.com only.
       import '../scripts/analytics';
       // RB2B visitor identification; loads on aldenteai.com only.
       import '../scripts/visitor-id';
+      // LinkedIn Insight Tag; loads on aldenteai.com only, after the visitor allows marketing cookies.
+      import '../scripts/linkedin-insight';
       // Holds the animations of sections that are off screen.
       import '../scripts/offscreen-pause';
     </script>

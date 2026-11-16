@@ -10,7 +10,7 @@ const loops = [
     title: 'Aldente Verify',
     when: 'At the packing station, in seconds',
     steps: [
-      { title: 'Order arrives', text: 'POS ticket on the tablet' },
+      { title: 'Order arrives', text: 'POS ticket at the station' },
       { title: 'Camera checks the bag', text: 'Every item and quantity' },
       { title: 'Error caught', text: '“Add 1 drink” before pickup' },
     ],
@@ -22,10 +22,10 @@ const loops = [
     when: 'When a delivery app still charges a refund',
     steps: [
       { title: 'Refund charged', text: 'Uber Eats charges $17.40' },
-      { title: 'Proof found', text: 'The packing clip for the order' },
-      { title: 'Evidence pack sent', text: 'Clip, item check and handoff' },
+      { title: 'Clip found', text: 'The packing clip for the order' },
+      { title: 'Evidence pack built', text: 'Clip, item check and handoff' },
     ],
-    result: { value: 'Reversed', text: 'The charge comes back to the store', tone: 'ok' },
+    result: { value: 'Ready', text: 'The evidence is ready for every claim', tone: 'ok' },
   },
 ];
 ---
@@ -109,7 +109,7 @@ const loops = [
     justify-content: center;
     gap: 4px;
     min-height: 88px;
-    padding: var(--card-pad-s) 18px;
+    padding: var(--card-pad-s);
     border-radius: var(--radius-m);
     background: var(--surface-2);
   }
@@ -138,7 +138,7 @@ const loops = [
 
   .loop__result--accent {
     background: var(--accent-soft);
-    border-color: rgb(224 86 52 / 0.5);
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
   }
 
   .loop__result--accent b {
@@ -147,7 +147,7 @@ const loops = [
 
   .loop__result--ok {
     background: var(--ok-soft);
-    border-color: rgb(79 191 133 / 0.5);
+    border-color: color-mix(in srgb, var(--ok) 50%, transparent);
   }
 
   .loop__result--ok b {

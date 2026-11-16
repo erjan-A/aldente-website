@@ -7,7 +7,7 @@ import exit from '../../assets/images/cams/cam-exit.jpg';
 import Detection from './Detection.astro';
 
 /**
- * Four cameras at one location, each reading a different part of the restaurant: what Aldente Vision
+ * Four cameras at one location, each reading a different part of the restaurant: what vision AI
  * finds on the frame (boxes) and the one number it turns it into. Readings match the rest of the site
  * (Location 03, Cam 04, Table 6 at 3:12). One row of four on wide screens, two by two below.
  */
@@ -18,7 +18,7 @@ const cams: {
   where: string;
   src: ImageMetadata;
   alt: string;
-  boxes: { tone: Tone; label: string; box: [number, number, number, number]; place?: 'top-start' | 'top-end' | 'bottom-start' | 'inside' }[];
+  boxes: { tone: Tone; label: string; box: [number, number, number, number]; place?: 'top-start' | 'bottom-start' | 'inside' }[];
   value: string;
   metric: string;
   tone: Tone;
@@ -27,7 +27,7 @@ const cams: {
     id: 'Cam 01',
     where: 'Entrance',
     src: entrance,
-    alt: 'Entrance camera: the front windows and door, with people passing on the street',
+    alt: 'Camera view of guests seated at tables near the entrance',
     boxes: [{ tone: 'neutral', label: 'Passer-by', box: [53, 21, 8.5, 28], place: 'bottom-start' }],
     value: '212',
     metric: 'passers-by an hour, 38% walk in',
@@ -69,7 +69,7 @@ const cams: {
 ];
 ---
 
-<ul class="cams" role="list" aria-label="Four cameras at Location 03, read by Aldente Vision">
+<ul class="cams" role="list" aria-label="Four cameras at Location 03, read by vision AI">
   {
     cams.map((cam) => (
       <li class="cam">
@@ -162,7 +162,7 @@ const cams: {
 
   .cam :global(.cam__det .det__label) {
     padding: 2px 6px;
-    font-size: 0.6875rem;
+    font-size: var(--step-mock-s);
   }
 
   .cam__reading {
@@ -173,7 +173,7 @@ const cams: {
 
   .cam__reading b {
     flex: none;
-    font-size: 1.5rem;
+    font-size: var(--step-h4);
     font-weight: 700;
     line-height: 1;
     letter-spacing: -0.02em;
@@ -210,7 +210,7 @@ const cams: {
     }
 
     .cam__id {
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
     }
 
     .cam :global(.cam__det .det__label) {
@@ -223,11 +223,11 @@ const cams: {
     }
 
     .cam__reading b {
-      font-size: 1.25rem;
+      font-size: var(--step-h4);
     }
 
     .cam__reading span {
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
     }
   }
 </style>

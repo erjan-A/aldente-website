@@ -8,8 +8,7 @@ import ProductPill from '../ui/ProductPill.astro';
  *   default  the CTA row (Buttons), shown under the lead
  *   media    optional visual. With it, >=1024px becomes a split: the title across the full width, then the
  *            lead and buttons left (6/12) beside the media (6/12). Below 1024px it stacks: copy, then media.
- *            Use align="left" with media. With mediaLayout="below" the media runs full width under the copy
- *            instead (for wide explainers such as the Aldente Vision pipeline), and the title may run wider.
+ *            Use align="left" with media.
  */
 interface Props {
   /** Which product the page is about, shown as a pill above the title. */
@@ -19,18 +18,15 @@ interface Props {
   lead?: string;
   align?: 'left' | 'center';
   tone?: 'dark' | 'paper';
-  /** Where the media slot goes: beside the copy (split, default) or full width below it. */
-  mediaLayout?: 'split' | 'below';
 }
 
-const { product, title, muted, lead, align = 'left', tone = 'dark', mediaLayout = 'split' } = Astro.props;
+const { product, title, muted, lead, align = 'left', tone = 'dark' } = Astro.props;
 const hasMedia = Astro.slots.has('media');
-const below = hasMedia && mediaLayout === 'below';
-const split = hasMedia && !below;
+const split = hasMedia;
 const hasExtra = Astro.slots.has('default');
 ---
 
-<section class:list={['page-hero', `tone-${tone}`, `page-hero--${align}`, { 'page-hero--split': split, 'page-hero--below': below }]}>
+<section class:list={['page-hero', `tone-${tone}`, `page-hero--${align}`, { 'page-hero--split': split }]}>
   <div class="container page-hero__inner">
     <div class="page-hero__copy">
       {product && <ProductPill product={product} />}
@@ -104,65 +100,24 @@ const hasExtra = Astro.slots.has('default');
     color: var(--fg-3);
   }
 
-  /* As in section headers: claim, then the muted continuation on its own line (hero titles are larger, so from 1200px). */
-  @media (min-width: 1200px) {
-    h1:has(span) {
-      text-wrap: wrap;
-    }
-
-    h1 span {
-      display: block;
-    }
-  }
-
-  /* Media below: a wider title (two lines at desktop) and a little less air above, so the visual starts
-     inside the first screen. */
-  .page-hero--below {
-    padding-top: clamp(48px, 7vw, 104px);
-  }
-
-  .page-hero--below .page-hero__lead {
-    max-width: 58ch;
-  }
-
-  /* Wide screens: the title runs full width in two lines; the lead and the buttons share the row under it,
-     so the visual starts inside the first screen. */
-  @media (min-width: 1100px) {
-    .page-hero--below .page-hero__copy {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      column-gap: clamp(40px, 5vw, 80px);
-      row-gap: 28px;
-      align-items: end;
-    }
-
-    .page-hero--below .page-hero__copy > :global(*) {
-      grid-column: 1 / -1;
-      justify-self: start;
-    }
-
-    .page-hero--below .page-hero__copy > .page-hero__lead {
-      grid-column: 1;
-    }
-
-    .page-hero--below .page-hero__copy > .page-hero__extra {
-      grid-column: 2;
-      flex-wrap: nowrap;
-    }
+  /* As in section headers: the claim, then the muted continuation on a line of its own, at every width. */
+  h1 span {
+    display: block;
+    text-wrap: balance;
   }
 
   /* A hero without media: the lead runs as wide as the title, as in every section header. */
-  .page-hero:not(.page-hero--split, .page-hero--below) .page-hero__copy {
+  .page-hero:not(.page-hero--split) .page-hero__copy {
     width: fit-content;
     min-width: min(100%, 36rem);
     max-width: 100%;
   }
 
-  .page-hero--center:not(.page-hero--split, .page-hero--below) .page-hero__copy {
+  .page-hero--center:not(.page-hero--split) .page-hero__copy {
     margin-inline: auto;
   }
 
-  .page-hero:not(.page-hero--split, .page-hero--below) .page-hero__lead {
+  .page-hero:not(.page-hero--split) .page-hero__lead {
     width: 0;
     min-width: 100%;
     max-width: none;

@@ -1,0 +1,191 @@
+---
+import type { ProductId } from '../../data/products';
+import Card from '../ui/Card.astro';
+import ProductPill from '../ui/ProductPill.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+/**
+ * Customer results: one card per lead product, its measured number on top and its operator's words under it. Quotes are signed by role and chain type, never by name.
+ */
+const results: { product: ProductId; value: string; unit: string; text: string }[] = [
+  {
+    product: 'verify',
+    value: '87%',
+    unit: 'fewer wrong orders',
+    text: 'At one location of a regional restaurant chain, about 200 delivery and drive-thru orders a day. Wrong orders went from 14–16 a day to about 2.',
+  },
+  {
+    product: 'dispute',
+    value: '1–2 hours',
+    unit: 'a day saved',
+    text: 'No more searching footage for each refund claim. The evidence pack is built from the packing clip.',
+  },
+  {
+    product: 'tab',
+    value: '8%',
+    unit: 'more orders at peak',
+    text: 'In the peak hour, at a serving-line chain with 225 stores.',
+  },
+];
+
+const quotes: { product: ProductId; quote: string; role: string; company: string }[] = [
+  {
+    product: 'verify',
+    quote:
+      'Every wrong order meant a full refund. Aldente put a camera at the packing station and trained it on our menu. Now every bag is checked before the courier takes it, and nobody wants to go back.',
+    role: 'Director of Operations',
+    company: 'Regional QSR chain',
+  },
+  {
+    product: 'dispute',
+    quote: 'We used to eat most refund claims, because fighting one took twenty minutes. Now the evidence pack is ready before anyone asks.',
+    role: 'Head of Off-Premise',
+    company: 'QSR chain',
+  },
+  {
+    product: 'tab',
+    quote: 'Our lines are moving faster, and every box on our serving line is tracked.',
+    role: 'VP of Operations',
+    company: 'Fast-casual bowl chain',
+  },
+];
+---
+
+<section class="results tone-paper section" id="results" aria-labelledby="results-title">
+  <div class="container results__inner">
+    <SectionHeader id="results-title" label="Customer results" title="Most errors stop at the counter," muted="and the team gets its hours back." />
+
+    {/* One card per product: what was measured, then the operator's words under it. */}
+    <ul class="results__pairs" role="list">
+      {
+        results.map((r) => {
+          const said = quotes.find((q) => q.product === r.product)!;
+          return (
+            <Card as="li" pad="none" class="tile">
+              <div class="tile__result">
+                <ProductPill product={r.product} />
+                <p class="tile__value">
+                  <b>{r.value}</b>{' '}
+                  <span>{r.unit}</span>
+                </p>
+                <p class="tile__text">{r.text}</p>
+              </div>
+              <figure class="quote">
+                <blockquote>“{said.quote}”</blockquote>
+                <figcaption>
+                  <b>{said.role}</b>
+                  <span>{said.company}</span>
+                </figcaption>
+              </figure>
+            </Card>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .results__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+  }
+
+  .results__pairs {
+    display: grid;
+    gap: 12px;
+  }
+
+  /* Each card is two zones that share the grid's two rows, so the line between result and quote runs level
+     across all three. The first card leads (the measured case and its operator's words): it is wider. */
+  /* Two classes, so this wins over the Card's own rules whatever order the stylesheets load in. */
+  .results__pairs > .tile {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  @media (min-width: 900px) {
+    .results__pairs {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr);
+      grid-template-rows: auto auto;
+    }
+
+    .results__pairs > .tile {
+      grid-row: span 2;
+      grid-template-rows: subgrid;
+    }
+  }
+
+  .tile__result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: var(--card-pad-l);
+  }
+
+  /* The number leads; its unit sits under it in the same weight, a step down. */
+  .tile__value {
+    display: grid;
+    gap: 4px;
+  }
+
+  /* One size for every figure; each stays on one line. */
+  .tile__value b {
+    font-size: var(--step-stat);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    white-space: nowrap;
+    color: var(--fg-accent);
+  }
+
+  .tile__value span {
+    font-size: var(--step-h4);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  .tile__text {
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  /* The operator's words: the lower part of the same card, on the section's own ground, under a hairline.
+     One light card, so result and quote read as one thing. */
+  .quote {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+    padding: var(--card-pad-l);
+    border-top: 1px solid var(--card-line);
+    background: var(--tone-bg);
+    color: var(--fg);
+  }
+
+  .quote blockquote {
+    font-size: var(--step-h4);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+
+  .quote figcaption {
+    display: grid;
+    justify-items: start;
+    gap: 2px;
+    font-size: var(--step-small);
+    color: var(--fg-3);
+  }
+
+  .quote figcaption b {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+</style>

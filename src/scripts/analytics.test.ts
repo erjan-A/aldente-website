@@ -85,19 +85,28 @@ describe('analytics', () => {
 
   it('counts clicks on links to the demo page by section and plan', () => {
     mount(`
+      <aside aria-label="Announcement"><a href="/demo">See Tab</a></aside>
       <header><a href="/demo">Book a demo</a></header>
       <section aria-label="Plans"><a href="/demo?plan=vision">Book a <b>demo</b></a></section>
       <section aria-labelledby="cta-title"><h2 id="cta-title">Ready?</h2><a href="/demo#schedule">Talk to us</a></section>
       <footer><a href="/pricing">Pricing</a></footer>`);
+    clickLink('aside a');
     clickLink('header a');
     clickLink('section[aria-label] a b');
     clickLink('section[aria-labelledby] a');
     clickLink('footer a');
     expect(queued).toEqual([
+      ['CTA click', { label: 'See Tab', section: 'Announcement', path: '/pricing', plan: 'general' }],
       ['CTA click', { label: 'Book a demo', section: 'header', path: '/pricing', plan: 'general' }],
       ['CTA click', { label: 'Book a demo', section: 'Plans', path: '/pricing', plan: 'vision' }],
       ['CTA click', { label: 'Talk to us', section: 'cta-title', path: '/pricing', plan: 'general' }],
     ]);
+  });
+
+  it('counts clicks on links that name their own event (the home contents list)', () => {
+    mount(`<nav aria-label="Products"><a href="#tab" data-track="TOC click">Tab <span>Line ring-up</span></a></nav>`);
+    clickLink('a span');
+    expect(queued).toEqual([['TOC click', { label: 'Tab Line ring-up', path: '/pricing' }]]);
   });
 
   it('never touches cookies or storage', () => {

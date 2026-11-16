@@ -3,12 +3,12 @@ export const ROLLOUT = [
   {
     when: 'Week 1',
     title: 'Install and connect',
-    text: 'Mount the verification tablet, connect your cameras and POS, and train Aldente on your menu.',
+    text: 'Connect your cameras and POS, and set Aldente up for your menu and your stations.',
   },
   {
     when: 'Weeks 2–3',
     title: 'Go live',
-    text: 'Tune accuracy, set up dispute workflows and alert routes, and give Aldo its first Playbooks.',
+    text: 'Tune accuracy, set up the alert routes and give Aldo its first Playbooks.',
   },
   { when: 'Week 4', title: 'Roll out', text: 'Review the first results with your team and plan the next locations.' },
 ] as const;

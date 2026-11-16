@@ -1,0 +1,287 @@
+---
+import Cta from '../components/home/Cta.astro';
+import { getImage } from 'astro:assets';
+import clipTab from '../assets/images/clip-tab.jpg';
+import PageHero from '../components/site/PageHero.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Faq from '../components/ui/Faq.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import { LINKS } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const poster = await getImage({ src: clipTab, width: 1280, format: 'webp' });
+
+const steps = [
+  { title: 'The camera sees each scoop', text: 'A camera above the line watches the ingredient boxes and the bowl being built.' },
+  { title: 'The register adds the item', text: 'Each item goes onto the order as it goes into the bowl.' },
+  { title: 'The guest pays', text: 'The order is on the register when the guest gets there. Nobody opens the box.' },
+];
+
+const fits = ['Bowls', 'Burritos', 'Salads'];
+
+// Ingredient box tracking, as the line view shows it: each box, how full it is, and its status.
+const boxes = [
+  { name: 'Rice', level: 80, status: 'In stock' },
+  { name: 'Steak', level: 45, status: 'Watch' },
+  { name: 'Corn', level: 15, status: 'Refill now', low: true },
+];
+
+const faq = [
+  {
+    q: 'Do staff do anything for each item?',
+    a: 'No. Staff build the order as they do today. The camera sees each scoop and the register adds the item.',
+  },
+  { q: 'Which POS does it work with?', a: 'Any POS. Tab adds the items to the register you already run.' },
+  { q: 'What hardware does it need?', a: 'A camera above the line. Tab works with the cameras you have.' },
+  { q: 'What else does it track?', a: 'The ingredient boxes on the line: how full each one is and which one needs a refill.' },
+];
+---
+
+<BaseLayout
+  title="Aldente Tab, orders rung up on the serving line"
+  description="Aldente Tab rings up each order while staff build it. A camera above the serving line sees each scoop, the register adds the item, and every ingredient box is tracked."
+>
+  <PageHero
+    product="tab"
+    title="Orders rung up"
+    muted="while staff build them."
+    lead="A camera above the line sees each scoop. The register adds the item. Nobody opens boxes at the register."
+  >
+    <Button href={LINKS.demo} size="lg" arrow>Book a live demo</Button>
+    <Card slot="media" pad="s" class="scene">
+      <loop-video>
+      <video
+        class="scene__video"
+        src="/media/tab.mp4"
+        poster={poster.src}
+        width="1280"
+        height="658"
+        controls
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-label="Aldente Tab: an overhead camera on a serving line follows one box, logs each scoop, and the ticket is on the register before the guest pays."
+      ></video>
+      </loop-video>
+    </Card>
+  </PageHero>
+
+  <section class="tone-surface section" aria-labelledby="tab-how-title">
+    <div class="container stack">
+      <SectionHeader id="tab-how-title" label="How it works" title="From the first scoop" muted="to the register." />
+      <ol class="steps" role="list">
+        {
+          steps.map((step, i) => (
+            <li>
+              <p class="steps__n">{String(i + 1).padStart(2, '0')}</p>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="tone-dark section" aria-labelledby="tab-case-title">
+    <div class="container results">
+      <Card as="article" pad="l" class="result">
+        <p class="result__label">Result</p>
+        <p class="result__figure">8%</p>
+        <h2 id="tab-case-title" class="result__title">More orders in the peak hour</h2>
+        <p>At a serving-line chain with 225 stores.</p>
+      </Card>
+      <Card as="article" pad="l" class="result">
+        <p class="result__label">Also on the line</p>
+        <h2 class="result__title">Ingredient box tracking</h2>
+        <p>Tab tracks every ingredient box on the line and shows which one is running low and needs a refill.</p>
+        <ul class="levels" role="list" aria-label="Three ingredient boxes and their levels">
+          {
+            boxes.map((box) => (
+              <li class:list={{ 'levels__low': 'low' in box }}>
+                <span>{box.name}</span>
+                <i style={`--level:${box.level}%`} aria-hidden="true" />
+                <b>{box.status}</b>
+              </li>
+            ))
+          }
+        </ul>
+      </Card>
+      <Card as="article" pad="l" class="result result--wide">
+        <p class="result__label">Built for build-your-own lines</p>
+        <ul class="result__fits" role="list">
+          {fits.map((fit) => <li>{fit}</li>)}
+        </ul>
+        <p>Any line where staff build the order in front of the guest and the register comes last.</p>
+      </Card>
+    </div>
+  </section>
+
+  <Faq items={faq} />
+  <Cta title="See Tab on your line." text="See Aldente Tab in a 30-minute demo." />
+</BaseLayout>
+
+<script>
+  import '../scripts/loop-video';
+</script>
+
+<style>
+  .scene loop-video {
+    display: block;
+  }
+
+  .scene__video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1280 / 658;
+    /* Outer radius minus the padding around it. */
+    border-radius: calc(var(--radius-l) - var(--card-pad-s));
+    background: var(--bg);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+  }
+
+  .steps {
+    display: grid;
+    gap: 32px;
+  }
+
+  @media (min-width: 800px) {
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .steps li {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-card);
+  }
+
+  .steps__n {
+    font-size: var(--step-small);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .steps h3 {
+    font-size: var(--step-h4);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+  }
+
+  .steps li > p:last-child {
+    font-size: var(--step-small);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .results {
+    display: grid;
+    gap: 16px;
+  }
+
+  @media (min-width: 900px) {
+    .results {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+
+  .result {
+    --card-gap: 16px;
+  }
+
+  .result > p {
+    color: var(--fg-2);
+  }
+
+  /* The last card runs the full width under the two above it. */
+  @media (min-width: 900px) {
+    .result--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .result h2.result__title {
+    font-size: var(--step-h3);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+  }
+
+  /* Ingredient boxes: name, how full, status. The low one is orange, the colour for "needs attention". */
+  .levels {
+    display: grid;
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    font-size: var(--step-small);
+  }
+
+  .levels li {
+    display: grid;
+    grid-template-columns: 5.5em minmax(0, 1fr) 6.5em;
+    align-items: center;
+    gap: 12px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg);
+  }
+
+  .levels i {
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(var(--line-strong), var(--line-strong)) left / var(--level) 100% no-repeat var(--surface-2);
+  }
+
+  .levels b {
+    font-weight: 500;
+    text-align: right;
+    color: var(--fg-3);
+  }
+
+  .levels__low i {
+    background-image: linear-gradient(var(--accent), var(--accent));
+  }
+
+  .levels__low b {
+    color: var(--accent);
+  }
+
+  .result__label {
+    font-size: var(--step-small);
+    color: var(--fg-3);
+  }
+
+  /* The measured number: a figure on the stat step, never a heading. */
+  .result > .result__figure {
+    font-size: var(--step-stat);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    color: var(--accent);
+  }
+
+  .result__fits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .result__fits li {
+    padding: 4px 12px;
+    border: 1px solid var(--line-card);
+    border-radius: var(--radius-pill);
+    font-size: var(--step-small);
+    color: var(--ink);
+  }
+</style>

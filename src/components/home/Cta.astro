@@ -1,7 +1,5 @@
 ---
-import mark from '../../assets/logos/aldente-mark.svg';
 import { LINKS } from '../../data/site';
-import { pagePath } from '../../lib/paths';
 import Button from '../ui/Button.astro';
 
 interface Props {
@@ -12,61 +10,71 @@ interface Props {
 }
 
 const {
-  title = 'Give every location a Chief of Staff.',
-  text = 'See Aldente work on your own restaurants in a 30-minute demo.',
+  title = 'See it on your orders.',
+  text = 'A 30-minute demo with our team. We show the checks on orders like yours and estimate the result for your locations.',
   plan,
 } = Astro.props;
 const demoHref = plan ? `${LINKS.demo}?plan=${plan}` : LINKS.demo;
 // "30-minute" never breaks at its hyphen.
 const textParts = text.split(/(\d+-minute)/);
-// No "Compare plans" on the pricing page itself.
-const comparePlans = pagePath(Astro.url.pathname) !== LINKS.pricing;
 ---
 
 <section class="cta tone-orange" aria-labelledby="cta-title">
-  <img class="cta__mark" src={mark.src} alt="" aria-hidden="true" width="347" height="424" loading="lazy" />
+  <slat-sea aria-hidden="true"></slat-sea>
   <div class="container cta__inner">
     <h2 id="cta-title" class="cta__title">{title}</h2>
     <p class="cta__text">{textParts.map((part, i) => (i % 2 ? <span class="cta__nowrap">{part}</span> : part))}</p>
     <div class="cta__actions">
-      <Button href={demoHref} variant="dark" size="lg" arrow>Book a demo</Button>
-      {
-        comparePlans && (
-          <Button href={LINKS.pricing} variant="outline" size="lg">Compare plans</Button>
-        )
-      }
+      <Button href={demoHref} variant="dark" size="lg" arrow>Book a live demo</Button>
     </div>
   </div>
 </section>
+
+<script>
+  import '../../scripts/slat-sea';
+</script>
 
 <style>
   .cta {
     position: relative;
     overflow: hidden;
-    padding-block: clamp(96px, 12vw, 176px);
+    padding-block: clamp(72px, 8vw, 120px);
   }
 
-  /* The whole mark, never clipped top and bottom. */
-  .cta__mark {
+  /* The slat wall (slat-sea.ts): decoration under the content, out of the way of clicks. It fades in once drawn. */
+  slat-sea {
     position: absolute;
-    right: 5%;
-    top: 50%;
-    translate: 0 -50%;
-    height: 84%;
-    width: auto;
-    opacity: 0.1;
-    filter: brightness(0) invert(1);
+    inset: 0;
+    pointer-events: none;
   }
 
-  /* Phones: the mark drops to the bottom corner, below the text, so it never lightens what you read. */
-  @media (max-width: 720px) {
-    .cta__mark {
-      top: auto;
-      bottom: -6%;
-      right: -12%;
-      translate: none;
-      height: 46%;
-      opacity: 0.08;
+  slat-sea :global(.slats__layer) {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+  }
+
+  slat-sea :global(.slats__layer.is-on) {
+    opacity: 1;
+  }
+
+  slat-sea :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    slat-sea :global(.slats__layer) {
+      transition: none;
+    }
+  }
+
+  /* Phones: the text fills the band, so the band runs on below it and the sea has open water to roll in. */
+  @media (max-width: 719px) {
+    .cta {
+      padding-bottom: clamp(112px, 30vw, 128px);
     }
   }
 
@@ -89,7 +97,7 @@ const comparePlans = pagePath(Astro.url.pathname) !== LINKS.pricing;
 
   /* One measure for every page's lead, so the band reads the same everywhere. */
   .cta__text {
-    max-width: 36ch;
+    max-width: 46ch;
     font-size: var(--step-lead);
     font-weight: 500;
     text-wrap: pretty;
@@ -101,14 +109,12 @@ const comparePlans = pagePath(Astro.url.pathname) !== LINKS.pricing;
 
   .cta__actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
   }
 
-  /* Phones: stacked buttons share one width. */
+  /* Phones: the booking button takes the row. */
   @media (max-width: 479px) {
-    .cta__actions > :global(.btn) {
-      flex: 1 1 100%;
+    .cta__actions > :global(.btn--dark) {
+      flex: 1;
     }
   }
 </style>

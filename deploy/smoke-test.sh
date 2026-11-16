@@ -45,27 +45,37 @@ expect_header() {
 }
 
 echo "Pages ($BASE)"
-for path in / /aldo /order-verification /analytics /pricing /security /company /demo /cookies /privacy /terms \
+for path in / /playbooks /order-verification /tab /pricing /security /company /demo /cookies /privacy /terms \
   /solutions/operations /solutions/hr /solutions/delivery /robots.txt /sitemap-index.xml /og.jpg /favicon.svg; do
   expect_status "$path" 200
 done
 
 echo "One address per page"
-expect_redirect /aldo.html /aldo
-expect_redirect /aldo/ /aldo
+expect_redirect /playbooks.html /playbooks
+expect_redirect /playbooks/ /playbooks
 expect_redirect /solutions/hr.html /solutions/hr
 expect_redirect /index.html /
 expect_redirect /about /company
 expect_redirect /careers /company
+expect_redirect /aldo /playbooks
+expect_redirect /analytics /playbooks
+
+echo "Clips"
+for clip in verify dispute tab watch tab-line verify-station; do
+  expect_status "/media/$clip.mp4" 200
+done
 
 echo "Missing pages"
 expect_status /no-such-page 404
+expect_status /solutions 404
 if curl -s "$BASE/no-such-page" | grep -q 'Aldo looked everywhere'; then pass "404 shows the site's own page"; else fail "404 does not show the site's own page"; fi
 
 echo "Security headers"
 for path in / /demo /no-such-page; do
   expect_header "$path" Content-Security-Policy "frame-src https://calendly.com"
 done
+# The LinkedIn tag (loaded after consent) needs its host in the CSP: an old snippet would block it silently.
+expect_header / Content-Security-Policy "snap.licdn.com"
 expect_header / X-Content-Type-Options nosniff
 expect_header / X-Frame-Options DENY
 expect_header / Referrer-Policy strict-origin-when-cross-origin
@@ -89,10 +99,10 @@ esac
 case "$BASE" in
   https://aldenteai.com)
     echo "Canonical host"
-    got=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "https://www.aldenteai.com/aldo")
-    [ "$got" = "301 https://aldenteai.com/aldo" ] && pass "www → bare domain" || fail "www → bare domain: got $got"
-    got=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://aldenteai.com/aldo")
-    [ "$got" = "301 https://aldenteai.com/aldo" ] && pass "http → https" || fail "http → https: got $got"
+    got=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "https://www.aldenteai.com/playbooks")
+    [ "$got" = "301 https://aldenteai.com/playbooks" ] && pass "www → bare domain" || fail "www → bare domain: got $got"
+    got=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://aldenteai.com/playbooks")
+    [ "$got" = "301 https://aldenteai.com/playbooks" ] && pass "http → https" || fail "http → https: got $got"
     ;;
 esac
 

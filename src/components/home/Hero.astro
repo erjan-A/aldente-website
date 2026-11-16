@@ -1,115 +1,177 @@
 ---
 import { LINKS } from '../../data/site';
 import Button from '../ui/Button.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
-import HeroCards from './HeroCards.astro';
+import Icon from '../ui/Icon.astro';
+import ProductPill from '../ui/ProductPill.astro';
+import HeroMedia from './HeroMedia.astro';
 
-// "See Aldente in action" scrolls to the order story on this page (Verify + Dispute, id="verification"): one order, in action.
-const seeAldente = '#verification';
+/**
+ * The home hero: the claim, two compact actions on one row (book, or watch the explainer first), then the
+ * product panel running past the first screen.
+ * The ground is orange, so the booking button is the dark one. Behind it all, <hero-backdrop> draws the
+ * "Ember" glow.
+ */
+
+// One line per product, in the order of the clips below.
+const lines = ['Check every order before pickup.', 'Answer every refund claim with proof.', 'Ring up orders while staff build them.'];
 ---
 
-<section class="hero tone-dark" aria-labelledby="hero-title">
-  <div class="container">
-    <div class="hero__stage">
-      <HeroCards />
-      <div class="hero__copy">
-        <div class="hero__heading">
-          <Eyebrow text="For restaurant chains and franchise operators" class="hero__eyebrow" />
-          <h1 id="hero-title" class="hero__title">Your AI Chief of Staff <span>with eyes.</span></h1>
-        </div>
-        <p class="hero__lead">
-          Aldente AI sees every location through your cameras, catches wrong orders before pickup, wins back refunds with evidence,
-          and hands routine work to your AI employee in Slack.
-        </p>
-        <div class="hero__actions">
-          <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
-          <Button href={seeAldente} variant="secondary" size="lg">See Aldente in action</Button>
-        </div>
+<section class="hero tone-orange" aria-labelledby="hero-title">
+  <hero-backdrop aria-hidden="true"></hero-backdrop>
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <ProductPill label="For restaurant chains" icon="utensils" />
+      <h1 id="hero-title" class="hero__title"><span>Vision AI</span> for every order.</h1>
+      <ul class="hero__lead" role="list">
+        {
+          lines.map((line) => <li>{line}</li>)
+        }
+      </ul>
+      <div class="hero__actions">
+        <Button href={LINKS.demo} variant="dark" size="sm" arrow><span>Book a <span class="hero__live">live </span>demo</span></Button>
+        <Button href="/media/watch.mp4" variant="secondary" size="sm" data-watch>
+          <Icon name="play" size={16} />
+          Watch it work
+        </Button>
       </div>
     </div>
+    <HeroMedia />
   </div>
 </section>
 
+<script>
+  import '../../scripts/hero-backdrop';
+</script>
+
 <style>
+  /* Air first: the headline stands alone, then the product at work, which still starts on the first screen. */
+  /* Its own stacking context: the backdrop (z-index -1) sits over the section's ground and under its content. */
   .hero {
-    padding-block: clamp(72px, 9vw, 136px) clamp(56px, 6.5vw, 96px);
-    overflow-x: clip;
-  }
-
-  /* Below 1240px the card deck sits above the headline and supplies the top space. */
-  @media (max-width: 1239px) {
-    .hero {
-      padding-top: clamp(24px, 5vw, 56px);
-    }
-  }
-
-  .hero__stage {
     position: relative;
+    isolation: isolate;
+    padding-block: clamp(56px, 7vw, 104px) var(--section-y);
+  }
+
+  .hero__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(56px, 6vw, 88px);
   }
 
   .hero__copy {
-    position: relative;
-    z-index: 1;
-    max-width: 780px;
-    margin-inline: auto;
+    max-width: 1120px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
+    gap: clamp(24px, 2.2vw, 32px);
     text-align: center;
   }
 
-  /* The audience line sits tight on the headline it qualifies. */
-  .hero__heading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(16px, 1.2vw + 8px, 24px);
-  }
-
-  /* Centred like the headline: the dot runs inline, so a narrow phone wraps the line into two centred rows. */
-  .hero__copy :global(.hero__eyebrow) {
-    display: block;
-    text-align: center;
-  }
-
-  .hero__copy :global(.hero__eyebrow)::before {
-    display: inline-block;
-    margin: 0 10px 0 0;
-    vertical-align: middle;
-    translate: 0 -1px;
-  }
-
+  /* The page-title step of the type scale: one line on desktop, two balanced lines on phones, and the product
+     panel starts inside the first screen. */
   .hero__title {
-    font-size: var(--step-display);
-    line-height: 0.95;
+    font-size: var(--step-h1);
+    line-height: 1;
     letter-spacing: -0.04em;
     font-weight: 700;
     text-wrap: balance;
   }
 
+  /* White text needs a deep ground: the hero stands on the deep end of the orange alone, without the lighter
+     wash other orange sections carry. Checked with tools/contrast.mjs (4.5:1 for every line). */
+  .hero.tone-orange {
+    background-image: none;
+  }
+
+  /* Who the page is for: a pill, centred like the rest and a step closer to the headline it belongs to than
+     the headline is to the lines under it. (On orange the pill is a dark chip by itself.) */
+  .hero__copy :global(.pill) {
+    align-self: center;
+    margin-bottom: -8px;
+  }
+
+  /* Phones: the headline breaks after the category, so each tone has its own line. */
+  @media (max-width: 479px) {
+    .hero__title span {
+      display: block;
+    }
+  }
+
+  /* The one emphasis in the headline: the category stays full white and the rest steps back. */
+  .hero__title {
+    color: var(--fg-3);
+  }
+
   .hero__title span {
-    color: var(--accent);
+    color: var(--fg);
   }
 
+  /* One line per product, centred under the headline like the rest of the copy. */
   .hero__lead {
-    max-width: 36ch;
+    display: grid;
+    gap: 4px;
     font-size: var(--step-lead);
-    line-height: 1.5;
-    color: var(--ink-2);
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--fg);
   }
 
+  /* A line that has to wrap on a narrow phone breaks into two even halves, never one stray word. */
+  .hero__lead li {
+    text-wrap: balance;
+  }
+
+  /* Phones: a step smaller, so each product keeps one line. */
+  @media (max-width: 479px) {
+    .hero__lead {
+      font-size: var(--step-body);
+    }
+  }
+
+  /* Two compact buttons on one row at every width; a step larger from tablets up. */
   .hero__actions {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
+    margin-top: 8px;
   }
 
-  /* Phones: stacked buttons share one width. */
-  @media (max-width: 479px) {
-    .hero__actions > :global(.btn) {
-      flex: 1 1 100%;
+  @media (min-width: 720px) {
+    .hero__actions :global(.btn) {
+      min-height: 48px;
+      padding: 0 24px;
+      font-size: var(--step-ui);
     }
+  }
+
+  /* 360px phones: a tighter row without the arrow, so both buttons stay inside the gutters side by side. */
+  @media (max-width: 379px) {
+    .hero__actions {
+      gap: 8px;
+    }
+
+    .hero__actions :global(.btn) {
+      padding: 0 16px;
+    }
+
+    .hero__actions :global(.btn__arrow) {
+      display: none;
+    }
+  }
+
+  /* The narrowest phones: tighter still, and the button says "Book a demo". */
+  @media (max-width: 359px) {
+    .hero__actions :global(.btn) {
+      padding: 0 12px;
+    }
+
+    .hero__live {
+      display: none;
+    }
+  }
+
+  .hero :global(.hm) {
+    max-width: 1080px;
   }
 </style>

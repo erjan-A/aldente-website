@@ -4,17 +4,16 @@ import Icon from './Icon.astro';
 
 /**
  * A link styled as a button. Variants:
- *   primary    orange fill. Booking actions ONLY: "Book a demo", "Talk to us".
+ *   primary    orange fill. Booking actions ONLY: "Book a live demo", "Talk to us".
  *   secondary  outline in --line-strong, for the second action on dark grounds.
  *   dark       near-black fill, for actions on orange and paper grounds.
- *   outline    currentColor edge, tone-aware (any ground).
  *   link       text link with an arrow, --fg-accent on hover. For "Compare plans", "How Verify works" etc.
  * Sizes (all at least 44px tall): sm 44px (header, compact rows), md 48px (default), lg 56px (heroes, CTA bands).
  * Extra attributes (data-*, aria-*, id, download…) pass through to the <a>.
  */
 interface Props extends Omit<HTMLAttributes<'a'>, 'href'> {
   href: string;
-  variant?: 'primary' | 'secondary' | 'dark' | 'outline' | 'link';
+  variant?: 'primary' | 'secondary' | 'dark' | 'link';
   size?: 'sm' | 'md' | 'lg';
   /** Trailing arrow. Defaults to true for variant "link", false otherwise. */
   arrow?: boolean;
@@ -33,7 +32,7 @@ const external = /^https?:\/\//.test(href);
   {...rest}
 >
   <slot />
-  {arrow && <Icon name="arrow-right" size={size === 'sm' ? 16 : 18} strokeWidth={2} class="btn__arrow" />}
+  {arrow && <Icon name="arrow-right" size={size === 'sm' ? 16 : 18} class="btn__arrow" />}
 </a>
 
 <style>
@@ -41,12 +40,12 @@ const external = /^https?:\/\//.test(href);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     min-height: 48px;
-    padding: 0 22px;
+    padding: 0 24px;
     border-radius: var(--radius-pill);
     border: 1.5px solid transparent;
-    font-size: 1rem;
+    font-size: var(--step-ui);
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
@@ -60,7 +59,7 @@ const external = /^https?:\/\//.test(href);
   .btn--sm {
     gap: 8px;
     min-height: 44px;
-    padding: 0 18px;
+    padding: 0 20px;
     font-size: var(--step-small);
   }
 
@@ -70,12 +69,8 @@ const external = /^https?:\/\//.test(href);
     font-size: var(--step-body);
   }
 
-  .btn:hover {
-    transform: translateY(-2px);
-  }
-
   .btn:active {
-    transform: translateY(0);
+    transform: scale(0.98);
   }
 
   .btn :global(.btn__arrow) {
@@ -88,18 +83,14 @@ const external = /^https?:\/\//.test(href);
   }
 
   /* A soft top-lit gradient on the logo orange, painted edge to edge (border-box) so no seam shows
-     at the rim. Dark text keeps AA contrast across it; hover adds a warm glow instead of an edge. */
+     at the rim. Dark text keeps AA contrast across it; hover lifts the fill a step. */
   .btn--primary {
-    background: linear-gradient(180deg, #ec6a42 0%, #db4f2c 100%) border-box;
+    background: var(--accent-fill) border-box;
     color: var(--on-accent);
-    transition:
-      transform 0.2s var(--ease-out),
-      box-shadow 0.2s ease;
   }
 
   .btn--primary:hover {
-    background: linear-gradient(180deg, #f07650 0%, #e05634 100%) border-box;
-    box-shadow: 0 12px 28px -12px rgb(224 86 52 / 0.7);
+    background: var(--accent-fill-hover) border-box;
   }
 
   .btn--secondary {
@@ -119,11 +110,6 @@ const external = /^https?:\/\//.test(href);
   .btn--dark {
     background: var(--bg);
     color: var(--ink);
-  }
-
-  .btn--outline {
-    border-color: currentColor;
-    color: var(--fg, var(--ink));
   }
 
   /* Text link: no box, but the hit area stays 44px tall. Overrides the box rules above. */

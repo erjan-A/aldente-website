@@ -9,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <div class="container missing__inner">
       <h1>Aldo looked everywhere. <span>This page isn’t here.</span></h1>
       <div class="missing__actions">
-        <Button href={LINKS.demo} size="lg" arrow>Book a demo</Button>
+        <Button href={LINKS.demo} size="lg" arrow>Book a live demo</Button>
         <Button href="/" variant="secondary" size="lg">Back to the home page</Button>
       </div>
     </div>
@@ -29,7 +29,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   /* Same title as every page hero (PageHero). */
   h1 {
-    max-width: 16ch;
+    max-width: 24ch;
     font-size: var(--step-h1);
     line-height: 1;
     letter-spacing: -0.04em;
@@ -37,6 +37,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   h1 span {
+    display: block;
     color: var(--fg-3);
   }
 

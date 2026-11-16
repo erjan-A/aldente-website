@@ -22,7 +22,7 @@ describe('Cookie policy', () => {
   it('uses the legal page layout and keeps every category and note', async () => {
     const doc = await page('/cookies', 'cookies');
     expect(text(doc.querySelector('h1'))).toBe('Cookie policy. Kept short.');
-    expect(text(doc.querySelector('.page-hero__lead'))).toMatch(/Updated 6\sOctober 2026\.$/);
+    expect(text(doc.querySelector('.page-hero__lead'))).toMatch(/Updated 16\sNovember 2026\.$/);
     const sections = [...doc.querySelectorAll('.legal__section h2')];
     expect(sections.map(text)).toEqual(['Necessary', 'Marketing', 'Visit counting', 'Other sites', 'Change your mind', 'Questions']);
     expect([...doc.querySelectorAll('.legal__toc a')].map((a) => a.getAttribute('href'))).toEqual(sections.map((h) => `#${h.id}`));
@@ -44,7 +44,7 @@ describe('Page heroes', () => {
     expect(text(doc.querySelector('h1'))).toBe('Aldo looked everywhere. This page isn’t here.');
     const buttons = [...doc.querySelectorAll('.missing__actions a.btn')];
     expect(buttons.map((b) => [text(b), b.getAttribute('href')])).toEqual([
-      ['Book a demo', '/demo'],
+      ['Book a live demo', '/demo'],
       ['Back to the home page', '/'],
     ]);
     for (const b of buttons) expect(b.classList.contains('btn--lg')).toBe(true);
@@ -53,9 +53,9 @@ describe('Page heroes', () => {
   it('Aldente Verify: the pricing link reads "Compare plans", as everywhere else', async () => {
     const doc = await page('/order-verification', 'order-verification');
     const ctas = [...doc.querySelectorAll('.page-hero__extra a.btn')];
-    expect(ctas.map(text)).toEqual(['Book a demo', 'Compare plans']);
+    expect(ctas.map(text)).toEqual(['Book a live demo', 'Compare plans']);
     expect(ctas[1]!.getAttribute('href')).toBe('/pricing');
-    expect(ctas.filter((a) => a.classList.contains('btn--primary')).map(text)).toEqual(['Book a demo']);
+    expect(ctas.filter((a) => a.classList.contains('btn--primary')).map(text)).toEqual(['Book a live demo']);
   });
 });
 

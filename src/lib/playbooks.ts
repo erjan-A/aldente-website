@@ -1,6 +1,9 @@
 export type Team = 'HR' | 'Operations' | 'Orders' | 'Dining room' | 'Catering';
 export type TeamFilter = Team | 'All';
 
+/** The frame a Playbook's message carries: which camera view or photo it shows. */
+export type Shot = 'exit' | 'counter' | 'order' | 'table' | 'tray' | 'room';
+
 export interface Playbook {
   id: string;
   team: Team;
@@ -13,6 +16,8 @@ export interface Playbook {
   destination: string;
   /** What the team receives. */
   result: string;
+  /** The frame that comes with it. */
+  shot: Shot;
 }
 
 export type StepKind = 'when' | 'if' | 'then' | 'send';

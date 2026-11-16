@@ -28,7 +28,7 @@ const boxes = [
   <div class="vh__tablet">
     <div class="vh__screen">
       <div class="vh__bar">
-        <span class="vh__app"><Icon name="check-check" size={14} strokeWidth={2.25} />Packing station</span>
+        <span class="vh__app"><Icon name="check-check" size={14} />Packing station</span>
         <span>Location 01</span>
       </div>
       <div class="vh__body">
@@ -54,7 +54,7 @@ const boxes = [
                   <span class="vh__name">{item.name}</span>
                   <b class="vh__count">
                     {item.count}
-                    <Icon name="check" size={14} strokeWidth={3} />
+                    <Icon name="check" size={14} />
                   </b>
                   {
                     item.flag && (
@@ -67,7 +67,7 @@ const boxes = [
               ))
             }
           </ul>
-          <p class="vh__status"><Icon name="check" size={16} strokeWidth={3} />Verified <time>12:41</time></p>
+          <p class="vh__status"><Icon name="check" size={16} />Verified <time>12:41</time></p>
         </div>
       </div>
     </div>
@@ -253,7 +253,7 @@ const boxes = [
 
   /* The drinks row keeps the first check's flag, so the catch stays visible after the fix. */
   .vh__item--flag {
-    box-shadow: inset 0 0 0 1px rgb(224 86 52 / 0.45);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
   }
 
   .vh__flag {
@@ -324,7 +324,7 @@ const boxes = [
     }
 
     .vh :global(.vh__det .det__label) {
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
       padding: 2px 5px;
     }
   }

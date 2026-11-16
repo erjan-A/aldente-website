@@ -4,6 +4,22 @@ import { expect, test } from './fixtures';
 test.use({ consent: false });
 
 test.describe('cookie consent', () => {
+  test('sits in the bottom right corner on a wide screen, and across the bottom edge on a phone', async ({ page, isMobile }) => {
+    await page.goto('/');
+    const card = page.locator('cookie-consent .consent__card');
+    await expect(card).toBeVisible();
+    const box = (await card.boundingBox())!;
+    const { width, height } = page.viewportSize()!;
+    if (isMobile) {
+      expect(Math.round(box.x)).toBe(0);
+      expect(Math.round(box.width)).toBe(width);
+    } else {
+      expect(Math.round(width - (box.x + box.width))).toBe(24);
+      expect(Math.round(height - (box.y + box.height))).toBe(24);
+      expect(box.x).toBeGreaterThan(width / 2);
+    }
+  });
+
   test('asks once, and rejecting takes one click', async ({ page }) => {
     await page.goto('/');
     const banner = page.getByRole('region', { name: 'Cookies' });

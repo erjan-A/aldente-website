@@ -1,8 +1,8 @@
 export const ROUTES = [
   '/',
-  '/aldo',
+  '/playbooks',
   '/order-verification',
-  '/analytics',
+  '/tab',
   '/pricing',
   '/solutions/operations',
   '/solutions/hr',

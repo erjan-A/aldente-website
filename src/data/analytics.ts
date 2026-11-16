@@ -20,6 +20,16 @@ export const RB2B = {
   script: `https://ddwl4m2hdecbv.cloudfront.net/b/${RB2B_KEY}/${RB2B_KEY}.js.gz`,
 } as const;
 
+/**
+ * LinkedIn Insight Tag (see src/scripts/linkedin-insight.ts): ad measurement, loaded only after the visitor
+ * allows marketing cookies. The conversion is "demo booked". None of these are secrets: they appear in every page.
+ */
+export const LINKEDIN = {
+  partnerId: '10055058',
+  script: 'https://snap.licdn.com/li.lms-analytics/insight.min.js',
+  conversionId: 32303322,
+} as const;
+
 /** Funnel events, as they appear in Umami (Events; usable as steps in Goals and Funnels). */
 export const EVENTS = {
   /** A click on any link to /demo or #schedule. Props: label, section, path, plan. */
@@ -30,4 +40,12 @@ export const EVENTS = {
   timeSelected: 'Time selected',
   /** Calendly reported a booking. Props: plan. */
   booked: 'Demo booked',
+  /** A click on a product in the home page's contents list. Props: label, path. */
+  tocClick: 'TOC click',
+  /** The visitor switched the home hero's view. Props: view. */
+  heroView: 'Hero view',
+  /** The longer product clip was opened ("Watch it work"). Props: path. */
+  videoPlay: 'Video play',
+  /** The visitor changed a number in the cost calculator, once per page view. Props: path. */
+  calculator: 'Calculator used',
 } as const;

@@ -3,7 +3,7 @@ import SectionHeader from '../ui/SectionHeader.astro';
 
 // The delivery-refund problem (rewritten 2026-10-13): what goes wrong, what it costs, the hours it eats.
 const facts = [
-  { value: '7–8%', unit: '', text: 'of delivery orders left one chain location wrong.' },
+  { value: '7–8%', unit: '', text: 'of delivery orders went out wrong at one chain location.' },
   { value: '$170', unit: 'a day', text: 'even 10 wrong orders at a $17 check, before the gift card.' },
   { value: '1–2 hours', unit: 'a day', text: 'go to searching footage, collecting evidence and disputing refunds.' },
 ];
@@ -11,7 +11,7 @@ const facts = [
 
 <section class="problem tone-orange section" aria-labelledby="problem-title">
   <div class="container problem__inner">
-    <SectionHeader id="problem-title" label="The problem" layout="stack" title="Delivery apps refund the guest first." muted="You have to prove it wasn’t you." />
+    <SectionHeader id="problem-title" label="The problem" layout="stack" title="Delivery apps refund the guest," muted="and the store pays, right or wrong." />
     <dl class="problem__facts">
       {
         facts.map((fact) => (
@@ -25,7 +25,7 @@ const facts = [
         ))
       }
     </dl>
-    <p class="problem__turn">Aldente puts every bag on record at the packing station, so a claim is settled with evidence, not an argument.</p>
+    <p class="problem__turn">Aldente puts every bag on record at the packing station, so a claim is answered with evidence, not an argument.</p>
   </div>
 </section>
 
@@ -50,23 +50,23 @@ const facts = [
     padding: 28px 32px 0 0;
   }
 
-  /* The figures sit on the heading's step, never above it. */
+  /* Figures take the stat step, under the heading. */
   .problem__facts dt {
-    font-size: var(--step-h2);
+    font-size: var(--step-stat);
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 1;
   }
 
   .problem__facts dt span {
-    font-size: var(--step-h4);
+    font-size: var(--step-body);
     letter-spacing: -0.01em;
   }
 
   .problem__facts dd {
     margin: 0;
     max-width: 30ch;
-    font-size: 1.125rem;
+    font-size: var(--step-body);
     font-weight: 500;
     line-height: 1.5;
   }

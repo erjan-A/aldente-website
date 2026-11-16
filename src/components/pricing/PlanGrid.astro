@@ -24,13 +24,13 @@ import ProductPill from '../ui/ProductPill.astro';
             <ul class="plan__features" role="list">
               {plan.aldo && (
                 <li class="plan__aldo">
-                  <ProductPill product="aldo" />
+                  <ProductPill label="Aldo" />
                   included
                 </li>
               )}
               {plan.features.map((feature) => (
                 <li>
-                  <Icon name="check" size={16} strokeWidth={2.5} class="plan__check" />
+                  <Icon name="check" size={16} class="plan__check" />
                   {feature}
                 </li>
               ))}
@@ -41,14 +41,14 @@ import ProductPill from '../ui/ProductPill.astro';
     </ul>
     <div class="aldo-incl">
       <p class="aldo-incl__head">
-        <ProductPill product="aldo" />
-        <span><b>Included with Aldente Verify or Aldente Vision.</b> Your AI Chief of Staff, working in Slack.</span>
+        <ProductPill label="Aldo" />
+        <span><b>Included with Aldente Verify or Aldente Playbooks.</b> The assistant that answers in Slack.</span>
       </p>
       <ul class="aldo-incl__list" role="list">
         {
           ALDO_INCLUDED.map((item) => (
             <li>
-              <Icon name="check" size={16} strokeWidth={2.5} />
+              <Icon name="check" size={16} />
               {item}
             </li>
           ))
@@ -160,7 +160,7 @@ import ProductPill from '../ui/ProductPill.astro';
 
   .plan__features li {
     display: flex;
-    gap: 10px;
+    gap: 12px;
   }
 
   .plan__aldo {
@@ -186,7 +186,7 @@ import ProductPill from '../ui/ProductPill.astro';
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 14px;
+    gap: 12px 16px;
     max-width: 72ch;
     color: var(--fg-2);
   }

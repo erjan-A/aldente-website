@@ -1,0 +1,1214 @@
+---
+import { Image, getImage } from 'astro:assets';
+import camDining from '../../assets/images/cams/cam-dining.jpg';
+import clipLine from '../../assets/images/clip-tab-line.jpg';
+import clipStation from '../../assets/images/clip-verify-station.jpg';
+import trayComplete from '../../assets/images/order-tray-complete.jpg';
+import mark from '../../assets/logos/aldente-mark.svg';
+import { EVENTS } from '../../data/analytics';
+import { PRODUCT_IDS, PRODUCTS, type ProductId } from '../../data/products';
+import { LINKS } from '../../data/site';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import Icon, { type IconName } from '../ui/Icon.astro';
+import ProductPill from '../ui/ProductPill.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+/**
+ * The products, all four in sight at once: a contents list that stays put on the left (a chip row on phones)
+ * and one block per product: pill, promise, what it does in plain words, features, one number where there is
+ * one, the booking and a link to its page, beside a scene of the product. The contents links are plain
+ * anchors, so the section works without script; <toc-spy> marks the block being read.
+ *
+ * Scenes ([data-seq], global.css) play as short stories and loop while on screen (data-loop): an order's five
+ * minutes for Verify, an evidence pack being built for Dispute, and for Playbooks a Slack channel where a
+ * manager asks once, Aldo saves the Playbook and later posts the camera view. Each is drawn in its final
+ * state. Tab shows its walkthrough clip instead, played by <loop-video> while it is on screen.
+ */
+interface Block {
+  id: ProductId;
+  title: string;
+  /** Who the product is for, when it is not every restaurant. */
+  tag?: string;
+  text: string;
+  features: { icon: IconName; title: string; text: string }[];
+  /** One measured number. */
+  stat?: string;
+  /** The demo page's ?plan= for this product's booking button, when it has one. */
+  plan?: string;
+}
+
+const blocks: Block[] = [
+  {
+    id: 'verify',
+    plan: 'verification',
+    title: 'Every order checked before pickup.',
+    text: 'A camera at the packing station checks every item against the ticket before the bag leaves. Staff see what is missing and fix it on the spot.',
+    features: [
+      { icon: 'receipt', title: 'Reads the ticket', text: 'Staff put the receipt under the camera. Verify finds the order itself.' },
+      { icon: 'layers', title: 'Whole order or item by item', text: 'Peak mode checks the whole order in one shot.' },
+      { icon: 'video', title: 'A clip for every order', text: 'Saved to the order, with a photo and the time of each item.' },
+    ],
+    stat: 'Wrong orders: from 14–16 a day to about 2',
+  },
+  {
+    id: 'dispute',
+    plan: 'verification',
+    title: 'Every refund claim answered with proof.',
+    text: 'Delivery apps charge the store for refund claims, right or wrong. Aldente Dispute builds the evidence pack for each claim.',
+    features: [
+      { icon: 'package', title: 'Evidence pack per claim', text: 'Clip, item check and handoff time in one pack.' },
+      { icon: 'truck', title: 'One list for all delivery apps', text: 'Uber Eats, DoorDash and Grubhub claims, each with its status.' },
+      { icon: 'clock', title: 'Built when the claim comes in', text: 'Nobody searches footage for it.' },
+    ],
+    stat: '1–2 hours a day saved on searching footage',
+  },
+  {
+    id: 'tab',
+    title: 'Orders rung up while staff build them.',
+    tag: 'For build-your-own lines',
+    text: 'At a build-your-own line, staff open each box and key every item. With Aldente Tab, a camera above the line sees each scoop and the register adds the item.',
+    features: [
+      { icon: 'scan-box', title: 'No keying at the register', text: 'Each item is added as it goes in the bowl.' },
+      { icon: 'gauge', title: 'Ingredient box tracking', text: 'Shows how full each one is and which needs a refill.' },
+      { icon: 'plug', title: 'Any POS, any hardware', text: 'Tab works with the register and the cameras you have.' },
+    ],
+    stat: '+8% orders in the peak hour · 225-store chain',
+  },
+  {
+    id: 'playbooks',
+    plan: 'starter',
+    title: 'Ask once in Slack, and it runs every shift.',
+    text: 'Aldente Playbooks reads the cameras you already have. Ask Aldo a question in Slack, or tell it what to watch: it saves the task as a Playbook and runs it at every location.',
+    features: [
+      { icon: 'message-square', title: 'Answers in Slack', text: 'A number, the location and the camera view, in the channel where you asked.' },
+      { icon: 'repeat', title: 'Say it once', text: 'The Playbook keeps what to check, when to run and who to tell.' },
+      { icon: 'camera', title: 'The cameras you have', text: 'Queues, tables, traffic and staff presence, by location and hour.' },
+    ],
+  },
+];
+
+// Order #4821 and its claim are the same as in the hero and on the product pages.
+const evidence = [
+  { title: 'Packing clip found', value: '0:42', photo: true },
+  { title: 'Item check', value: '4/4 in the bag' },
+  { title: 'Handoff time', value: '12:44' },
+];
+/** The blocks whose panel plays a real clip instead of a drawn scene. */
+const isClip = (id: string) => id === 'verify' || id === 'tab';
+const linePoster = await getImage({ src: clipLine, width: 720, format: 'webp' });
+const stationPoster = await getImage({ src: clipStation, width: 720, format: 'webp' });
+---
+
+<section class="tour tone-dark section" id="products" aria-labelledby="tour-title">
+  <div class="container tour__inner">
+    <SectionHeader
+      id="tour-title"
+      label="Products"
+      title="Checked, proven, rung up."
+      muted="What vision AI does with every order."
+    />
+
+    <div class="tour__grid">
+      <toc-spy class="tour__toc" data-anchor="0.45">
+        <nav aria-label="Products" data-toc-scroll>
+          <ul role="list" class="toc__group">
+              {PRODUCT_IDS.map((id) => (
+                <li>
+                  <a class="toc__link" href={`#${id}`} data-track={EVENTS.tocClick}>
+                    <span class="toc__icon" aria-hidden="true">
+                      <Icon name={PRODUCTS[id].icon} size={18} />
+                    </span>
+                    <span class="toc__name">{PRODUCTS[id].short}</span>
+                    <span class="toc__does">{PRODUCTS[id].does}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+        </nav>
+      </toc-spy>
+
+      <div class="tour__blocks">
+        {
+          blocks.map((block) => (
+            <article class:list={['block', `block--${block.id}`]} id={block.id} aria-labelledby={`${block.id}-title`}>
+              <div class="block__copy">
+                <div class="block__pills">
+                  <ProductPill product={block.id} />
+                  {block.tag && <span class="block__tag">{block.tag}</span>}
+                </div>
+                <h3 id={`${block.id}-title`}>{block.title}</h3>
+                <p class="block__text">{block.text}</p>
+                {block.features.length > 0 && (
+                  <ul class="block__features" role="list">
+                    {block.features.map((f) => (
+                      <li>
+                        <span class="block__icon" aria-hidden="true">
+                          <Icon name={f.icon} size={18} />
+                        </span>
+                        <span class="block__feature">
+                          <b>{f.title}</b>
+                          <span>{f.text}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {block.stat && <p class="block__stat">{block.stat}</p>}
+                <div class="block__actions">
+                  <Button href={block.plan ? `${LINKS.demo}?plan=${block.plan}` : LINKS.demo} arrow>
+                    Book a live demo
+                  </Button>
+                  <Button href={PRODUCTS[block.id].href} variant="link">
+                    Learn more<span class="visually-hidden"> about {PRODUCTS[block.id].name}</span>
+                  </Button>
+                </div>
+              </div>
+
+              <Card
+                class:list={['block__media', { 'block__media--clip': isClip(block.id) }]}
+                pad="l"
+                {...(isClip(block.id) ? {} : { 'aria-hidden': 'true' as const, 'data-seq': '', 'data-loop': '' })}
+              >
+                {block.id === 'verify' && (
+                  <loop-video class="walk walk--station">
+                    <video
+                      src="/media/verify-station.mp4"
+                      poster={stationPoster.src}
+                      width="720"
+                      height="1028"
+                      muted
+                      loop
+                      playsinline
+                      controls
+                      preload="none"
+                      aria-label="Aldente Verify at a packing station: staff put each item under the camera, the screen checks it against the order, and a wrong item is caught before the bag is closed."
+                    />
+                  </loop-video>
+                )}
+                {block.id === 'dispute' && (
+                  <div class="scene scene--light tone-paper desk">
+                    <p class="desk__top">
+                      <span class="desk__brand">
+                        <img src={mark.src} alt="" width="9" height="11" loading="lazy" />
+                        Refund claims
+                      </span>
+                      <span class="desk__store">Location 01</span>
+                    </p>
+                    <div class="desk__claim">
+                      <p class="desk__order">
+                        <span>
+                          <b>#4821</b> · Uber Eats
+                        </span>
+                        <span class="desk__status">
+                          <span class="st st--new until-5">New claim</span>
+                          <span class="st st--ready r5">
+                            <Icon name="check" size={12} />
+                            Evidence ready
+                          </span>
+                        </span>
+                      </p>
+                      <p class="desk__what">Claim: missing drink · $17.40</p>
+                    </div>
+                    <ul class="desk__pack" role="list">
+                      {evidence.map((item, n) => (
+                        <li class={`r${n + 2}`}>
+                          {item.photo ? (
+                            <span class="desk__clip">
+                              <Image src={trayComplete} alt="" widths={[120, 240]} sizes="56px" loading="lazy" />
+                              <Icon name="play" size={12} />
+                            </span>
+                          ) : (
+                            <span class="desk__tick">
+                              <Icon name="check" size={12} />
+                            </span>
+                          )}
+                          <span>{item.title}</span>
+                          <b>{item.value}</b>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {block.id === 'tab' && (
+                  <loop-video class="walk walk--line">
+                    <video
+                      src="/media/tab-line.mp4"
+                      poster={linePoster.src}
+                      width="720"
+                      height="464"
+                      muted
+                      loop
+                      playsinline
+                      controls
+                      preload="none"
+                      aria-label="Aldente Tab on a serving line: a camera over the line sees each scoop, the register adds the item, and the order is rung up before the guest pays. One box waits while a pan is refilled."
+                    />
+                    {/* The product's own screen, in step with the clip (data-at and data-until are seconds of it). */}
+                    <div class="reg" aria-hidden="true">
+                      <p class="reg__head">
+                        <b>Boxes on the line</b>
+                      </p>
+                      <ul class="reg__boxes" role="list">
+                        <li class="reg__box">
+                          <p class="reg__id">
+                            <b>B1 · #4401</b>
+                            <span>Plate</span>
+                            <span class="reg__state">
+                              <i data-at="0" data-until="10.5">Filling</i>
+                              <i class="reg__state--ready" data-at="10.5" data-until="13.5">Ready to pay</i>
+                              <i class="reg__state--done" data-at="13.5">Paid</i>
+                            </span>
+                          </p>
+                          <ul class="reg__items" role="list">
+                            <li data-at="2.5">Chow mein</li>
+                            <li data-at="5">Sesame chicken</li>
+                            <li data-at="10.5">Beef broccoli</li>
+                          </ul>
+                        </li>
+                        <li class="reg__box" data-at="7.5">
+                          <p class="reg__id">
+                            <b>B2 · #4402</b>
+                            <span>Bowl</span>
+                            <span class="reg__state">
+                              <i class="reg__state--wait" data-at="7.5" data-until="13.5">Waiting for a refill</i>
+                              <i data-at="13.5" data-until="14.5">Filling</i>
+                              <i class="reg__state--ready" data-at="14.5">Ready to pay</i>
+                            </span>
+                          </p>
+                          <ul class="reg__items" role="list">
+                            <li data-at="7.5">Fried rice</li>
+                            <li data-at="13.5">Kung pao chicken</li>
+                          </ul>
+                        </li>
+                      </ul>
+                      <p class="reg__head">
+                        <b>Steam table</b>
+                      </p>
+                      <ul class="reg__pans" role="list">
+                        <li>
+                          <span class="reg__pan">Fried rice</span>
+                          <span class="reg__level">
+                            <b>64%</b>
+                            <span class="reg__bar" style="--level:64%" />
+                            <i class="reg__pan--ok">In stock</i>
+                          </span>
+                        </li>
+                        <li>
+                          <span class="reg__pan">Chow mein</span>
+                          <span class="reg__level">
+                            <b>38%</b>
+                            <span class="reg__bar" style="--level:38%" />
+                            <i>Watch</i>
+                          </span>
+                        </li>
+                        <li class="reg__swap">
+                          <span class="reg__pan">Kung pao</span>
+                          <span class="reg__level" data-at="0" data-until="7.5">
+                            <b>6%</b>
+                            <span class="reg__bar reg__bar--low" style="--level:6%" />
+                            <i class="reg__pan--low">Low</i>
+                          </span>
+                          <span class="reg__level" data-at="7.5" data-until="13.5">
+                            <b>0%</b>
+                            <span class="reg__bar reg__bar--low" style="--level:0%" />
+                            <i class="reg__pan--low">Refill now</i>
+                          </span>
+                          <span class="reg__level" data-at="13.5">
+                            <b>100%</b>
+                            <span class="reg__bar" style="--level:100%" />
+                            <i class="reg__pan--ok">In stock</i>
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </loop-video>
+                )}
+                {block.id === 'playbooks' && (
+                  <div class="scene scene--light tone-paper chat">
+                    <p class="chat__head"># floor-team</p>
+                    <div class="chat__msg r1">
+                      <span class="chat__avatar">DM</span>
+                      <p>
+                        <b>District manager</b>
+                        @Aldo tell this channel when a table waits more than 3 minutes to be cleared.
+                      </p>
+                    </div>
+                    <div class="chat__msg r2">
+                      <span class="chat__avatar chat__avatar--aldo">
+                        <img src={mark.src} alt="" width="11" height="14" loading="lazy" />
+                      </span>
+                      <div class="chat__body">
+                        <p>
+                          <b>Aldo</b>
+                          Saved as a Playbook. I’ll watch the dining room cameras.
+                        </p>
+                        <dl class="chat__pb r3">
+                          <div>
+                            <dt>When</dt>
+                            <dd>A table is uncleared for 3 minutes</dd>
+                          </div>
+                          <div>
+                            <dt>Where</dt>
+                            <dd>Dining room cameras</dd>
+                          </div>
+                          <div>
+                            <dt>Tell</dt>
+                            <dd># floor-team</dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </div>
+                    <div class="chat__msg r5">
+                      <span class="chat__avatar chat__avatar--aldo">
+                        <img src={mark.src} alt="" width="11" height="14" loading="lazy" />
+                      </span>
+                      <div class="chat__body">
+                        <p>
+                          <b>Aldo</b>
+                          Table 6 has waited 3 minutes. I asked Maya to reset it.
+                        </p>
+                        <span class="chat__photo">
+                          <Image src={camDining} alt="" widths={[360, 720]} sizes="360px" loading="lazy" />
+                          <i class="chat__box">
+                            <b>Table 6 · 3:12</b>
+                          </i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/toc-spy';
+</script>
+
+<script>
+  import '../../scripts/loop-video';
+</script>
+
+<style>
+  .tour__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+  }
+
+  /* minmax(0, …): the chip row scrolls inside its track instead of widening the page. */
+  .tour__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  /* Contents list. Phones and tablets: a chip row that sticks under the header and scrolls sideways. */
+  .tour__toc {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 5;
+    display: block;
+    margin-inline: calc(-1 * var(--gutter));
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tour__toc nav {
+    display: flex;
+    gap: 4px;
+    padding: 8px var(--gutter);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tour__toc nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toc__group,
+  .toc__group ul {
+    display: flex;
+    gap: 4px;
+  }
+
+  .toc__does {
+    display: none;
+  }
+
+  .toc__link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-3);
+    font-size: var(--step-small);
+    font-weight: 600;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .toc__link:hover {
+    color: var(--ink);
+  }
+
+  .toc__icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+  }
+
+  .toc__icon img {
+    opacity: 0.6;
+  }
+
+  .toc__link[aria-current] {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .toc__link[aria-current] .toc__icon {
+    color: var(--accent);
+  }
+
+  .toc__link[aria-current] .toc__icon img {
+    opacity: 1;
+  }
+
+  .toc__link:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .tour__blocks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(72px, 9vw, 128px) 16px;
+  }
+
+
+
+
+
+
+  /* A block: copy, then its scene. */
+  .block {
+    display: grid;
+    gap: clamp(32px, 4vw, 56px);
+    align-items: center;
+    scroll-margin-top: calc(var(--header-h) + 72px);
+  }
+
+  .block__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .block__pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Who the product is for: the design system's tag, quieter than the product pill beside it. */
+  .block__tag {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    background: var(--tag-bg);
+    font-size: var(--step-label);
+    font-weight: 500;
+    color: var(--tag-fg);
+  }
+
+  .block h3 {
+    max-width: 16em;
+    font-size: var(--step-h3);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .block__text {
+    max-width: 34em;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  /* Features: one per row, the icon in a tile and the title over its line, so three of them scan as a list. */
+  .block__features {
+    display: grid;
+    width: 100%;
+    margin-top: 4px;
+    border-top: 1px solid var(--line);
+    font-size: var(--step-small);
+    line-height: 1.45;
+  }
+
+  .block__features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .block__icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    color: var(--ink-2);
+  }
+
+  .block__feature {
+    display: grid;
+    gap: 2px;
+    color: var(--ink-3);
+  }
+
+  .block__feature b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* The measured number: a plain line under the features, so it does not read as a button. */
+  .block__stat {
+    font-size: var(--step-small);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+
+  /* The booking first, the product's page as the quieter link beside it. */
+  .block__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin-top: 8px;
+  }
+
+  .block__actions :global(.btn--link) {
+    align-self: center;
+  }
+
+  /*
+   * Phones and tablets: the scene comes right after the product's two lines, before the feature list, so
+   * the visitor sees the product before reading about it. The copy's children join the block's own column.
+   */
+  @media (max-width: 1023px) {
+
+
+
+  }
+
+  /* Phones: the panel's own padding steps down, so the scene keeps its width. */
+  @media (max-width: 639px) {
+  }
+
+  /* The media panel: one scene of product UI, centred on a Card. */
+  .block__media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    --loop: 11s;
+  }
+
+  .scene {
+    width: min(100%, 440px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--radius-m);
+    font-size: var(--step-label);
+    line-height: 1.4;
+    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.7);
+  }
+
+  /* Light product UI, as on the decks: the scene carries the paper tone (tone-paper), so its ground, ink,
+     cards, hairlines and tags are the design system's paper tokens. Green text is the darkened --ok-deep. */
+  .scene--light {
+    /* The green wash under --ok-deep text: opaque, so the text keeps AA on the paper ground too. */
+    --ok-wash: color-mix(in srgb, var(--ok) 14%, var(--paper-card));
+  }
+
+  /* Dispute: the claim, and the evidence pack filling in under it. */
+  .desk__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .desk__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--step-small);
+    font-weight: 600;
+  }
+
+  .desk__brand img {
+    width: 20px;
+    height: 20px;
+    padding: 4px 5px;
+    border-radius: var(--radius-xs);
+    background: var(--bg);
+  }
+
+  .desk__store {
+    color: var(--fg-3);
+  }
+
+  .desk__claim {
+    display: grid;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid var(--card-line);
+    border-radius: var(--radius-s);
+    background: var(--card);
+  }
+
+  .desk__order {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .desk__what {
+    color: var(--fg-3);
+  }
+
+  /* The two statuses share one cell; the scene swaps them. */
+  .desk__status {
+    display: grid;
+    justify-items: end;
+  }
+
+  .st {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .st--new {
+    background: #fdf1dc;
+    color: #8a5a0a;
+    opacity: 0;
+  }
+
+  .st--ready {
+    background: var(--ok-wash);
+    color: var(--ok-deep);
+  }
+
+  .desk__pack {
+    display: grid;
+    gap: 4px;
+  }
+
+  .desk__pack li {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 4px 12px 4px 4px;
+    border: 1px solid var(--card-line);
+    border-radius: var(--radius-s);
+    background: var(--card);
+  }
+
+  .desk__pack b {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .desk__clip,
+  .desk__tick {
+    position: relative;
+    width: 40px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: var(--radius-xs);
+  }
+
+  .desk__clip :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .desk__clip :global(svg) {
+    position: relative;
+    color: #ffffff;
+    filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.8));
+  }
+
+  .desk__tick {
+    background: var(--ok-wash);
+    color: var(--ok-deep);
+  }
+
+  /* Verify and Tab: a real clip in a portrait frame. Its own ground is the panel's colour, so it sits in the
+     panel without an edge. */
+  .block__media--clip {
+    padding-block: var(--card-pad-m);
+  }
+
+  .walk {
+    display: block;
+    width: min(100%, 352px);
+  }
+
+  /* Verify: the packing station from above, then the product's own screen. A little wider than Tab's frame,
+     so the two panels end up the same height. */
+  .walk--station {
+    width: min(100%, 400px);
+  }
+
+  .walk video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 720 / 1154;
+    border-radius: var(--radius-m);
+    background: var(--card);
+  }
+
+  .walk--station video {
+    aspect-ratio: 720 / 1028;
+  }
+
+  /* Tab: the serving line across the whole panel, then the product's own screen under it. */
+  .walk--line {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .walk--line video {
+    aspect-ratio: 720 / 464;
+  }
+
+  /* The screen: boxes on the line, then the steam table. Rows on the page ground, a step off the panel. */
+  .reg {
+    display: grid;
+    gap: 8px;
+    font-size: var(--step-mock);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  .reg__head {
+    color: var(--ink-3);
+  }
+
+  .reg__head:not(:first-child) {
+    margin-top: 8px;
+  }
+
+  .reg__head b {
+    font-size: var(--step-label);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .reg__boxes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .reg__box,
+  .reg__pans li {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    background: var(--bg);
+  }
+
+  .reg__id {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    color: var(--ink-3);
+  }
+
+  .reg__id b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* One status at a time, in the same place. */
+  .reg__state,
+  .reg__swap {
+    display: grid;
+  }
+
+  .reg__state {
+    flex-basis: 100%;
+    justify-items: start;
+  }
+
+  .reg__state i {
+    grid-area: 1 / 1;
+  }
+
+  /* The pan's name on the first row, its three passing levels stacked on the second. */
+  .reg__level {
+    grid-area: 2 / 1;
+  }
+
+  .reg__state i {
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    font-style: normal;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  .reg__state .reg__state--ready {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .reg__state .reg__state--done {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+
+  .reg__state .reg__state--wait {
+    color: var(--accent);
+  }
+
+  .reg__items {
+    display: grid;
+    gap: 4px;
+    min-height: 4.6em;
+    color: var(--ink);
+  }
+
+  .reg__items li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reg__items li::before {
+    content: '';
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    /* Neutral: orange is kept for what needs someone (ready to pay, refill now). */
+    background: var(--ink-3);
+  }
+
+  .reg__pans {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .reg__pans li {
+    gap: 4px;
+  }
+
+  .reg__pans b {
+    font-size: var(--step-small);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .reg__pans i {
+    font-style: normal;
+    color: var(--ink-3);
+  }
+
+  .reg__level {
+    display: grid;
+    gap: 4px;
+  }
+
+  /* How full the pan is. */
+  .reg__bar {
+    height: 4px;
+    margin-block: 2px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(var(--ink-3), var(--ink-3)) left / var(--level) 100% no-repeat var(--surface-2);
+  }
+
+  .reg__bar--low {
+    background-image: linear-gradient(var(--accent), var(--accent));
+  }
+
+  .reg__pans .reg__pan--ok {
+    color: var(--ok);
+  }
+
+  .reg__pans .reg__pan--low {
+    color: var(--accent);
+  }
+
+  /* A part with an end is a passing state: hidden unless the clip is at it. While the script follows the
+     clip, everything else also waits for its moment. Hidden parts keep their space, so the panel never jumps. */
+  .reg [data-until],
+  .walk--line[data-live] .reg [data-at] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .walk--line .reg [data-at].is-on {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Playbooks: a manager asks once in a Slack channel, Aldo saves the Playbook, then posts the camera view. */
+  .chat__head {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--card-line);
+    font-size: var(--step-small);
+    font-weight: 700;
+  }
+
+  .chat__msg {
+    display: flex;
+    gap: 12px;
+    color: var(--fg-2);
+  }
+
+  .chat__msg b {
+    display: block;
+    font-weight: 700;
+    color: var(--fg);
+  }
+
+  .chat__avatar {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-s);
+    background: #2b6cb0;
+    color: #ffffff;
+    font-size: var(--step-mock-s);
+    font-weight: 700;
+  }
+
+  .chat__avatar--aldo {
+    background: var(--bg);
+  }
+
+  .chat__body {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  /* The saved Playbook: what it checks, where, and who it tells. */
+  .chat__pb {
+    display: grid;
+    margin: 0;
+    border: 1px solid var(--card-line);
+    border-radius: var(--radius-s);
+    background: var(--card);
+  }
+
+  .chat__pb div {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .chat__pb div + div {
+    border-top: 1px solid var(--card-line);
+  }
+
+  .chat__pb dt {
+    color: var(--fg-3);
+  }
+
+  .chat__pb dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  /* The camera view Aldo posts, with the table it is talking about marked. */
+  .chat__photo {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-s);
+  }
+
+  .chat__photo :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: 20% 100%;
+  }
+
+  .chat__box {
+    position: absolute;
+    left: 6%;
+    top: 38%;
+    width: 46%;
+    height: 54%;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-xs);
+    background: var(--accent-soft);
+    font-style: normal;
+  }
+
+  .chat__box b {
+    position: absolute;
+    left: -2px;
+    bottom: 100%;
+    padding: 2px 8px;
+    border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+    background: var(--accent);
+    font-family: var(--font-mono);
+    font-size: var(--step-mock-s);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--on-accent);
+  }
+
+
+
+
+
+
+
+
+  /* Scene motion beyond the shared steps: the status swaps. */
+  @media (prefers-reduced-motion: no-preference) {
+
+    .st--new {
+      opacity: 1;
+    }
+  }
+
+
+  /* Desktop: the contents list on the left stays put; each block is copy beside its scene. */
+  @media (min-width: 1024px) {
+    .tour__grid {
+      grid-template-columns: 200px minmax(0, 1fr);
+      gap: 48px;
+      align-items: start;
+    }
+
+    .tour__toc {
+      top: calc(var(--header-h) + 24px);
+      margin-inline: 0;
+      background: none;
+      border-bottom: 0;
+    }
+
+    .tour__toc nav {
+      flex-direction: column;
+      gap: 24px;
+      padding: 0;
+      overflow: visible;
+    }
+
+    .toc__group,
+    .toc__group ul {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toc__link {
+      border-radius: var(--radius-s);
+      white-space: normal;
+    }
+
+    .tour__blocks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .block {
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 48px;
+      scroll-margin-top: calc(var(--header-h) + 24px);
+    }
+
+    .block__media {
+      min-height: 460px;
+    }
+
+
+  }
+
+  /* Room for the second line of the contents list: what each product does. */
+  @media (min-width: 1200px) {
+    .tour__grid {
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 64px;
+    }
+
+    .toc__link {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 0 12px;
+      min-height: 0;
+      padding: 8px 12px;
+    }
+
+    .toc__does {
+      display: block;
+      grid-column: 2;
+      font-size: var(--step-label);
+      font-weight: 400;
+      color: var(--ink-3);
+    }
+  }
+</style>

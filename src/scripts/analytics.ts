@@ -1,5 +1,5 @@
 import { ANALYTICS, EVENTS } from '../data/analytics';
-import { ctaProps, sectionName, shouldLoad, type EventProps } from '../lib/analytics';
+import { cleanText, ctaProps, sectionName, shouldLoad, type EventProps } from '../lib/analytics';
 
 /**
  * Cookieless analytics (Umami). Loaded once from BaseLayout. Events wait in `queued` until Umami's script
@@ -57,7 +57,7 @@ export function loadAnalytics(hostname = location.hostname): boolean {
 }
 
 function sectionOf(link: Element): string {
-  const region = link.closest('section, header, footer');
+  const region = link.closest('section, header, footer, aside');
   if (!region) return sectionName(null);
   const heading = region.querySelector('h1, h2, h3');
   return sectionName({
@@ -69,10 +69,13 @@ function sectionOf(link: Element): string {
   });
 }
 
-/** "CTA click" for every link that leads to booking, with where it sat and which plan it asked for. */
+/** "CTA click" for every link that leads to booking, with where it sat and which plan it asked for; and a link's own event. */
 function onClick(event: MouseEvent): void {
   const link = (event.target as Element | null)?.closest?.('a[href]');
   if (!link) return;
+  // A link that names its own event (data-track), such as the home page's contents list.
+  const named = (link as HTMLElement).dataset.track;
+  if (named) track(named, { label: cleanText(link.textContent), path: location.pathname });
   const props = ctaProps({
     text: link.textContent ?? '',
     href: link.getAttribute('href') ?? '',

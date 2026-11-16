@@ -95,9 +95,20 @@ test('stays within the performance budget', async ({ isMobile }) => {
   test.skip(isMobile, 'The budget is checked once against the build output.');
   const dir = join(process.cwd(), 'dist', '_astro');
   const files = readdirSync(dir);
-  const gz = (ext: string) => files.filter((f) => f.endsWith(ext)).reduce((sum, f) => sum + gzipSync(readFileSync(join(dir, f))).length, 0);
+  const size = (list: string[]) => list.reduce((sum, f) => sum + gzipSync(readFileSync(join(dir, f))).length, 0);
+  const gz = (ext: string) => size(files.filter((f) => f.endsWith(ext)));
 
-  expect(gz('.js'), 'all JavaScript, gzipped').toBeLessThan(20_000);
+  // The two background effects are chunks of their own, loaded after the page and only where they show: the
+  // hero's glow (hero-ember.ts, with Paper Shaders) and the closing band's slat wall (slat-sea-gl.ts). Each
+  // has its own budget, and every page's own scripts keep theirs.
+  const glow = (f: string) => /^hero-ember\.[\w-]+\.js$/.test(f);
+  const wall = (f: string) => /^slat-sea-gl\.[\w-]+\.js$/.test(f);
+  const scripts = files.filter((f) => f.endsWith('.js'));
+  expect(scripts.filter(glow), 'the glow is one separate chunk').toHaveLength(1);
+  expect(scripts.filter(wall), 'the slat wall is one separate chunk').toHaveLength(1);
+  expect(size(scripts.filter((f) => !glow(f) && !wall(f))), 'page JavaScript, gzipped').toBeLessThan(20_000);
+  expect(size(scripts.filter(glow)), 'hero glow, gzipped').toBeLessThan(12_000);
+  expect(size(scripts.filter(wall)), 'slat wall, gzipped').toBeLessThan(4_000);
   expect(gz('.css'), 'all CSS, gzipped').toBeLessThan(40_000);
 
   const heavyImages = files.filter((f) => /\.(webp|avif|jpe?g|png)$/.test(f)).filter((f) => statSync(join(dir, f)).size > 250_000);

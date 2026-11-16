@@ -55,6 +55,6 @@ It checks every page, redirect, the 404, security headers, caching and compressi
 ## Good to know
 
 - **DNS:** A/AAAA records for `aldenteai.com` and `www.aldenteai.com` point to the server.
-- **Updates:** rebuild and upload `dist/` again (or rebuild the image). Pages revalidate on every visit; hashed files in `/_astro/` are cached for a year.
-- **Security headers** live in `deploy/nginx/snippets/aldente-headers.conf`. The CSP allows scripts from Umami and RB2B, frames from Calendly, and requests and images to any https host; after changing it, run `npm run verify`.
+- **Updates:** rebuild and upload `dist/` again (or rebuild the image). If a file in `deploy/nginx/` changed in the release (new redirects, a new host in the CSP), copy the snippets again and reload nginx, as in the first install; then run the smoke test. Pages revalidate on every visit; hashed files in `/_astro/` are cached for a year.
+- **Security headers** live in `deploy/nginx/snippets/aldente-headers.conf`. The CSP allows scripts from Umami, RB2B and LinkedIn, frames from Calendly, and requests and images to any https host; after changing it, run `npm run verify`.
 - **HSTS** is off. Turn it on once HTTPS works for both hostnames (instructions in `aldenteai.com.conf`).

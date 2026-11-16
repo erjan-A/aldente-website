@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { ANALYTICS, RB2B } from '../../src/data/analytics';
+import { ANALYTICS, LINKEDIN, RB2B } from '../../src/data/analytics';
 import { SITE } from '../../src/data/site';
 import { securityHeaders } from '../../deploy/headers';
 
@@ -26,7 +26,7 @@ describe('server configuration', () => {
     expect(headers['X-Frame-Options']).toBe('DENY');
   });
 
-  it('lets the CSP run scripts from Umami and RB2B only, frame Calendly only, and send requests and images to any https host', () => {
+  it('lets the CSP run scripts from Umami, RB2B and LinkedIn only, frame Calendly only, and send requests and images to any https host', () => {
     const csp = Object.fromEntries(
       headers['Content-Security-Policy']!.split(';').map((d) => {
         const [name, ...values] = d.trim().split(/\s+/);
@@ -36,11 +36,13 @@ describe('server configuration', () => {
     const umamiScript = new URL(ANALYTICS.script).origin;
     const calendly = new URL(SITE.calendly).origin;
     expect(csp['default-src']).toEqual(["'self'"]);
-    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin]);
+    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin, new URL(LINKEDIN.script).origin]);
     expect(csp['connect-src']).toEqual(["'self'", 'https:']);
     expect(csp['img-src']).toEqual(["'self'", 'data:', 'https:']);
     expect(csp['frame-src']).toEqual([calendly]);
     expect(csp['frame-ancestors']).toEqual(["'none'"]);
+    // A clip that failed to load is tried again from memory (clip-rescue.ts).
+    expect(csp['media-src']).toEqual(["'self'", 'blob:']);
     expect(csp['object-src']).toEqual(["'none'"]);
   });
 
@@ -58,11 +60,19 @@ describe('server configuration', () => {
     expect(site).toMatch(/if \(\$request_uri ~ "\^\/index\\\.html/);
     expect(site).not.toMatch(/location = \/index\.html/);
     expect(site).toContain('error_page 404 /404.html;');
+    // A folder of the build (/solutions, /media) has no page of its own: the 404 page, not nginx's bare 403.
+    expect(site).toContain('error_page 403 =404 /404.html;');
   });
 
   it('redirects the old addresses to the company page', () => {
     expect(site).toMatch(/location = \/about \{\s*return 301 \/company;/);
     expect(site).toMatch(/location = \/careers \{\s*return 301 \/company;/);
+  });
+
+  it('redirects the retired Aldo and Aldente Vision pages to Aldente Playbooks', () => {
+    // The old addresses keep their campaign tags.
+    expect(site).toMatch(/location = \/aldo \{\s*return 301 \/playbooks\$is_args\$args;/);
+    expect(site).toMatch(/location = \/analytics \{\s*return 301 \/playbooks\$is_args\$args;/);
   });
 
   it('caches the hashed build assets for a year and revalidates pages', () => {

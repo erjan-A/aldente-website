@@ -1,13 +1,8 @@
 /* Slack-style UI used wherever Aldo appears, so visitors read it as a Slack app at a glance. */
 .slack {
-  --slack-aubergine: #3f0e40;
-  --slack-aubergine-2: #350d36;
-  --slack-sidebar-text: #cfc3cf;
-  --slack-active: #1164a3;
   --slack-text: #1d1c1d;
   --slack-muted: #616061;
   --slack-border: #dddddd;
-  --slack-hover: #f8f8f8;
   --slack-green: #007a5a;
   --slack-link: #1264a3;
   font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -39,14 +34,6 @@
 .slack-muted {
   color: var(--slack-muted);
   font-size: 13px;
-}
-
-.slack-quote {
-  margin: 0;
-  padding-left: 12px;
-  border-left: 4px solid #dddddd;
-  color: var(--slack-text);
-  font-style: italic;
 }
 
 .slack-actions {

@@ -1,0 +1,163 @@
+---
+import { ANNOUNCEMENT, LINKS } from '../../data/site';
+import { pagePath } from '../../lib/paths';
+import Icon from '../ui/Icon.astro';
+
+/** On the booking page the link jumps to the calendar instead of reloading the page (as the header's does). */
+const onDemo = pagePath(Astro.url.pathname) === LINKS.demo;
+const href = ANNOUNCEMENT && onDemo && ANNOUNCEMENT.href === LINKS.demo ? '#schedule' : ANNOUNCEMENT?.href;
+---
+
+{
+  ANNOUNCEMENT && (
+    <aside class="announce" aria-label="Announcement">
+      <p class="container announce__line">
+        <span class="announce__run">
+          <span class="announce__text">{ANNOUNCEMENT.text}</span>
+          <span class="announce__text" aria-hidden="true">{ANNOUNCEMENT.text}</span>
+        </span>
+        <a href={href} class="announce__link">
+          <span class="announce__cta">{ANNOUNCEMENT.cta}</span>
+          <Icon name="arrow-right" size={16} />
+        </a>
+      </p>
+    </aside>
+  )
+}
+
+<style>
+  /* One 40px line above the sticky header, in normal flow: it scrolls away and the header takes the top. */
+  .announce {
+    position: relative;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .announce__line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 40px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .announce__run {
+    display: flex;
+    min-width: 0;
+  }
+
+  /* The second copy only exists to follow the first one round where the line runs. */
+  .announce__text + .announce__text {
+    display: none;
+  }
+
+  .announce__link {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+  }
+
+  .announce__cta {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  /*
+   * Below 768px: running news. The same sentence as on a wide screen does not fit, so it runs right to left
+   * in a loop (two copies, each moving one full width), fades out before the link, and "Learn more" stays in
+   * place at the right edge.
+   */
+  @media (max-width: 767px) {
+    .announce__line {
+      justify-content: flex-start;
+      gap: 0;
+      padding-inline: 0;
+      font-size: var(--step-label);
+    }
+
+    .announce__run {
+      flex: 1;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+    }
+
+    .announce__text,
+    .announce__text + .announce__text {
+      display: block;
+      flex: none;
+      padding-inline: 16px 32px;
+    }
+
+    .announce__link {
+      padding-inline: 4px 16px;
+    }
+  }
+
+  @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+    .announce__text {
+      animation: announce-run 30s linear infinite;
+    }
+  }
+
+  /* Reduced motion on a narrow screen: the sentence stands still and wraps. */
+  @media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+    .announce__line {
+      height: auto;
+      min-height: 40px;
+      padding-block: 8px;
+      line-height: 1.4;
+      white-space: normal;
+    }
+
+    .announce__run {
+      mask-image: none;
+    }
+
+    .announce__text + .announce__text {
+      display: none;
+    }
+  }
+
+  @keyframes announce-run {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* The whole bar is the link's target. */
+  .announce__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .announce__link :global(svg) {
+    transition: transform 0.15s var(--ease-out);
+  }
+
+  .announce:hover .announce__link :global(svg) {
+    transform: translateX(3px);
+  }
+
+  .announce__link:focus-visible {
+    outline: none;
+  }
+
+  .announce:has(.announce__link:focus-visible) {
+    outline: 2px solid var(--on-accent);
+    outline-offset: -4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .announce__link :global(svg) {
+      transition: none;
+    }
+  }
+</style>

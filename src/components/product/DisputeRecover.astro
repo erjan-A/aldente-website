@@ -7,17 +7,17 @@ import SectionHeader from '../ui/SectionHeader.astro';
 
 /**
  * Aldente Dispute, as on the decks' slide: four numbered steps beside a light dispute desk where one claim
- * plays out: the claim comes in, the packing clip proves the bag, the evidence pack goes to the app in its
- * support chat, and the charge comes back. The order is #4821 from the rest of the page.
+ * plays out: the claim comes in, the packing clip is found, the evidence pack is built and it is ready to
+ * send. Aldente Dispute builds the evidence; it never promises how a delivery app will decide. The order is #4821 from the rest of the page.
  *
  * <scroll-beats> reveals the desk step by step as it scrolls into view (data-beat 0-4). The markup ships at
  * beat 4, so without JavaScript or with reduced motion the whole story shows at once.
  */
 const steps = [
   { title: 'Claim comes in', text: 'Uber Eats charges $17.40 for a missing drink.' },
-  { title: 'Proof found', text: 'Aldente pulls the packing clip: all 4 items in the bag.' },
-  { title: 'Evidence pack ready and submitted', text: 'Clip, item check and handoff, sent to the app in its support chat.' },
-  { title: 'Money back', text: 'The charge is reversed and $17.40 returns to the store.' },
+  { title: 'Clip found', text: 'Aldente pulls the packing clip: all 4 items in the bag.' },
+  { title: 'Evidence pack built', text: 'Clip, item check and handoff time, in one pack.' },
+  { title: 'Evidence ready', text: 'The pack is ready when your team answers the claim.' },
 ];
 const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
 ---
@@ -27,8 +27,8 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
     <SectionHeader
       id="dispute-title"
       product="dispute"
-      title="When a refund still hits,"
-      muted="Aldente disputes it with video proof."
+      title="Every refund claim"
+      muted="answered with proof."
       lead="Delivery apps charge the store for refund claims, right or wrong. Aldente Dispute builds the evidence pack for each claim."
     />
 
@@ -50,19 +50,19 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
           }
         </ol>
 
-        <figure class="desk" aria-label="Aldente’s dispute desk: the Uber Eats claim on order #4821, the packing clip, the dispute and the reversed charge">
+        <figure class="desk" aria-label="Aldente’s dispute desk: the Uber Eats claim on order #4821, the packing clip and the evidence pack, ready to send">
           <div class="desk__top">
-            <span class="desk__brand"><img src={mark.src} alt="" width="13" height="16" />Delivery disputes</span>
+            <span class="desk__brand"><img src={mark.src} alt="" width="13" height="16" />Refund claims</span>
             <span class="desk__store">Location 01</span>
           </div>
 
           <div class="desk__kpis">
             <div class="desk__kpi">
-              <span>Won back this month</span>
-              <b><span class="v-before">$4,202</span><span class="v-after">$4,219</span></b>
+              <span>Claims this month</span>
+              <b><span class="v-before">42</span><span class="v-after">42</span></b>
             </div>
             <div class="desk__kpi">
-              <span>Disputes won</span>
+              <span>Evidence packs ready</span>
               <b><span class="v-before">41</span><span class="v-after">42</span></b>
             </div>
           </div>
@@ -73,8 +73,8 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
               <span class="desk__status">
                 <span class="st st--new">New claim</span>
                 <span class="st st--proof">Clip found</span>
-                <span class="st st--sent">Disputed</span>
-                <span class="st st--back"><Icon name="check" size={12} strokeWidth={3} />Reversed</span>
+                <span class="st st--sent">Pack built</span>
+                <span class="st st--back"><Icon name="check" size={12} />Evidence ready</span>
               </span>
             </div>
             <p class="desk__claim">Claim: missing drink · <b>$17.40</b></p>
@@ -89,7 +89,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
                   {
                     items.map((item) => (
                       <li>
-                        <Icon name="check" size={12} strokeWidth={3} />
+                        <Icon name="check" size={12} />
                         {item}
                       </li>
                     ))
@@ -101,12 +101,12 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
 
             <div class="desk__chat">
               <p class="msg msg--app b1"><b>Uber Eats support</b>Guest reported a missing drink. $17.40 charged to the store.</p>
-              <p class="msg msg--us b3"><b>Aldente</b>All 4 items were packed. Evidence pack from Aldente attached.</p>
-              <p class="msg msg--app b4"><b>Uber Eats support</b>Evidence reviewed. Charge reversed.</p>
+              <p class="msg msg--us b3"><b>Aldente</b>Packing clip found. All 4 items were packed.</p>
+              <p class="msg msg--us b4"><b>Aldente</b>Evidence pack ready: clip 0:42, item check 4/4, handoff 12:44.</p>
             </div>
           </div>
 
-          <p class="desk__toast b4"><Icon name="check" size={14} strokeWidth={3} />$17.40 returned to Location 01</p>
+          <p class="desk__toast b4"><Icon name="check" size={14} />Evidence pack ready for order #4821</p>
         </figure>
       </div>
     </scroll-beats>
@@ -206,7 +206,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
     --d-ink: #141414;
     --d-muted: #6b6b6b;
     --d-line: #e4e4e0;
-    --d-ok: #147a43; /* the decks' #1e9e5a, darkened to keep AA on white and on --d-ok-soft */
+    --d-ok: var(--ok-deep);
     --d-ok-soft: #e6f5ec;
     position: relative;
     margin: 0;
@@ -244,7 +244,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
     height: 22px;
     padding: 4px 5px;
     border-radius: var(--radius-xs);
-    background: #0b0b0b;
+    background: var(--bg);
   }
 
   .desk__store {
@@ -379,7 +379,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
     border-radius: var(--radius-xs);
     background: rgb(0 0 0 / 0.72);
     color: #ffffff;
-    font-size: 12px;
+    font-size: var(--step-mock);
     font-weight: 700;
   }
 
@@ -424,12 +424,12 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
   .msg {
     max-width: 88%;
     padding: 8px 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-m);
   }
 
   .msg b {
     display: block;
-    font-size: 12px;
+    font-size: var(--step-mock);
     opacity: 0.75;
   }
 
@@ -437,7 +437,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
     align-self: flex-start;
     background: var(--d-card);
     border: 1px solid var(--d-line);
-    border-bottom-left-radius: 4px;
+    border-bottom-left-radius: var(--radius-xs);
   }
 
   /* Dark text on the orange bubble: white on the accent would miss AA at this size. */
@@ -445,7 +445,7 @@ const items = ['Sandwich', 'Fries', 'Drink 1', 'Drink 2'];
     align-self: flex-end;
     background: var(--accent);
     color: var(--on-accent);
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: var(--radius-xs);
   }
 
   .msg--us b {

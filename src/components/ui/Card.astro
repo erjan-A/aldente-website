@@ -6,24 +6,22 @@ import type { HTMLAttributes } from 'astro/types';
  * dark, paper and orange sections alike. Content is a flex column with a 12px gap (override with
  * --card-gap). Style children from the parent with :global(). Never nest a Card in a Card.
  *
- *   as           'div' (default) | 'li' | 'article' | 'section'
+ *   as           'div' (default) | 'li' | 'article' | 'section' | 'figure'
  *   pad          'none' | 's' 16px | 'm' 20-28px (default) | 'l' 24-40px  (tokens --card-pad-s|m|l)
- *   radius       'm' 16px | 'l' 24px (default) | 'xl' 32px (large panels)
- *   interactive  edge brightens on hover; use when the card contains its main link
+ *   radius       'l' 24px (default) | 'xl' 32px (large panels)
  * Extra attributes (id, aria-*, data-*) pass through.
  */
 interface Props extends HTMLAttributes<'div'> {
-  as?: 'div' | 'li' | 'article' | 'section';
+  as?: 'div' | 'li' | 'article' | 'section' | 'figure';
   pad?: 'none' | 's' | 'm' | 'l';
-  radius?: 'm' | 'l' | 'xl';
-  interactive?: boolean;
+  radius?: 'l' | 'xl';
   class?: string;
 }
 
-const { as: Tag = 'div', pad = 'm', radius = 'l', interactive = false, class: className, ...rest } = Astro.props;
+const { as: Tag = 'div', pad = 'm', radius = 'l', class: className, ...rest } = Astro.props;
 ---
 
-<Tag class:list={['card', `card--pad-${pad}`, `card--r-${radius}`, { 'card--interactive': interactive }, className]} {...rest}>
+<Tag class:list={['card', `card--pad-${pad}`, `card--r-${radius}`, className]} {...rest}>
   <slot />
 </Tag>
 
@@ -55,24 +53,11 @@ const { as: Tag = 'div', pad = 'm', radius = 'l', interactive = false, class: cl
     padding: var(--card-pad-l);
   }
 
-  .card--r-m {
-    border-radius: var(--radius-m);
-  }
-
   .card--r-l {
     border-radius: var(--radius-l);
   }
 
   .card--r-xl {
     border-radius: var(--radius-xl);
-  }
-
-  .card--interactive {
-    transition: border-color 0.2s ease;
-  }
-
-  .card--interactive:hover,
-  .card--interactive:focus-within {
-    border-color: color-mix(in srgb, var(--card-line, var(--line-card)), var(--fg, var(--ink)) 35%);
   }
 </style>

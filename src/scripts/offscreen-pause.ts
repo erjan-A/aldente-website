@@ -1,6 +1,6 @@
 /**
  * Pauses CSS animations nobody can see. Every section in <main>, and any element marked
- * `data-loop` (looping parts inside a tall section, such as the hero cards and the logo strip),
+ * `data-loop` (looping parts inside a tall section, such as the logo row),
  * gets `data-paused` while it is off screen; the `[data-paused]` rule in global.css then holds its
  * animations. They resume, from where they stopped, a little before they scroll back into view.
  * Loaded once from BaseLayout. Nothing changes with reduced motion, where no animation runs.

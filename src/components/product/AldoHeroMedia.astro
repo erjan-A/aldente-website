@@ -6,12 +6,12 @@ import SlackWindow from '../slack/SlackWindow.astro';
 import Icon from '../ui/Icon.astro';
 
 /**
- * /aldo hero: one question in Slack and Aldo's numbered answer with the camera clip behind it. The readings
+ * /playbooks hero: one question in Slack and Aldo's numbered answer with the camera clip behind it. The readings
  * match the home console (Location 03, Cam 04, 12:41).
  */
 ---
 
-<SlackWindow active="district-west" sidebar={false} class="aldo-hero" label="A district manager asks Aldo about Location 03 in Slack">
+<SlackWindow active="district-west" class="aldo-hero" label="A district manager asks Aldo about Location 03 in Slack">
   <SlackMessage author="District manager" avatar="DM" avatarColor="#2b6cb0" time="12:41 PM">
     <p class="slack-text"><span class="slack-mention">@Aldo</span> how’s Location 03 doing right now?</p>
   </SlackMessage>
@@ -35,7 +35,7 @@ import Icon from '../ui/Icon.astro';
       <span class="aldo-hero__play" aria-hidden="true"><Icon name="play" size={14} /></span>
       <span class="slack-media__label aldo-hero__label">Cam 04 · Table 6</span>
     </div>
-    <p class="slack-muted">Source: Aldente Vision · Location 03, Cam 04</p>
+    <p class="slack-muted">Source: Location 03, Cam 04</p>
     <div class="slack-actions"><span class="slack-btn slack-btn--primary">View clip</span><span class="slack-btn">Open records</span></div>
   </SlackMessage>
 </SlackWindow>
@@ -56,7 +56,7 @@ import Icon from '../ui/Icon.astro';
   .aldo-hero__answer li {
     position: relative;
     padding-left: 24px;
-    font-size: 15px;
+    font-size: var(--step-small);
     line-height: 1.46668;
     color: var(--slack-text);
     counter-increment: answer;

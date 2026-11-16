@@ -2,7 +2,8 @@ import { define } from './define';
 
 /**
  * Mobile menu: a disclosure button that controls the menu it names (aria-controls). While open it sets
- * `data-menu-open` on <html> (CSS locks the page scroll with it). Escape (focus returns to the button),
+ * `data-menu-open` on <html> (CSS locks the page scroll with it) and `--menu-top` on the menu (the header's
+ * bottom edge, where a fixed sheet starts). Escape (focus returns to the button),
  * following a link, a tap outside the menu's `[data-menu-panel]` (the backdrop, or the bar around the button)
  * and focus leaving the element all close it.
  */
@@ -42,6 +43,9 @@ export class SiteNav extends HTMLElement {
     menu.hidden = !open;
     document.documentElement.toggleAttribute('data-menu-open', open);
     if (open) {
+      // The sheet is fixed; the header may sit lower than the top while the announcement above it shows.
+      const bottom = this.closest('header')?.getBoundingClientRect().bottom;
+      if (bottom) menu.style.setProperty('--menu-top', `${Math.round(bottom)}px`);
       document.addEventListener('keydown', this.onKeydown);
       document.addEventListener('click', this.onDocumentClick);
     } else {

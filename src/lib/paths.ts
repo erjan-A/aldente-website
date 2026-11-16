@@ -1,4 +1,4 @@
-/** The clean address of a page, e.g. "/aldo" for the built "/aldo.html" and "/" for "/index.html". */
+/** The clean address of a page, e.g. "/tab" for the built "/tab.html" and "/" for "/index.html". */
 export function pagePath(pathname: string): string {
   const path = pathname
     .replace(/(^|\/)index\.html$/, '$1')
@@ -8,7 +8,7 @@ export function pagePath(pathname: string): string {
 }
 
 /**
- * The clean address an internal link opens: "/aldo#aldo" -> "/aldo", "/demo?plan=starter" -> "/demo".
+ * The clean address an internal link opens: "/playbooks#aldo" -> "/playbooks", "/demo?plan=starter" -> "/demo".
  * Links that are not root-relative (a hash on the same page, another site, mailto) give "".
  */
 export function linkPath(href: string): string {

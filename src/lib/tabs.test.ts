@@ -18,6 +18,13 @@ describe('nextTabIndex', () => {
     expect(nextTabIndex(1, 'End', 4)).toBe(3);
   });
 
+  it('in a row of tabs, leaves Up and Down alone', () => {
+    expect(nextTabIndex(0, 'ArrowDown', 4, 'row')).toBeNull();
+    expect(nextTabIndex(0, 'ArrowUp', 4, 'row')).toBeNull();
+    expect(nextTabIndex(0, 'ArrowRight', 4, 'row')).toBe(1);
+    expect(nextTabIndex(0, 'ArrowLeft', 4, 'row')).toBe(3);
+  });
+
   it('ignores other keys', () => {
     expect(nextTabIndex(2, 'Enter', 4)).toBeNull();
   });

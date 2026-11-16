@@ -1,0 +1,11 @@
+#!/bin/sh
+# Design system gate: a commit that touches styles or components must keep to the tokens (see DESIGN.md).
+# Runs in about a second. The full check is `npm run verify`.
+if git diff --cached --name-only | grep -qE '\.(astro|css)$|^tests/unit/design-system\.test\.ts$'; then
+  echo "Checking the design system (DESIGN.md)..."
+  npx vitest run tests/unit/design-system.test.ts --reporter=dot || {
+    echo ""
+    echo "Commit stopped: a style left the design system. See the list above and DESIGN.md."
+    exit 1
+  }
+fi

@@ -45,6 +45,22 @@ describe('<toc-spy>', () => {
     expect(current()).toEqual(['Three']);
   });
 
+  it('keeps the current link in view inside a sideways-scrolling row (the phone chip row)', () => {
+    mount(fixture.replace('<toc-spy>', '<toc-spy><div data-toc-scroll>').replace('</toc-spy>', '</div></toc-spy>'));
+    const row = document.querySelector<HTMLElement>('[data-toc-scroll]')!;
+    const scrollTo = vi.fn();
+    row.scrollTo = scrollTo as unknown as typeof row.scrollTo;
+    vi.spyOn(row, 'scrollWidth', 'get').mockReturnValue(600);
+    vi.spyOn(row, 'clientWidth', 'get').mockReturnValue(300);
+    const third = document.querySelectorAll<HTMLElement>('toc-spy a')[2]!;
+    vi.spyOn(third, 'offsetLeft', 'get').mockReturnValue(420);
+    place({ one: -1900, two: -900, three: 120 });
+    spy().update();
+    expect(scrollTo).toHaveBeenCalledWith({ left: 404, behavior: 'smooth' });
+    spy().update();
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+  });
+
   it('does nothing when a link points nowhere', () => {
     mount(`<toc-spy><a href="#missing">Missing</a></toc-spy>`);
     spy().update();

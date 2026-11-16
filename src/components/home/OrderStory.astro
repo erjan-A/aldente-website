@@ -7,34 +7,29 @@ import Icon from '../ui/Icon.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 
 interface Props {
-  /** false: a visually hidden h2 only (the page around it supplies the visible heading). */
-  heading?: boolean;
-  /** The visible heading. Override where the page hero already uses the home wording (/order-verification). */
-  title?: string;
+  /** The visible heading. */
+  title: string;
   muted?: string;
   lead?: string;
-  /** Product pills above the title; omit on the product's own page. */
-  product?: ProductId | ProductId[] | null;
-  /** The section's ground: surface where a dark section sits right above it (home). */
-  tone?: 'dark' | 'surface';
+  /** Product pill above the title; omit on the product's own page. */
+  product?: ProductId | null;
 }
 
-// Home: Aldente Verify and Aldente Dispute told as one order, from the ticket to the refund claim.
+// Aldente Verify and Aldente Dispute told as one order, from the ticket to the refund claim
+// (/order-verification, /solutions/delivery).
 const {
-  heading = true,
-  title = 'Every order checked before pickup,',
-  muted = 'every refund answered with proof.',
-  lead = 'Checks each order at the packing station, fixes the miss before pickup, and files the evidence when a refund claim comes in.',
-  product = ['verify', 'dispute'],
-  tone = 'dark',
+  title,
+  muted,
+  lead = 'Aldente Verify checks each order at the packing station, the team fixes the miss before pickup, and the evidence is saved for any refund claim.',
+  product,
 } = Astro.props;
 
 const steps = [
   { title: 'Order arrives', time: '12:39', text: 'The ticket comes from your POS: a turkey sandwich, fries and two drinks.' },
-  { title: 'Bag is checked', time: '12:40', text: 'The tablet camera checks every item and quantity. One drink is in the bag. Two are required.' },
+  { title: 'Bag is checked', time: '12:40', text: 'The camera checks every item and quantity. One drink is in the bag. Two are required.' },
   { title: 'Fixed before pickup', time: '12:41', text: 'The team adds the second drink and checks again. Fixed before the courier arrives.' },
   { title: 'Evidence saved', time: '12:41', text: 'The photo, the detections and a 42-second clip are saved as one record for order #4821.' },
-  { title: 'Refund disputed', time: 'Day 2', text: 'Uber Eats reports a missing drink. Aldente Dispute submits the evidence pack, and the charge is reversed.' },
+  { title: 'Refund claim answered', time: 'Day 2', text: 'Uber Eats reports a missing drink. Aldente Dispute builds the evidence pack for the claim.' },
 ];
 
 // Counts per state: before the check, after the check, after the fix.
@@ -45,15 +40,9 @@ const items = [
 ];
 ---
 
-<section class:list={['story section', `tone-${tone}`]} id="verification" aria-labelledby="story-title">
+<section class="story section tone-surface" id="verification" aria-labelledby="story-title">
   <div class="container story__inner">
-    {
-      heading && (
-        <SectionHeader product={product ?? undefined} id="story-title" title={title} muted={muted} lead={lead} />
-      )
-    }
-    {/* Without the visible heading, a hidden one keeps the step titles (h3) under an h2, as in Playbooks. */}
-    {!heading && <h2 id="story-title" class="visually-hidden">How an order is verified</h2>}
+    <SectionHeader product={product ?? undefined} id="story-title" title={title} muted={muted} lead={lead} />
 
     <scroll-story class="story__grid" data-step="0">
       <ol class="story__steps" role="list">
@@ -109,8 +98,8 @@ const items = [
           <div class="layer layer--dispute">
             <div class="thread">
               <p class="thread__msg thread__msg--them"><b>Uber Eats Support</b>Customer reports a missing drink on #4821. A $17.40 refund will be charged to your store.</p>
-              <p class="thread__msg thread__msg--us"><b>Aldente</b>The packing clip from 12:41 shows both drinks in the bag. Evidence attached. We’re disputing this charge.</p>
-              <p class="thread__msg thread__msg--them"><b>Uber Eats Support</b>Evidence reviewed. <span class="thread__ok">Charge reversed.</span></p>
+              <p class="thread__msg thread__msg--us"><b>Aldente</b>The packing clip from 12:41 shows both drinks in the bag.</p>
+              <p class="thread__msg thread__msg--us"><b>Aldente</b>Clip, item check and handoff time attached. <span class="thread__ok">Evidence ready.</span></p>
             </div>
           </div>
         </div>
@@ -214,7 +203,7 @@ const items = [
   }
 
   .story__text p:last-child {
-    font-size: 1.125rem;
+    font-size: var(--step-body);
   }
 
   .story__step[aria-current='step'] .story__text p:last-child {
@@ -284,7 +273,7 @@ const items = [
     border-radius: var(--radius-xs);
     background: var(--ok);
     color: var(--on-accent);
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
   }
 
   .det--missing {
@@ -308,7 +297,7 @@ const items = [
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-size: 0.875rem;
+    font-size: var(--step-small);
   }
 
   .ticket__head {
@@ -320,11 +309,11 @@ const items = [
   }
 
   .ticket__head b {
-    font-size: 1.125rem;
+    font-size: var(--step-body);
   }
 
   .ticket__head span {
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
     color: var(--ink-3);
   }
 
@@ -371,14 +360,14 @@ const items = [
     max-width: 88%;
     padding: 12px 14px;
     border-radius: var(--radius-m);
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     line-height: 1.45;
   }
 
   .thread__msg b {
     display: block;
     margin-bottom: 2px;
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
   }
 
   .thread__msg--them {
@@ -429,12 +418,12 @@ const items = [
 
   .record__head b {
     color: var(--bg);
-    font-size: 1rem;
+    font-size: var(--step-body);
   }
 
   .record__head span {
     margin-left: auto;
-    font-size: 0.8125rem;
+    font-size: var(--step-label);
     font-weight: 600;
     color: var(--paper-ink-3);
   }
@@ -450,7 +439,7 @@ const items = [
     gap: 10px;
     padding: 8px 0;
     border-top: 1px solid var(--paper-line);
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     font-weight: 500;
   }
 
@@ -461,7 +450,7 @@ const items = [
   }
 
   .record__foot {
-    font-size: 0.8125rem;
+    font-size: var(--step-label);
     color: var(--paper-ink-3);
   }
 
@@ -765,7 +754,7 @@ const items = [
       text-overflow: ellipsis;
       white-space: nowrap;
       color: var(--ink-2);
-      font-size: 0.75rem;
+      font-size: var(--step-mock);
     }
 
     .story__step {
@@ -790,7 +779,7 @@ const items = [
       left: 4px;
       top: 4px;
       padding: 2px 6px;
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
     }
 
     .record {
@@ -803,7 +792,7 @@ const items = [
 
     .record li {
       padding: 5px 0;
-      font-size: 0.75rem;
+      font-size: var(--step-mock);
     }
 
     .record__foot {
@@ -821,13 +810,13 @@ const items = [
       max-width: 92%;
       padding: 6px 10px;
       border-radius: var(--radius-s);
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
       line-height: 1.4;
     }
 
     .thread__msg b {
       margin-bottom: 0;
-      font-size: 0.75rem;
+      font-size: var(--step-mock);
     }
 
     scroll-story[data-step='3'] .det b {

@@ -3,12 +3,12 @@ import type { ProductId } from '../../data/products';
 import ProductPill from './ProductPill.astro';
 
 /**
- * Section heading block. Title uses --step-h2 (or --step-h1 with as="h1"), lead uses --step-lead.
- * Layouts: split and stack (the lead under the title, as wide as the title), center.
+ * Section heading block. Title is an h2 in --step-h2, lead uses --step-lead.
+ * Layouts: split and stack (the lead under the title, as wide as the title).
  */
 interface Props {
-  /** Which product the section belongs to, shown as a pill above the title. Several share one section. */
-  product?: ProductId | ProductId[];
+  /** Which product the section belongs to, shown as a pill above the title. */
+  product?: ProductId;
   /** The pill's text: a topic on its own ("Customer results"), or a product's own wording ("Aldo in Slack"). */
   label?: string;
   /** The claim, in full ink. */
@@ -16,33 +16,19 @@ interface Props {
   /** The continuation, in muted ink. */
   muted?: string;
   lead?: string;
-  layout?: 'split' | 'stack' | 'center';
-  as?: 'h1' | 'h2';
+  layout?: 'split' | 'stack';
   id?: string;
 }
 
-const { product, label, title, muted, lead, layout = 'split', as: Heading = 'h2', id } = Astro.props;
-const products = product === undefined ? [] : Array.isArray(product) ? product : [product];
+const { product, label, title, muted, lead, layout = 'split', id } = Astro.props;
 ---
 
 <header class:list={['head', `head--${layout}`]}>
   <div class="head__titles">
-    {
-      products.length > 1 ? (
-        <div class="head__pills">
-          {products.map((p) => (
-            <ProductPill product={p} />
-          ))}
-        </div>
-      ) : products[0] ? (
-        <ProductPill product={products[0]} label={label} />
-      ) : (
-        label && <ProductPill label={label} />
-      )
-    }
-    <Heading class:list={['head__title', { 'head__title--page': Heading === 'h1' }]} id={id}>
+    {product ? <ProductPill product={product} label={label} /> : label && <ProductPill label={label} />}
+    <h2 class="head__title" id={id}>
       {title}{muted && <> <span class="head__muted">{muted}</span></>}
-    </Heading>
+    </h2>
   </div>
   {lead && <p class="head__lead">{lead}</p>}
 </header>
@@ -59,26 +45,10 @@ const products = product === undefined ? [] : Array.isArray(product) ? product :
     max-width: 100%;
   }
 
-  .head--center {
-    align-items: center;
-    margin-inline: auto;
-    text-align: center;
-  }
-
   .head__titles {
     display: flex;
     flex-direction: column;
     gap: 24px;
-  }
-
-  .head__pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .head--center .head__titles {
-    align-items: center;
   }
 
   /* Two lines at most from about 1000px: wide enough for the longest titles, and balanced, so a short
@@ -93,26 +63,15 @@ const products = product === undefined ? [] : Array.isArray(product) ? product :
     text-wrap: balance;
   }
 
-  .head__title--page {
-    font-size: var(--step-h1);
-    line-height: 1;
-    letter-spacing: -0.04em;
-  }
-
   .head__muted {
     color: var(--fg-3);
   }
 
-  /* Wide screens: claim on line one, continuation on line two. Never a grey word hanging at the end of the
-     claim, and the block (and so the lead) is as wide as the longer line. */
-  @media (min-width: 1000px) {
-    .head__title:has(.head__muted) {
-      text-wrap: wrap;
-    }
-
-    .head__muted {
-      display: block;
-    }
+  /* The claim, then its continuation on a line of its own, at every width: never a grey word hanging at the
+     end of the claim. Each half stays balanced. */
+  .head__muted {
+    display: block;
+    text-wrap: balance;
   }
 
   .head__lead {

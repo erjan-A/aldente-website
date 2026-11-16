@@ -12,10 +12,6 @@ const fixture = `
 <calendly-embed data-url="${URL_BASE}">
   <div data-cal-stage>
     <div data-cal-skeleton aria-hidden="true"></div>
-    <div data-cal-consent data-consent-inline hidden>
-      <p>The scheduler is run by Calendly, which sets its own cookies.</p>
-      <button type="button" data-cal-load>Show available times</button>
-    </div>
     <p role="status" aria-live="polite" data-cal-status></p>
     <p data-cal-slow hidden>Taking longer than usual?</p>
   </div>
@@ -74,41 +70,19 @@ describe('<calendly-embed>', () => {
   it('with marketing consent: tells Calendly not to ask again', () => {
     mount(fixture);
     expect(new URL(frame()!.getAttribute('src')!).searchParams.get('hide_gdpr_banner')).toBe('1');
-    expect(part('consent').hidden).toBe(true);
   });
 
-  it('without marketing consent (none yet, or rejected): asks once in the card and loads nothing', () => {
+  it('on a first visit, or after "Reject all": still loads at once, and leaves the cookie question to Calendly', () => {
     for (const stored of [null, JSON.stringify(makeConsent(NONE, Date.now()))]) {
       localStorage.clear();
       if (stored) localStorage.setItem(CONSENT_KEY, stored);
       mount(fixture);
-      expect(host().dataset.state).toBe('consent');
-      expect(part('consent').hidden).toBe(false);
-      expect(frame()).toBeNull();
+      expect(host().dataset.state).toBe('loading');
+      const params = new URL(frame()!.getAttribute('src')!).searchParams;
+      expect(params.has('hide_gdpr_banner')).toBe(false);
+      // Loading the calendar is not consent: the site's own choice stays as it was.
+      expect(localStorage.getItem(CONSENT_KEY)).toBe(stored);
     }
-  });
-
-  it('"Show available times" saves the banner’s "Accept all", tells the page and loads without Calendly’s question', () => {
-    localStorage.clear();
-    const heard: unknown[] = [];
-    window.addEventListener('consentchange', (e) => heard.push((e as CustomEvent).detail), { once: true });
-    mount(fixture);
-    part('load').click();
-    expect(JSON.parse(localStorage.getItem(CONSENT_KEY)!).marketing).toBe(true);
-    expect(document.documentElement.getAttribute('data-consent-marketing')).toBe('granted');
-    expect(heard).toHaveLength(1);
-    expect(part('consent').hidden).toBe(true);
-    expect(host().dataset.state).toBe('loading');
-    expect(new URL(frame()!.getAttribute('src')!).searchParams.get('hide_gdpr_banner')).toBe('1');
-  });
-
-  it('loads when marketing cookies are accepted in the cookie settings while the card asks', () => {
-    localStorage.clear();
-    mount(fixture);
-    expect(frame()).toBeNull();
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(makeConsent(ALL, Date.now())));
-    window.dispatchEvent(new CustomEvent('consentchange', { detail: makeConsent(ALL, Date.now()) }));
-    expect(frame()).not.toBeNull();
   });
 
   it('passes the campaign the visitor arrived with to Calendly', () => {
@@ -169,6 +143,20 @@ describe('<calendly-embed>', () => {
     expect(part('booked').hidden).toBe(false);
     expect(document.activeElement?.textContent).toBe('You’re booked.');
     expect(queued).toContainEqual(['Demo booked', { plan: 'enterprise' }]);
+  });
+
+  it('reports the LinkedIn demo conversion on a booking only, not when a time is picked', () => {
+    const lintrk = vi.fn<NonNullable<Window["lintrk"]>>();
+    window.lintrk = lintrk;
+    try {
+      mount(fixture);
+      post({ event: 'calendly.date_and_time_selected', payload: {} });
+      expect(lintrk).not.toHaveBeenCalled();
+      post({ event: 'calendly.event_scheduled', payload: { event: { uri: 'x' } } });
+      expect(lintrk).toHaveBeenCalledExactlyOnceWith('track', { conversion_id: 32303322 });
+    } finally {
+      delete window.lintrk;
+    }
   });
 
   it('offers Calendly’s own page when the scheduler is slow', () => {

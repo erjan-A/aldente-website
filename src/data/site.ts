@@ -5,9 +5,9 @@ import { SOLUTIONS } from './solutions';
 export const SITE = {
   name: 'Aldente AI',
   url: 'https://aldenteai.com',
-  tagline: 'Your AI Chief of Staff with eyes.',
+  tagline: 'Vision AI for every order.',
   description:
-    'Aldente AI sees every restaurant through your cameras, catches wrong orders before pickup, wins back refunds with evidence, and hands routine work to your AI employee in Slack.',
+    'Aldente is vision AI for restaurant chains: every order checked before pickup, every refund claim answered with proof, and orders rung up while staff build them.',
   email: 'support@aldenteai.com',
   /** Shown as written; dialled from `phoneHref` (E.164). */
   phone: '+1 (818) 974-1857',
@@ -20,13 +20,21 @@ export const LINKS = {
   demo: '/demo',
   cookies: '/cookies',
   pricing: '/pricing',
-  /** "See Aldo in action": the Aldo page's live Slack demo (the section with id="aldo"). */
-  seeAldo: '/aldo#aldo',
+  /** "See Aldo in action": the Playbooks page's live Slack demo (the section with id="aldo"). */
+  seeAldo: '/playbooks#aldo',
   security: '/security',
   company: '/company',
   privacy: '/privacy',
   terms: '/terms',
 } as const;
+
+/** The line above the header on every page (AnnounceBar). One message at a time; set to null to remove the bar. */
+/** The same sentence on every screen; below 768px it runs past as a news line. */
+export const ANNOUNCEMENT: { text: string; cta: string; href: string } | null = {
+  text: 'Our new product, Aldente Tab, is out. It added 8% more orders in the peak hour.',
+  cta: 'Learn more',
+  href: '/tab',
+};
 
 /**
  * Orders-verified figure. The site shows `label` until PUBLIC_STATS_ENDPOINT is set;
@@ -74,39 +82,36 @@ const productLink = (product: ProductId): NavLink => {
   return { label: name, href, note, product, ...(icon ? { icon } : {}) };
 };
 
-/** Menu notes and icons for the solution pages, restating each page's description in src/data/solutions.ts. */
-const SOLUTION_NAV: Record<string, { note: string; icon: IconName }> = {
-  operations: { note: 'Queues, staffing gaps and weekly patterns', icon: 'gauge' },
-  hr: { note: 'Departure clips and missing clock-outs', icon: 'user-check' },
-  delivery: { note: 'Checked bags and refund disputes', icon: 'truck' },
+/** Each solution page in the header menu: its icon and one line on what the team gets. */
+const SOLUTION_NAV: Record<string, { icon: IconName; note: string }> = {
+  operations: { icon: 'gauge', note: 'Queues, empty stations and weekly patterns' },
+  hr: { icon: 'user-check', note: 'Missing clock-outs closed the same day' },
+  delivery: { icon: 'truck', note: 'Every bag verified, every claim with evidence' },
 };
 
 /**
- * The header: Product · Solutions · Security · Pricing · Company. The mobile menu uses the same groups.
- * Product links carry their ProductId; solution links carry an icon. Every entry has a note or is a direct link.
+ * The header: Products · Solutions · About us · Pricing (order set 2026-11-16). The mobile menu uses the same
+ * groups. Product links carry their ProductId. Security is linked from the footer.
  */
 export const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'Product',
+    label: 'Products',
     items: PRODUCT_IDS.map(productLink),
   },
   {
     label: 'Solutions',
-    items: SOLUTIONS.map((solution) => ({
-      label: solution.name,
-      href: `/solutions/${solution.slug}`,
-      ...SOLUTION_NAV[solution.slug],
-    })),
+    items: SOLUTIONS.map((solution) => ({ label: solution.name, href: `/solutions/${solution.slug}`, ...SOLUTION_NAV[solution.slug] })),
   },
-  { label: 'Security', href: LINKS.security },
+  { label: 'About us', href: LINKS.company },
   { label: 'Pricing', href: LINKS.pricing },
-  { label: 'Company', href: LINKS.company },
 ];
 
-export const FOOTER: { title: string; links: NavItem[] }[] = [
+export const FOOTER: { title: string; links: (NavItem & { icon?: IconName })[] }[] = [
   {
-    title: 'Product',
-    links: [...PRODUCT_IDS.map((id) => ({ label: PRODUCTS[id].name, href: PRODUCTS[id].href })), { label: 'Pricing', href: LINKS.pricing }],
+    title: 'Products',
+    links: [
+      ...PRODUCT_IDS.map((id) => ({ label: PRODUCTS[id].name, href: PRODUCTS[id].href, icon: PRODUCTS[id].icon })),
+    ],
   },
   {
     title: 'Solutions',
@@ -115,9 +120,10 @@ export const FOOTER: { title: string; links: NavItem[] }[] = [
   {
     title: 'Company',
     links: [
-      { label: 'About', href: LINKS.company },
+      { label: 'About us', href: LINKS.company },
+      { label: 'Pricing', href: LINKS.pricing },
       { label: 'Security', href: LINKS.security },
-      { label: 'Book a demo', href: LINKS.demo },
+      { label: 'Book a live demo', href: LINKS.demo },
     ],
   },
   {
@@ -129,3 +135,32 @@ export const FOOTER: { title: string; links: NavItem[] }[] = [
     ],
   },
 ];
+
+/**
+ * The home page's questions: what a buyer asks before booking, answered with what the product pages, the
+ * pricing page and the Security page already state.
+ */
+export const HOME_FAQ: { q: string; a: string }[] = [
+  {
+    q: 'What do we need to install?',
+    a: 'A camera on a stand at the packing station. It runs on Wi-Fi, and the hardware comes with the plan.',
+  },
+  {
+    q: 'Does it work with our POS and delivery apps?',
+    a: 'Yes. Aldente works with any POS system. Aldente Verify reads the ticket from the receipt under the camera or straight from your POS, and Aldente Dispute keeps every delivery-app claim in one list.',
+  },
+  {
+    q: 'Do staff have to change how they pack?',
+    a: 'No. Staff put the receipt under the camera and pack as they do today. Aldente shows what is missing before the bag is closed.',
+  },
+  {
+    q: 'How long until a location is live?',
+    a: 'Most locations are live within 2–3 weeks: install and connect in week one, go live in weeks two and three.',
+  },
+  { q: 'Can we start with one location?', a: 'Yes. Many chains start with one or two locations and roll out after the first results.' },
+  {
+    q: 'What happens to our footage?',
+    a: 'Footage and records stay in your account and are used to run your workspace. Access follows roles, locations and regions, and you set how long footage is kept, per location.',
+  },
+];
+

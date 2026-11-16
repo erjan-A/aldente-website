@@ -15,13 +15,13 @@ export const PLANS: Plan[] = [
   {
     id: 'verification',
     name: 'Aldente Verify + Dispute',
-    summary: 'For delivery and drive-thru accuracy, and refunds won back.',
-    cta: { label: 'Book a demo', href: `${LINKS.demo}?plan=verification` },
+    summary: 'For delivery and drive-thru accuracy, and evidence for every refund claim.',
+    cta: { label: 'Book a live demo', href: `${LINKS.demo}?plan=verification` },
     features: [
       'Verification tablet and camera included',
       'Item and quantity checks against your POS',
       'Photo and clip for every order',
-      'Aldente Dispute: automatic delivery refund disputes',
+      'Aldente Dispute: an evidence pack for every delivery refund claim',
       'Accuracy dashboard by location',
     ],
     aldo: true,
@@ -29,15 +29,15 @@ export const PLANS: Plan[] = [
   },
   {
     id: 'vision',
-    name: 'Aldente Vision',
-    summary: 'For seeing what happens inside every location.',
-    cta: { label: 'Book a demo', href: `${LINKS.demo}?plan=vision` },
+    name: 'Aldente Playbooks',
+    summary: 'For seeing what happens inside every location, and acting on it in Slack.',
+    cta: { label: 'Book a live demo', href: `${LINKS.demo}?plan=vision` },
     features: [
       'Works with the IP cameras you already have',
       'Traffic, occupancy, queues and tables by hour',
       'Staff presence and repeat visits',
       'Heatmaps and leaderboards across locations',
-      'Rules that alert the right person',
+      'Playbooks that alert the right person',
     ],
     aldo: true,
   },
@@ -65,28 +65,10 @@ export const ALDO_INCLUDED = [
   'Clips and frames in answers',
 ];
 
-const Y = true;
-const N = false;
-export type Cell = boolean | string;
-
-export const COMPARE: { feature: string; cells: [Cell, Cell, Cell] }[] = [
-  { feature: 'Aldo in Slack, Telegram and WhatsApp', cells: [Y, Y, Y] },
-  { feature: 'Playbooks and alerts', cells: [Y, Y, Y] },
-  { feature: 'POS, HR and time-clock connections', cells: [Y, Y, Y] },
-  { feature: 'Analytics on your existing cameras', cells: [Y, N, Y] },
-  { feature: 'Clips and frames in answers', cells: [Y, 'Orders', Y] },
-  { feature: 'Voice requests', cells: [Y, Y, Y] },
-  { feature: 'Packing checks against the POS', cells: [N, Y, Y] },
-  { feature: 'Verification tablet', cells: [N, 'Included', 'Included'] },
-  { feature: 'Automatic refund disputes', cells: [N, Y, Y] },
-  { feature: 'SSO and custom integrations', cells: [N, N, Y] },
-  { feature: 'Dedicated success manager', cells: [N, N, Y] },
-];
-
 export const PRICING_FAQ: { q: string; a: string }[] = [
   {
     q: 'Is Aldo included?',
-    a: 'Yes. Aldo comes with Aldente Verify and with Aldente Vision: questions in Slack, Telegram or WhatsApp, Playbooks, alerts and voice requests.',
+    a: 'Yes. Aldo, the assistant in Slack, comes with Aldente Verify and with Aldente Playbooks: questions in Slack, Telegram or WhatsApp, alerts and voice requests.',
   },
   { q: 'What counts as a location?', a: 'One restaurant with its own cameras and POS.' },
   {
@@ -95,7 +77,7 @@ export const PRICING_FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Do I need new cameras?',
-    a: 'Not for Aldo or Aldente Vision. We work with most IP cameras. Aldente Verify includes a tablet with a camera for the packing station.',
+    a: 'Not for Aldente Playbooks. We work with most IP cameras. Aldente Verify includes a tablet with a camera for the packing station.',
   },
   {
     q: 'How long does setup take?',

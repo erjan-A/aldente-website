@@ -40,6 +40,13 @@ describe('<site-nav>', () => {
     expect(locked()).toBe(false);
   });
 
+  it('starts the sheet at the header’s bottom edge, wherever the header sits when it opens', () => {
+    const header = document.querySelector('header')!;
+    header.getBoundingClientRect = () => ({ bottom: 108 }) as DOMRect;
+    button().click();
+    expect(menu().style.getPropertyValue('--menu-top')).toBe('108px');
+  });
+
   it('closes on Escape and returns focus to the button', () => {
     button().click();
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));

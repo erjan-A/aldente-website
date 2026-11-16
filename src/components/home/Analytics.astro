@@ -2,13 +2,15 @@
 import Icon, { type IconName } from '../ui/Icon.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
 import VisionCameras from '../product/VisionCameras.astro';
-import LiveConsole from './LiveConsole.astro';
 
 interface Props {
-  heading?: boolean;
+  /** The visible heading over the four cameras. */
+  title: string;
+  muted?: string;
+  lead?: string;
 }
 
-const { heading = true } = Astro.props;
+const { title, muted, lead } = Astro.props;
 
 // Each metric carries a small preview of what it looks like in the product.
 type Viz = 'traffic' | 'occupancy' | 'queue' | 'tables' | 'staff' | 'repeat' | 'heatmap' | 'leaders';
@@ -34,121 +36,91 @@ const heat = [0.5, 0.6, 0.85, 1].flatMap((day) => byHour.map((hour) => +(hour * 
 const leaders = [94, 81, 67];
 ---
 
-<section class:list={['analytics tone-dark section', { 'analytics--flush': !heading }]} id="analytics" aria-labelledby="analytics-title">
+<section class="analytics tone-dark section" id="analytics" aria-labelledby="analytics-title">
   <div class="container analytics__inner">
-    {
-      heading && (
-        <SectionHeader
-          product="vision"
-          id="analytics-title"
-          title="Queues, tables and traffic by hour,"
-          muted="from the cameras you already have."
-          lead="Computer vision and a vision-language model recognise behaviours and events, and fire the rules you set. Compare locations, find the peak hours and let Aldo act."
-        />
-      )
-    }
-    {/* Without the visible heading, a hidden one keeps the card titles (h3) under an h2, as in Playbooks. */}
-    {!heading && <h2 id="analytics-title" class="visually-hidden">Aldente Vision</h2>}
+    <SectionHeader id="analytics-title" title={title} muted={muted} lead={lead} />
 
-    {/* Home: one camera live, posting to Slack as you scroll. The Vision page shows four cameras and the pipeline. */}
-    {heading ? <LiveConsole /> : <VisionCameras />}
+    <VisionCameras />
 
-    {/* Home: the eight metrics as one compact row of chips; the Vision page shows them with their charts. */}
-    {
-      heading ? (
-        <ul class="metric-chips" role="list" aria-label="What Aldente Vision measures">
-          {metrics.map((m) => (
-            <li class="chip">
-              <Icon name={m.icon} size={18} />
-              <span>
-                <b>{m.name}</b>
-                <small>{m.detail}</small>
-              </span>
+    <in-view class="metrics" data-threshold="0.15">
+      <ul class="analytics__metrics" role="list">
+        {
+          metrics.map((m) => (
+            <li class="metric">
+              <div class="metric__head">
+                <Icon name={m.icon} size={18} />
+                <h3 class="metric__name">{m.name}</h3>
+              </div>
+              <div class:list={['viz', `viz--${m.viz}`]} aria-hidden="true">
+                {m.viz === 'traffic' && traffic.map((h, i) => <i class:list={{ hot: h === 100 }} style={`--h:${h}%;--i:${i}`} />)}
+                {m.viz === 'occupancy' && (
+                  <>
+                    <span class="ring" style="--p:72%" />
+                    <span class="viz__stat">
+                      <b>72%</b>
+                      <small>full now</small>
+                    </span>
+                  </>
+                )}
+                {m.viz === 'queue' && (
+                  <>
+                    <span class="line">
+                      {Array.from({ length: 6 }, (_, i) => (
+                        <i style={`--i:${i}`} />
+                      ))}
+                    </span>
+                    <span class="timer">4:12</span>
+                  </>
+                )}
+                {m.viz === 'tables' && (
+                  <>
+                    <span class="floor">
+                      {tables.map((t) => (
+                        <i class={t} />
+                      ))}
+                    </span>
+                    <span class="viz__stat">
+                      <b>2</b>
+                      <small>to clear</small>
+                    </span>
+                  </>
+                )}
+                {m.viz === 'staff' &&
+                  shifts.map((row) => (
+                    <span class="shift">
+                      {row.spans.map(([a, b]) => (
+                        <i style={`left:${a}%;width:${b! - a!}%`} />
+                      ))}
+                      {row.gap && <b style={`left:${row.gap[0]}%;width:${row.gap[1]! - row.gap[0]!}%`} />}
+                    </span>
+                  ))}
+                {m.viz === 'repeat' && (
+                  <>
+                    <span class="split">
+                      <i style="flex:62" />
+                      <i style="flex:38" />
+                    </span>
+                    <span class="viz__legend">
+                      <span>New 62%</span>
+                      <span>Returning 38%</span>
+                    </span>
+                  </>
+                )}
+                {m.viz === 'heatmap' && heat.map((o) => <i style={`--o:${o}`} />)}
+                {m.viz === 'leaders' &&
+                  leaders.map((w, i) => (
+                    <span class="leader">
+                      <span>{i + 1}</span>
+                      <i style={`--w:${w}%;--i:${i}`} />
+                    </span>
+                  ))}
+              </div>
+              <p class="metric__detail">{m.detail}</p>
             </li>
-          ))}
-        </ul>
-      ) : (
-        <in-view class="metrics" data-threshold="0.15">
-          <ul class="analytics__metrics" role="list">
-            {
-              metrics.map((m) => (
-                <li class="metric">
-                  <div class="metric__head">
-                    <Icon name={m.icon} size={18} />
-                    <h3 class="metric__name">{m.name}</h3>
-                  </div>
-                  <div class:list={['viz', `viz--${m.viz}`]} aria-hidden="true">
-                    {m.viz === 'traffic' && traffic.map((h, i) => <i class:list={{ hot: h === 100 }} style={`--h:${h}%;--i:${i}`} />)}
-                    {m.viz === 'occupancy' && (
-                      <>
-                        <span class="ring" style="--p:72%" />
-                        <span class="viz__stat">
-                          <b>72%</b>
-                          <small>full now</small>
-                        </span>
-                      </>
-                    )}
-                    {m.viz === 'queue' && (
-                      <>
-                        <span class="line">
-                          {Array.from({ length: 6 }, (_, i) => (
-                            <i style={`--i:${i}`} />
-                          ))}
-                        </span>
-                        <span class="timer">4:12</span>
-                      </>
-                    )}
-                    {m.viz === 'tables' && (
-                      <>
-                        <span class="floor">
-                          {tables.map((t) => (
-                            <i class={t} />
-                          ))}
-                        </span>
-                        <span class="viz__stat">
-                          <b>2</b>
-                          <small>to clear</small>
-                        </span>
-                      </>
-                    )}
-                    {m.viz === 'staff' &&
-                      shifts.map((row) => (
-                        <span class="shift">
-                          {row.spans.map(([a, b]) => (
-                            <i style={`left:${a}%;width:${b! - a!}%`} />
-                          ))}
-                          {row.gap && <b style={`left:${row.gap[0]}%;width:${row.gap[1]! - row.gap[0]!}%`} />}
-                        </span>
-                      ))}
-                    {m.viz === 'repeat' && (
-                      <>
-                        <span class="split">
-                          <i style="flex:62" />
-                          <i style="flex:38" />
-                        </span>
-                        <span class="viz__legend">
-                          <span>New 62%</span>
-                          <span>Returning 38%</span>
-                        </span>
-                      </>
-                    )}
-                    {m.viz === 'heatmap' && heat.map((o) => <i style={`--o:${o}`} />)}
-                    {m.viz === 'leaders' &&
-                      leaders.map((w, i) => (
-                        <span class="leader">
-                          <span>{i + 1}</span>
-                          <i style={`--w:${w}%;--i:${i}`} />
-                        </span>
-                      ))}
-                  </div>
-                  <p class="metric__detail">{m.detail}</p>
-                </li>
-              ))
-            }
-          </ul>
-        </in-view>
-      )
-    }
+          ))
+        }
+      </ul>
+    </in-view>
   </div>
 </section>
 
@@ -159,80 +131,11 @@ const leaders = [94, 81, 67];
     gap: var(--section-gap);
   }
 
-  /* On the Vision page the hero sits right above, so the section doesn't add its own top space. */
-  .analytics--flush {
-    padding-top: 0;
-  }
-
-  /* Equal rows (1fr), so a detail that wraps never makes one card taller than the rest. */
-  .metric-chips {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 1fr;
-    gap: 8px;
-    margin: 0;
-  }
-
-  .chip {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 14px 16px;
-    border-radius: var(--radius-m);
-    background: var(--card);
-    border: 1px solid var(--card-line);
-    color: var(--accent);
-  }
-
-  .chip :global(svg) {
-    flex: none;
-    margin-top: 2px;
-  }
-
-  .chip span {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-
-  .chip b {
-    font-size: var(--step-small);
-    font-weight: 600;
-    line-height: 1.3;
-    color: var(--fg);
-  }
-
-  .chip small {
-    font-size: var(--step-label);
-    line-height: 1.35;
-    color: var(--fg-3);
-  }
-
-  /* Phones: names only, so the eight chips stay a short block. */
-  @media (max-width: 599px) {
-    .chip {
-      align-items: center;
-      padding: 12px 14px;
-    }
-
-    .chip small {
-      display: none;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .metric-chips {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-    }
-  }
-
   .metrics {
     display: block;
   }
 
-  /* One rounded panel ruled into cells, like the chart cards above and the /aldo abilities grid: the 1px
+  /* One rounded panel ruled into cells, like the chart cards above and the /playbooks abilities grid: the 1px
      gaps show the edge colour. Two columns, four from 1024px, so every row is full. */
   .analytics__metrics {
     --mute: var(--line-card);
@@ -254,14 +157,10 @@ const leaders = [94, 81, 67];
   .metric {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
     padding: var(--card-pad-m);
     background: var(--card);
     transition: background-color 0.3s ease;
-  }
-
-  .metric:hover {
-    background: var(--card-2);
   }
 
   .metric__head {
@@ -282,7 +181,7 @@ const leaders = [94, 81, 67];
 
   .metric__detail {
     margin-top: auto;
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     color: var(--ink-3);
   }
 
@@ -301,13 +200,13 @@ const leaders = [94, 81, 67];
   }
 
   .viz__stat b {
-    font-size: 1.5rem;
+    font-size: var(--step-h4);
     font-weight: 700;
     letter-spacing: -0.02em;
   }
 
   .viz__stat small {
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
     color: var(--ink-3);
   }
 
@@ -357,9 +256,9 @@ const leaders = [94, 81, 67];
   .timer {
     padding: 3px 9px;
     border-radius: var(--radius-pill);
-    border: 1px solid rgb(224 86 52 / 0.6);
+    border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
     color: var(--accent);
-    font-size: 0.875rem;
+    font-size: var(--step-small);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
@@ -419,7 +318,7 @@ const leaders = [94, 81, 67];
     bottom: -2px;
     border-radius: var(--radius-xs);
     border: 1.5px dashed var(--accent);
-    background: rgb(224 86 52 / 0.22);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
   }
 
   .split {
@@ -440,7 +339,7 @@ const leaders = [94, 81, 67];
   .viz__legend {
     display: flex;
     justify-content: space-between;
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
     color: var(--ink-3);
   }
 
@@ -455,7 +354,8 @@ const leaders = [94, 81, 67];
 
   .viz--heatmap i {
     border-radius: var(--radius-xs);
-    background: rgb(224 86 52 / calc(0.08 + var(--o) * 0.92));
+    background: var(--accent);
+    opacity: calc(0.08 + var(--o) * 0.92);
   }
 
   .leader {
@@ -463,7 +363,7 @@ const leaders = [94, 81, 67];
     grid-template-columns: 14px 1fr;
     align-items: center;
     gap: 8px;
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
     line-height: 1.2;
     color: var(--ink-3);
     font-variant-numeric: tabular-nums;
@@ -517,11 +417,11 @@ const leaders = [94, 81, 67];
     }
 
     .viz__stat b {
-      font-size: 1.125rem;
+      font-size: var(--step-body);
     }
 
     .viz__stat small {
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
     }
 
     .ring {
@@ -561,7 +461,7 @@ const leaders = [94, 81, 67];
     }
 
     .viz__legend {
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
     }
 
     /* Fluid squares, so twelve hours fit any tile. */
@@ -577,7 +477,7 @@ const leaders = [94, 81, 67];
 
     .leader {
       gap: 6px;
-      font-size: 0.6875rem;
+      font-size: var(--step-mock-s);
     }
   }
 

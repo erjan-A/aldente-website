@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import './playbook-explorer';
 import { mount } from './test-utils';
 
-const pb = (id: string, team: string, title: string, trigger: string) =>
+const pb = (id: string, team: string, title: string, trigger: string, shot = 'exit') =>
   JSON.stringify({
     id,
     team,
@@ -14,6 +14,7 @@ const pb = (id: string, team: string, title: string, trigger: string) =>
     action: `Do ${title}`,
     destination: `#${id}`,
     result: `Result ${title}`,
+    shot,
   }).replace(/"/g, '&quot;');
 
 const fixture = `
@@ -25,8 +26,8 @@ const fixture = `
   </div>
   <ul>
     <li data-team="HR"><button type="button" data-playbook="${pb('clock', 'HR', 'Clock-outs', 'After closing')}" aria-pressed="true">Clock-outs</button></li>
-    <li data-team="Operations"><button type="button" data-playbook="${pb('queue', 'Operations', 'Queues', 'A queue forms')}" aria-pressed="false">Queues</button></li>
-    <li data-team="Operations"><button type="button" data-playbook="${pb('monday', 'Operations', 'Monday', 'Every Monday')}" aria-pressed="false">Monday</button></li>
+    <li data-team="Operations"><button type="button" data-playbook="${pb('queue', 'Operations', 'Queues', 'A queue forms', 'counter')}" aria-pressed="false">Queues</button></li>
+    <li data-team="Operations"><button type="button" data-playbook="${pb('monday', 'Operations', 'Monday', 'Every Monday', 'room')}" aria-pressed="false">Monday</button></li>
   </ul>
   <div data-graph data-run>
     <span data-graph-title>Clock-outs</span>
@@ -36,6 +37,9 @@ const fixture = `
     <span data-graph-step="then">Do Clock-outs</span>
     <span data-graph-step="send">#clock</span>
     <span data-graph-result>Result Clock-outs</span>
+    <figure data-shot="exit"></figure>
+    <figure data-shot="counter" hidden></figure>
+    <figure data-shot="room" hidden></figure>
   </div>
 </playbook-explorer>`;
 
@@ -70,6 +74,15 @@ describe('<playbook-explorer>', () => {
     expect(q('[data-graph-result]').textContent).toBe('Result Monday');
     expect(buttons[2]!.getAttribute('aria-pressed')).toBe('true');
     expect(buttons[0]!.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('shows the camera frame the chosen Playbook sends, and only that one', () => {
+    const shown = () => [...document.querySelectorAll<HTMLElement>('[data-shot]')].filter((f) => !f.hidden).map((f) => f.dataset.shot);
+    expect(shown()).toEqual(['exit']);
+    document.querySelectorAll<HTMLButtonElement>('[data-playbook]')[1]!.click();
+    expect(shown()).toEqual(['counter']);
+    q<HTMLButtonElement>('[data-filter="HR"]').click();
+    expect(shown()).toEqual(['exit']);
   });
 
   it('restarts the graph animation on every selection', () => {

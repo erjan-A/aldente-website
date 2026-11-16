@@ -11,6 +11,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Find the departure clip',
     destination: '#hr-ops',
     result: 'A case summary with the clip, ready for HR.',
+    shot: 'exit',
   },
   {
     id: 'long-queues',
@@ -22,6 +23,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Attach the camera view',
     destination: 'Nearest district manager',
     result: 'An alert with the location, the wait and the frame.',
+    shot: 'counter',
   },
   {
     id: 'refund-evidence',
@@ -33,6 +35,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Pull the packing photo and clip',
     destination: 'Store manager',
     result: 'The order, the packing photo and the clip in one message.',
+    shot: 'order',
   },
   {
     id: 'table-reset',
@@ -44,6 +47,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Send the table number and frame',
     destination: '#floor-team',
     result: 'The table number and a frame, in the floor channel.',
+    shot: 'table',
   },
   {
     id: 'unattended-counter',
@@ -55,6 +59,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Nudge with the camera view',
     destination: 'Shift lead',
     result: 'A nudge before guests notice.',
+    shot: 'counter',
   },
   {
     id: 'tray-handover',
@@ -66,6 +71,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Count trays against the order',
     destination: '#catering',
     result: 'A handover record with counts and a photo.',
+    shot: 'tray',
   },
   {
     id: 'monday-review',
@@ -77,6 +83,7 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Rank lunch peaks and queues',
     destination: '#ops-leads',
     result: 'A ranked summary with the busiest hours and longest queues.',
+    shot: 'room',
   },
   {
     id: 'weather-traffic',
@@ -88,5 +95,6 @@ export const PLAYBOOKS: Playbook[] = [
     action: 'Match it with the weather',
     destination: '#ops-leads',
     result: 'Patterns your POS alone can’t show.',
+    shot: 'room',
   },
 ];

@@ -9,7 +9,7 @@ export interface DemoIntent {
   lead: string;
 }
 
-// Aldente, not Aldo, unless the visitor came from Aldo's own page (?plan=starter): first-time visitors don't know Aldo yet.
+// "starter" and "vision" both open the Playbooks demo (the plan names are older than the product's).
 const DEFAULT: Omit<DemoIntent, 'plan'> = {
   title: 'See Aldente on your restaurants.',
   muted: 'on your restaurants.',
@@ -24,14 +24,14 @@ export const isDemoPlan = (plan: string | null | undefined): plan is DemoPlan =>
 
 const COPY: Record<DemoPlan, Omit<DemoIntent, 'plan'>> = {
   starter: {
-    title: 'Get Aldo with Aldente Verify or Vision.',
-    muted: 'with Aldente Verify or Vision.',
-    lead: 'Aldo comes with both products. Pick a time and we’ll show you Aldo in Slack with questions like yours.',
+    title: 'See Aldente Playbooks in your Slack.',
+    muted: 'in your Slack.',
+    lead: '30 minutes. We show Aldo in Slack with questions like yours, and how a first Playbook is set up.',
   },
   vision: {
-    title: 'See Aldente Vision on your cameras.',
+    title: 'See Aldente Playbooks on your cameras.',
     muted: 'on your cameras.',
-    lead: '30 minutes on what Aldente Vision reads from the cameras you already have, with answers in Slack.',
+    lead: '30 minutes on what Aldente Playbooks reads from the cameras you already have, with answers and alerts in Slack.',
   },
   verification: {
     title: 'See Aldente Verify on your menu.',
@@ -45,8 +45,11 @@ const COPY: Record<DemoPlan, Omit<DemoIntent, 'plan'>> = {
   },
 };
 
-/** Keeps "Aldente Verify" and "Aldente Vision" on one line in headings (a no-break space inside the name). */
-export const keepNames = (text: string): string => text.replace(/Aldente (Verify|Vision)/g, 'Aldente\u00a0$1');
+/**
+ * Keeps "Aldente Verify" on one line in headings (a no-break space inside the name). "Aldente Playbooks" is
+ * too long for that: held together, it would leave "See" alone on the first line.
+ */
+export const keepNames = (text: string): string => text.replace(/Aldente Verify/g, 'Aldente\u00a0Verify');
 
 /** The heading in two parts: the claim in full ink, then the muted ending. */
 export function titleParts({ title, muted }: Pick<DemoIntent, 'title' | 'muted'>): { claim: string; muted: string } {

@@ -13,12 +13,12 @@ describe('demoIntent', () => {
     });
   });
 
-  it('names Aldo only for visitors from Aldo’s own page', () => {
+  it('names Aldo only for visitors who came for the Slack side of Aldente Playbooks', () => {
     for (const plan of ALL.filter((p) => p !== 'starter')) {
       const { title, lead } = demoIntent(plan ? `?plan=${plan}` : '');
       expect(`${title} ${lead}`).not.toMatch(/\bAldo\b/);
     }
-    expect(demoIntent('?plan=starter').title).toContain('Aldo');
+    expect(demoIntent('?plan=starter').lead).toMatch(/\bAldo\b/);
   });
 
   it('knows the plans the site links to', () => {
@@ -29,15 +29,19 @@ describe('demoIntent', () => {
     expect(isDemoPlan(null)).toBe(false);
   });
 
-  it('frames Aldo as coming with Aldente Verify and Aldente Vision', () => {
-    const intent = demoIntent('?plan=starter');
-    expect(intent.plan).toBe('starter');
-    expect(intent.title).toBe('Get Aldo with Aldente Verify or Vision.');
-    expect(intent.lead).toBe('Aldo comes with both products. Pick a time and we’ll show you Aldo in Slack with questions like yours.');
+  it('opens the Aldente Playbooks demo from both of its older plan names', () => {
+    const slack = demoIntent('?plan=starter');
+    expect(slack.plan).toBe('starter');
+    expect(slack.title).toBe('See Aldente Playbooks in your Slack.');
+    expect(slack.lead).toBe('30 minutes. We show Aldo in Slack with questions like yours, and how a first Playbook is set up.');
+    expect(demoIntent('?plan=vision').title).toBe('See Aldente Playbooks on your cameras.');
   });
 
-  it('has its own page for Aldente Vision', () => {
-    expect(demoIntent('?plan=vision').title).toBe('See Aldente Vision on your cameras.');
+  it('no longer names the retired Aldente Vision', () => {
+    for (const plan of ALL) {
+      const { title, lead } = demoIntent(`?plan=${plan}`);
+      expect(`${title} ${lead}`, plan).not.toMatch(/Aldente Vision/);
+    }
   });
 
   it('promises only what a 30-minute intro call can show', () => {
@@ -50,7 +54,7 @@ describe('demoIntent', () => {
   it('uses the exact product names ("Aldente" alone is the company)', () => {
     for (const plan of ALL) {
       const { title, lead } = demoIntent(`?plan=${plan}`);
-      for (const text of [title, lead]) expect(text, plan).not.toMatch(/\bVerify\b(?<!Aldente Verify)|Aldente (?!Verify|Vision|Dispute)[A-Z]/);
+      for (const text of [title, lead]) expect(text, plan).not.toMatch(/\bVerify\b(?<!Aldente Verify)|Aldente (?!Verify|Playbooks|Dispute)[A-Z]/);
     }
   });
 
@@ -68,7 +72,7 @@ describe('demoIntent', () => {
   });
 
   it('keeps product names on one line', () => {
-    expect(keepNames('Get Aldo with Aldente Verify or Aldente Vision.')).toBe('Get Aldo with Aldente\u00a0Verify or Aldente\u00a0Vision.');
+    expect(keepNames('Aldente Verify or Aldente Playbooks.')).toBe('Aldente\u00a0Verify or Aldente Playbooks.');
     expect(keepNames('See Aldo on your restaurants.')).toBe('See Aldo on your restaurants.');
   });
 
@@ -79,7 +83,7 @@ describe('demoIntent', () => {
       expect(muted, plan).not.toBe('');
       expect(`${claim} ${muted}`, plan).toBe(intent.title);
     }
-    expect(titleParts(demoIntent('?plan=vision'))).toEqual({ claim: 'See Aldente Vision', muted: 'on your cameras.' });
+    expect(titleParts(demoIntent('?plan=vision'))).toEqual({ claim: 'See Aldente Playbooks', muted: 'on your cameras.' });
   });
 
   it('keeps the whole heading as the claim when the muted part does not end it', () => {

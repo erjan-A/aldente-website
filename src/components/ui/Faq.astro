@@ -1,6 +1,7 @@
 ---
 import { LINKS, SITE } from '../../data/site';
 import Icon from './Icon.astro';
+import SectionHeader from './SectionHeader.astro';
 
 interface Props {
   items: { q: string; a: string }[];
@@ -10,69 +11,66 @@ interface Props {
   tone?: 'paper' | 'dark';
 }
 
-const { items, title = 'Questions,', muted = 'answered.', tone = 'paper' } = Astro.props;
+const { items, title = 'Before you book,', muted = 'the usual questions.', tone = 'paper' } = Astro.props;
 ---
 
 <section class:list={['faq', 'section', `tone-${tone}`]} aria-labelledby="faq-title">
   <div class="container faq__inner">
-    <div class="faq__intro">
-      <h2 id="faq-title">{title}{muted && <> <span class="faq__muted">{muted}</span></>}</h2>
-      <p>
+    <SectionHeader id="faq-title" label="FAQ" title={title} muted={muted} />
+    <div class="faq__body">
+      <div class="faq__list">
+        {
+          items.map((item) => (
+            <details>
+              <summary>
+                {item.q}
+                <span class="faq__plus" aria-hidden="true"><Icon name="plus" size={20} /></span>
+              </summary>
+              <p>{item.a}</p>
+            </details>
+          ))
+        }
+      </div>
+      <p class="faq__more">
         Something else? Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>, call <a href={SITE.phoneHref} class="nowrap">{SITE.phone}</a> or{' '}
-        <a href={LINKS.demo}>book a demo</a>.
+        <a href={LINKS.demo}>book a live demo</a>.
       </p>
-    </div>
-    <div class="faq__list">
-      {
-        items.map((item) => (
-          <details>
-            <summary>
-              {item.q}
-              <span class="faq__plus" aria-hidden="true"><Icon name="plus" size={20} strokeWidth={2} /></span>
-            </summary>
-            <p>{item.a}</p>
-          </details>
-        ))
-      }
     </div>
   </div>
 </section>
 
 <style>
+  /* The same header as every section, the questions under it, and the way to ask something else beside them. */
   .faq__inner {
     display: flex;
-    flex-wrap: wrap;
-    gap: 48px;
-  }
-
-  .faq__intro {
-    flex: 1 1 280px;
-    display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--section-gap);
   }
 
-  .faq__intro h2 {
-    font-size: var(--step-h2);
-    letter-spacing: -0.035em;
-    line-height: 1.04;
+  .faq__body {
+    display: grid;
+    gap: 32px;
   }
 
-  .faq__muted {
-    color: var(--fg-3);
+  @media (min-width: 960px) {
+    .faq__body {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 80px;
+      align-items: start;
+    }
   }
 
-  .faq__intro p {
+  .faq__more {
     color: var(--fg-2);
+    text-wrap: pretty;
   }
 
-  .faq__intro a {
+  .faq__more a {
     text-decoration: underline;
     text-underline-offset: 3px;
   }
 
   .faq__list {
-    flex: 2 1 520px;
     border-top: 1px solid var(--card-line);
   }
 
@@ -84,7 +82,7 @@ const { items, title = 'Questions,', muted = 'answered.', tone = 'paper' } = Ast
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    padding: 22px 0;
+    padding: 24px 0;
     font-size: var(--step-h4);
     font-weight: 600;
     line-height: 1.35;
@@ -111,7 +109,7 @@ const { items, title = 'Questions,', muted = 'answered.', tone = 'paper' } = Ast
 
   details p {
     max-width: 62ch;
-    padding-bottom: 22px;
+    padding-bottom: 24px;
     color: var(--fg-2);
   }
 </style>

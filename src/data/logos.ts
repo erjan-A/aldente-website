@@ -1,15 +1,16 @@
 import type { ImageMetadata } from 'astro';
 import apple from '../assets/logos/apple.png';
+import birdline from '../assets/logos/birdline-chicken.png';
 import burgerKingMono from '../assets/logos/burger-king-mono.svg';
-import burgerKing from '../assets/logos/burger-king.svg';
 import cmu from '../assets/logos/carnegie-mellon.svg';
 import kfcBlack from '../assets/logos/kfc-black.svg';
 import kfc from '../assets/logos/kfc.svg';
+import limepost from '../assets/logos/limepost-tacos.png';
 import linkedin from '../assets/logos/linkedin.svg';
 import mcdonalds from '../assets/logos/mcdonalds.svg';
+import meltShack from '../assets/logos/melt-shack.png';
 import nvidia from '../assets/logos/nvidia.png';
 import pfChangs from '../assets/logos/pf-changs.png';
-import shaurmaFood from '../assets/logos/shaurma-food.png';
 import un from '../assets/logos/united-nations.png';
 
 export interface Logo {
@@ -17,17 +18,21 @@ export interface Logo {
   src: ImageMetadata;
   /** Display height in px. */
   height: number;
-  /** How to render on a light ground: full colour, black silhouette or greyscale. */
-  treatment?: 'color' | 'silhouette' | 'mono';
+  /** How to render on a light ground: black silhouette or greyscale. Without it the artwork shows as drawn. */
+  treatment?: 'silhouette' | 'mono';
   /** One-colour artwork for dark grounds, when a plain silhouette would lose detail. */
   mono?: ImageMetadata;
 }
 
+// The three larger chains mixed with three newer customers. The newer three are one-tone artwork made from
+// their colour logos (2026-11-16), so the whole row reads in one tone.
 export const CUSTOMER_LOGOS: Logo[] = [
   { name: 'McDonald’s', src: mcdonalds, height: 52 },
+  { name: 'Melt Shack', src: meltShack, height: 60 },
   { name: 'KFC', src: kfc, height: 36 },
-  { name: 'Burger King', src: burgerKing, mono: burgerKingMono, height: 58 },
-  { name: 'Shaurma Food', src: shaurmaFood, height: 46 },
+  { name: 'Birdline Chicken', src: birdline, height: 48 },
+  { name: 'Burger King', src: burgerKingMono, height: 58 },
+  { name: 'Limepost Tacos', src: limepost, height: 52 },
 ];
 
 export const TEAM_LOGOS: Logo[] = [

@@ -4,26 +4,23 @@
  * a 2px box in the tone colour and a solid label.
  *   tone   alert (orange, needs a person) | ok (green, checked or staffed) | neutral (white, information)
  *   box    position and size in % of the frame: [left, top, width, height]
- *   place  where the label sits: inside the box (top left), or outside it above / below, at its start or end,
- *          or to its left ("side")
- *   dashed a dashed edge, for an item that is expected but not seen
+ *   place  where the label sits: inside the box (top left), or outside it, above or below its start
  * Decorative: the frame's own alt text or caption carries the meaning.
  */
 interface Props {
   tone?: 'alert' | 'ok' | 'neutral';
   label: string;
   box: readonly [number, number, number, number];
-  place?: 'inside' | 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end' | 'side';
-  dashed?: boolean;
+  place?: 'inside' | 'top-start' | 'bottom-start';
   class?: string;
 }
 
-const { tone = 'ok', label, box, place = 'top-start', dashed = false, class: className } = Astro.props;
+const { tone = 'ok', label, box, place = 'top-start', class: className } = Astro.props;
 const [left, top, width, height] = box;
 ---
 
 <span
-  class:list={['det', `det--${tone}`, `det--${place}`, { 'det--dashed': dashed }, className]}
+  class:list={['det', `det--${tone}`, `det--${place}`, className]}
   style={`left:${left}%;top:${top}%;width:${width}%;height:${height}%`}
   aria-hidden="true"
 >
@@ -40,7 +37,7 @@ const [left, top, width, height] = box;
   .det--alert {
     --det: var(--accent);
     --det-ink: var(--on-accent);
-    background: rgb(224 86 52 / 0.14);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
   }
 
   .det--ok {
@@ -53,10 +50,6 @@ const [left, top, width, height] = box;
     --det-ink: var(--bg);
   }
 
-  .det--dashed {
-    border-style: dashed;
-  }
-
   .det__label {
     position: absolute;
     display: inline-flex;
@@ -65,7 +58,7 @@ const [left, top, width, height] = box;
     border-radius: var(--radius-xs);
     background: var(--det);
     color: var(--det-ink);
-    font-size: 0.75rem;
+    font-size: var(--step-mock);
     font-weight: 700;
     line-height: 1.25;
     white-space: nowrap;
@@ -77,29 +70,16 @@ const [left, top, width, height] = box;
     top: 6px;
   }
 
-  .det--top-start .det__label,
-  .det--top-end .det__label {
+  .det--top-start .det__label {
     bottom: calc(100% + 4px);
   }
 
-  .det--bottom-start .det__label,
-  .det--bottom-end .det__label {
+  .det--bottom-start .det__label {
     top: calc(100% + 4px);
   }
 
   .det--top-start .det__label,
   .det--bottom-start .det__label {
     left: -2px;
-  }
-
-  .det--top-end .det__label,
-  .det--bottom-end .det__label {
-    right: -2px;
-  }
-
-  .det--side .det__label {
-    right: calc(100% + 6px);
-    top: 50%;
-    translate: 0 -50%;
   }
 </style>

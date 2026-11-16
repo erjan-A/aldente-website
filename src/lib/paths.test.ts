@@ -3,28 +3,28 @@ import { activeEntry, isCurrentPage, isWithin, linkPath, pagePath } from './path
 
 describe('pagePath', () => {
   it('gives the clean address for built .html pages', () => {
-    expect(pagePath('/aldo.html')).toBe('/aldo');
+    expect(pagePath('/tab.html')).toBe('/tab');
     expect(pagePath('/solutions/hr.html')).toBe('/solutions/hr');
     expect(pagePath('/index.html')).toBe('/');
   });
 
   it('leaves clean addresses as they are', () => {
-    expect(pagePath('/aldo')).toBe('/aldo');
-    expect(pagePath('/aldo/')).toBe('/aldo');
+    expect(pagePath('/tab')).toBe('/tab');
+    expect(pagePath('/tab/')).toBe('/tab');
     expect(pagePath('/')).toBe('/');
   });
 });
 
 describe('linkPath', () => {
   it('drops the query and the hash of an internal link', () => {
-    expect(linkPath('/aldo#aldo')).toBe('/aldo');
+    expect(linkPath('/playbooks#aldo')).toBe('/playbooks');
     expect(linkPath('/demo?plan=starter')).toBe('/demo');
     expect(linkPath('/solutions/hr.html')).toBe('/solutions/hr');
   });
 
   it('gives no path for links that leave the page tree', () => {
     expect(linkPath('#schedule')).toBe('');
-    expect(linkPath('https://aldenteai.com/aldo')).toBe('');
+    expect(linkPath('https://aldenteai.com/tab')).toBe('');
     expect(linkPath('mailto:support@aldenteai.com')).toBe('');
   });
 });
@@ -32,14 +32,14 @@ describe('linkPath', () => {
 describe('isCurrentPage', () => {
   it('matches the same page whatever the build or the link adds', () => {
     expect(isCurrentPage('/pricing.html', '/pricing')).toBe(true);
-    expect(isCurrentPage('/aldo', '/aldo#aldo')).toBe(true);
+    expect(isCurrentPage('/playbooks', '/playbooks#aldo')).toBe(true);
     expect(isCurrentPage('/', '/')).toBe(true);
   });
 
   it('does not match a different page or a parent', () => {
     expect(isCurrentPage('/solutions/hr', '/solutions/delivery')).toBe(false);
     expect(isCurrentPage('/solutions/hr', '/solutions')).toBe(false);
-    expect(isCurrentPage('/aldo', '#schedule')).toBe(false);
+    expect(isCurrentPage('/tab', '#schedule')).toBe(false);
   });
 });
 
@@ -59,7 +59,7 @@ describe('isWithin', () => {
 describe('activeEntry', () => {
   // Product · Solutions · Security · Pricing · Company, as the header lists them.
   const entries = [
-    ['/aldo', '/order-verification', '/analytics'],
+    ['/playbooks', '/order-verification', '/tab'],
     ['/solutions/operations', '/solutions/hr', '/solutions/delivery'],
     ['/security'],
     ['/pricing'],

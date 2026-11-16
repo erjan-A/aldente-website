@@ -56,6 +56,10 @@ export class PlaybookExplorer extends HTMLElement {
     set('[data-graph-say]', playbook.say);
     set('[data-graph-result]', playbook.result);
     for (const step of graphSteps(playbook)) set(`[data-graph-step="${step.kind}"]`, step.value);
+    // The frame this Playbook's message carries.
+    graph.querySelectorAll<HTMLElement>('[data-shot]').forEach((frame) => {
+      frame.hidden = frame.dataset.shot !== playbook.shot;
+    });
 
     // Replay the node-by-node light-up.
     graph.removeAttribute('data-run');

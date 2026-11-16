@@ -17,12 +17,16 @@
     "test:e2e": "playwright test",
     "test:e2e:browsers": "playwright test -c playwright.browsers.config.ts",
     "verify": "npm run check && npm test && npm run build && npm run test:e2e",
+    "test:design": "vitest run tests/unit/design-system.test.ts",
+    "prepare": "git config core.hooksPath .githooks || true",
     "astro": "astro",
     "smoke": "sh deploy/smoke-test.sh"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "@fontsource-variable/onest": "^5.3.1",
+    "@paper-design/shaders": "^0.0.82",
     "astro": "^7.3.5"
   },
   "allowScripts": {
@@ -33,6 +37,7 @@
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.62.1",
     "happy-dom": "^20.14.5",
+    "sharp": "^0.35.5",
     "typescript": "^5.9.3",
     "vitest": "^5.0.3"
   },

@@ -16,21 +16,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const tiles = [
   ['Verified orders', 'Every bag checked, by location and shift'],
   ['Wrong orders caught', 'What was missing, and where'],
-  ['Disputes won', 'Refund claims answered with video'],
-  ['Recovered revenue', 'Money back from delivery platforms'],
+  ['Claims answered', 'Refund claims with an evidence pack'],
+  ['Open claims', 'Refund claims waiting for an answer'],
   ['Complaint reasons', 'Timing, portions, missing items'],
   ['Skipped checks', 'Stations where verification was bypassed'],
 ];
 ---
 
-<BaseLayout title="Aldente Verify, order verification for restaurants" description="Aldente Verify checks every bag before pickup, and Aldente Dispute wins back delivery refunds with video: a camera at the packing station, the packing clip for every claim.">
+<BaseLayout title="Aldente Verify, order verification for restaurants" description="Aldente Verify checks every order before pickup, and Aldente Dispute builds the evidence pack for every refund claim: a camera at the packing station, the packing clip for each order.">
   <PageHero
     product="verify"
-    title="Verify checks every bag."
-    muted="Dispute wins back refunds."
-    lead="A camera at the packing station checks every item against the POS order before pickup. When a delivery app still charges a refund, Aldente disputes it with the packing clip."
+    title="Verify checks every order."
+    muted="Dispute answers every claim."
+    lead="A camera at the packing station checks every item against the POS order before pickup. When a delivery app charges a refund, Aldente Dispute builds the evidence pack from the packing clip."
   >
-    <Button href={`${LINKS.demo}?plan=verification`} size="lg" arrow>Book a demo</Button>
+    <Button href={`${LINKS.demo}?plan=verification`} size="lg" arrow>Book a live demo</Button>
     <Button href={LINKS.pricing} variant="secondary" size="lg">Compare plans</Button>
     <VerifyHeroMedia slot="media" />
   </PageHero>
@@ -44,7 +44,7 @@ const tiles = [
         id="dash-title"
         title="Accuracy for every location,"
         muted="in real time."
-        lead="See verified orders, wrong orders caught, disputes won and money recovered by location. Find the stations where checks are skipped and fix them with training."
+        lead="See verified orders, wrong orders caught and refund claims answered, by location. Find the stations where checks are skipped and fix them with training."
       />
       <ul class="dash__tiles" role="list">
         {
@@ -58,7 +58,7 @@ const tiles = [
       </ul>
       <Card class="dash__catering">
         <h3>Built for catering too</h3>
-        <p>A 30-item catering order can lose track in the bags. Check trays from the tablet or the phone app and log the handover.</p>
+        <p>It is easy to lose track of a 30-item catering order across the bags. Check trays at the station or in the phone app and log the handover.</p>
       </Card>
     </div>
   </section>

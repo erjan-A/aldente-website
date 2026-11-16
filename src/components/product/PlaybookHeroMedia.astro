@@ -29,7 +29,7 @@ const steps = graphSteps(playbook);
     <div class="pbh__head">
       <span class="pbh__kind">New Playbook</span>
       <span class="pbh__title">{playbook.title}</span>
-      <span class="pbh__status"><Icon name="check" size={12} strokeWidth={3} />Confirmed</span>
+      <span class="pbh__status"><Icon name="check" size={12} />Confirmed</span>
     </div>
     <ol class="pbh__steps" role="list">
       {
@@ -42,7 +42,7 @@ const steps = graphSteps(playbook);
       }
     </ol>
     <p class="pbh__result">
-      <span class="pbh__ok" aria-hidden="true"><Icon name="check" size={13} strokeWidth={3} /></span>
+      <span class="pbh__ok" aria-hidden="true"><Icon name="check" size={13} /></span>
       <span>{playbook.result}</span>
     </p>
   </div>
@@ -77,7 +77,7 @@ const steps = graphSteps(playbook);
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-size: 11px;
+    font-size: var(--step-mock-s);
     font-weight: 700;
   }
 
@@ -258,7 +258,7 @@ const steps = graphSteps(playbook);
     20%,
     55% {
       border-color: var(--accent);
-      background: rgb(224 86 52 / 0.1);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
     }
   }
 

@@ -2,24 +2,18 @@ import { ALL, CONSENT_KEY, makeConsent } from '../../src/lib/consent';
 import { expect, test } from './fixtures';
 
 test.describe('demo booking', () => {
-  test('asks once in the card, then embeds Calendly’s scheduler on the page', async ({ page }) => {
+  test('embeds Calendly’s scheduler on the page at once, with no question before it', async ({ page }) => {
     await page.goto('/demo');
     const schedule = page.locator('#schedule');
     await expect(schedule.getByRole('heading', { name: 'Pick a time' })).toBeVisible();
     await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
 
-    // Marketing cookies not accepted: one line and two actions in the card, and no Calendly yet.
-    await expect(schedule.getByText('The scheduler is run by Calendly, which sets its own cookies.')).toBeVisible();
-    await expect(schedule.getByRole('link', { name: 'Open on Calendly' })).toHaveAttribute('href', 'https://calendly.com/aldenteai/30min');
     const calendar = page.locator('iframe[title="Book a time with Aldente on Calendly"]');
-    await expect(calendar).toHaveCount(0);
-
-    // Showing the times saves the banner’s "Accept all", so Calendly doesn’t ask again.
-    await schedule.getByRole('button', { name: 'Show available times' }).click();
     await expect(calendar).toHaveAttribute('src', /^https:\/\/calendly\.com\/aldenteai\/30min\?/);
     await expect(schedule.getByRole('status')).toHaveText('Loading available times…');
-    expect(new URL((await calendar.getAttribute('src'))!).searchParams.get('hide_gdpr_banner')).toBe('1');
-    expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)!).marketing, CONSENT_KEY)).toBe(true);
+    await expect(schedule.getByRole('button', { name: 'Show available times' })).toHaveCount(0);
+    // Marketing cookies were rejected: Calendly keeps its own cookie question.
+    expect(new URL((await calendar.getAttribute('src'))!).searchParams.has('hide_gdpr_banner')).toBe(false);
 
     // No "You can also open it on Calendly…" line, no How we start, and Aldente, not Aldo, in the heading.
     await expect(page.getByRole('link', { name: 'open it on Calendly' })).toHaveCount(0);
@@ -34,7 +28,6 @@ test.describe('demo booking', () => {
 
   test('passes the plan to Calendly', async ({ page }) => {
     await page.goto('/demo?plan=vision');
-    await page.getByRole('button', { name: 'Show available times' }).click();
     const src = await page.locator('#schedule iframe').getAttribute('src');
     const params = new URL(src!).searchParams;
     expect(params.get('utm_content')).toBe('vision');
@@ -43,7 +36,6 @@ test.describe('demo booking', () => {
 
   test('keeps the campaign a visitor arrived with', async ({ page }) => {
     await page.goto('/demo?plan=verification&utm_source=linkedin&utm_campaign=q4');
-    await page.getByRole('button', { name: 'Show available times' }).click();
     const params = new URL((await page.locator('#schedule iframe').getAttribute('src'))!).searchParams;
     expect(params.get('utm_source')).toBe('linkedin');
     expect(params.get('utm_campaign')).toBe('q4');
@@ -53,7 +45,7 @@ test.describe('demo booking', () => {
   test('keeps the plan heading in two tones, with "See" on the product’s line', async ({ page }) => {
     await page.goto('/demo?plan=vision');
     const h1 = page.getByRole('heading', { level: 1 });
-    await expect(h1).toHaveText('See Aldente Vision on your cameras.');
+    await expect(h1).toHaveText('See Aldente Playbooks on your cameras.');
     await expect(h1.locator('span')).toHaveText('on your cameras.');
     // "See" never sits alone on the first line.
     const firstLine = await h1.evaluate((el) => {
@@ -84,10 +76,10 @@ test.describe('demo booking', () => {
     }
   });
 
-  test('explains that Aldo comes with both products when the visitor asks for it', async ({ page }) => {
+  test('names Aldente Playbooks and Aldo in Slack for a visitor from the Playbooks page', async ({ page }) => {
     await page.goto('/demo?plan=starter');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Get Aldo with Aldente Verify or Vision.');
-    await expect(page.getByText('Aldo comes with both products.')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('See Aldente Playbooks in your Slack.');
+    await expect(page.getByText('We show Aldo in Slack with questions like yours', { exact: false })).toBeVisible();
   });
 
   test('has no call agenda, and no over-promises', async ({ page }) => {
@@ -100,11 +92,9 @@ test.describe('demo booking', () => {
 test.describe('demo booking on a first visit', () => {
   test.use({ consent: false });
 
-  test('shows one question, in the card: the site’s cookie banner stays closed', async ({ page }) => {
+  test('shows the calendar at once, and the site’s cookie banner as on any page', async ({ page }) => {
     await page.goto('/demo');
-    await expect(page.getByText('The scheduler is run by Calendly, which sets its own cookies.')).toBeVisible();
-    await expect(page.locator('cookie-consent')).toBeHidden();
-    await page.goto('/');
+    await expect(page.locator('#schedule iframe')).toHaveAttribute('src', /calendly\.com/);
     await expect(page.locator('cookie-consent')).toBeVisible();
   });
 });

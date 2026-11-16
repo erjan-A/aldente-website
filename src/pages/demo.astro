@@ -17,7 +17,7 @@ const days = Array.from({ length: 35 }, (_, i) => i);
 const weekdays = Array.from({ length: 7 }, (_, i) => i);
 ---
 
-<BaseLayout title="Book a demo" description="See Aldente on your restaurants in 30 minutes. Pick a time that suits you, and we’ll show the workflows that matter to your team.">
+<BaseLayout title="Book a live demo" description="See Aldente on your restaurants in 30 minutes. Pick a time that suits you, and we’ll show the workflows that matter to your team.">
   <section class="demo tone-dark" aria-labelledby="demo-title">
     <demo-intent class="container demo__grid">
       <div class="demo__head">
@@ -42,15 +42,10 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
               </div>
               <div class="sk__zone"><div></div><div></div></div>
             </div>
+            <noscript>
+              <p class="cal__noscript"><a href={SITE.calendly} target="_blank" rel="noopener">Pick a time on Calendly</a></p>
+            </noscript>
             <div class="cal__overlay">
-              {/* Asked once, here, before Calendly loads; the site's cookie banner stays closed on this page meanwhile. */}
-              <div class="cal__consent" data-cal-consent data-consent-inline hidden>
-                <p>The scheduler is run by Calendly, which sets its own cookies.</p>
-                <div class="cal__consent-actions">
-                  <button type="button" class="cal__load" data-cal-load>Show available times</button>
-                  <a href={SITE.calendly} target="_blank" rel="noopener">Open on Calendly</a>
-                </div>
-              </div>
               <p class="cal__status" role="status" aria-live="polite" data-cal-status></p>
               <p class="cal__slow" data-cal-slow hidden>
                 Taking longer than usual? <a href={SITE.calendly} target="_blank" rel="noopener">Open the scheduler on Calendly</a>.
@@ -59,7 +54,7 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
           </div>
 
           <div class="cal__booked" data-cal-booked hidden>
-            <span class="cal__booked-mark"><Icon name="check" size={22} strokeWidth={2.25} /></span>
+            <span class="cal__booked-mark"><Icon name="check" size={22} /></span>
             <h3 class="cal__booked-title" tabindex="-1">You’re booked.</h3>
             <ul class="cal__next" role="list">
               <li>Calendly emails you the invite.</li>
@@ -78,7 +73,7 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
 
         <div class="demo__proof">
           <p class="demo__proof-line">
-            <b>{COUNTER.label}</b> orders verified across 200+ restaurant locations.
+            <b>{COUNTER.label}</b> orders served across 200+ restaurant locations.
           </p>
           <ul class="demo__logos" role="list">
             {
@@ -137,10 +132,12 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
 
   /* The span is rebuilt per plan by <demo-intent>, so it is styled through :global(). */
   h1 :global(span) {
+    display: block;
     color: var(--fg-3);
+    text-wrap: balance;
   }
 
-  /* Phones: a step smaller, so "See Aldente Vision" (no-break space in the name) holds the first line
+  /* Phones: a step smaller, so "See Aldente Verify" (no-break space in the name) holds the first line
      instead of leaving "See" alone above it. 41px at 390, 38px at 360. */
   @media (max-width: 639px) {
     h1 {
@@ -212,7 +209,7 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 22px;
+    gap: 24px;
     padding: 32px 16px;
   }
 
@@ -247,14 +244,14 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 40px));
     justify-content: center;
-    gap: 8px 6px;
+    gap: 8px 8px;
     width: 100%;
   }
 
   .sk__zone {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     width: min(100%, 304px);
   }
 
@@ -274,7 +271,7 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     justify-self: center;
     width: 22px;
     height: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     border-radius: var(--radius-xs);
     background: var(--surface-2);
   }
@@ -306,69 +303,18 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
     background: radial-gradient(ellipse 50% 28% at 50% 50%, var(--card) 45%, color-mix(in srgb, var(--card) 0%, transparent));
   }
 
-  .cal__consent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    max-width: 34ch;
-  }
 
-  .cal__consent[hidden] {
-    display: none;
-  }
 
-  .cal__consent p {
-    font-size: var(--step-small);
-    line-height: 1.5;
-    color: var(--fg-2);
-  }
 
-  .cal__consent-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 12px 20px;
-  }
 
-  /* Shows the booking times: the page's one booking action, so it takes the orange of "Book a demo". */
-  .cal__load {
-    min-height: 48px;
-    padding: 0 24px;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: linear-gradient(180deg, #ec6a42 0%, #db4f2c 100%) border-box;
-    color: var(--on-accent);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-    transition: box-shadow 0.2s ease;
-  }
 
-  /* The same fill and hover as the primary Button. */
-  .cal__load:hover {
-    background: linear-gradient(180deg, #f07650 0%, #e05634 100%) border-box;
-    box-shadow: 0 12px 28px -12px rgb(224 86 52 / 0.7);
-  }
 
-  .cal__consent-actions a {
-    font-size: var(--step-small);
-    font-weight: 500;
-    color: var(--fg);
-    text-decoration: underline;
-    text-decoration-color: var(--line-strong);
-    text-underline-offset: 3px;
-  }
 
-  .cal__consent-actions a:hover {
-    text-decoration-color: currentColor;
-  }
 
   .cal__status {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-size: var(--step-small);
     font-weight: 500;
     color: var(--fg-2);
@@ -577,7 +523,7 @@ const weekdays = Array.from({ length: 7 }, (_, i) => i);
 
     .sk__grid {
       grid-template-columns: repeat(7, minmax(0, 44px));
-      gap: 10px 8px;
+      gap: 12px 8px;
     }
 
     .sk__zone {

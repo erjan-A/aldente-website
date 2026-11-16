@@ -1,0 +1,258 @@
+---
+import { LINKS } from '../../data/site';
+import { COST_DEFAULTS, COST_LIMITS, formatCount, formatMoney, wrongOrderCost } from '../../lib/cost';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+
+/**
+ * What wrong orders cost, from four numbers the visitor can change. The page ships the example's result, so
+ * the section reads without script; <cost-calculator> recomputes it. The numbers live here and in the customer
+ * results, never in a headline.
+ */
+const fields = [
+  { name: 'locations', label: 'Locations', step: 1 },
+  { name: 'ordersPerDay', label: 'Delivery and drive-thru orders a day, per location', step: 10 },
+  { name: 'averageCheck', label: 'Average check', step: 1, prefix: '$' },
+  { name: 'errorRate', label: 'Orders that go out wrong', step: 0.5, suffix: '%' },
+] as const;
+const result = wrongOrderCost(COST_DEFAULTS);
+---
+
+<section class="calc tone-surface section" id="calculator" aria-labelledby="calc-title">
+  <div class="container calc__inner">
+    <div class="calc__head">
+      <SectionHeader
+        id="calc-title"
+        label="Calculator"
+        title="Each wrong order is a full refund,"
+        muted={'every day, at\u00a0every location.'}
+      />
+    </div>
+
+    <Card pad="none" class="calc__card">
+      <cost-calculator class="calc__grid">
+        <div class="calc__fields">
+          {
+            fields.map((field) => (
+              <label class="calc__field">
+                <span>{field.label}</span>
+                <span class="calc__input">
+                  {'prefix' in field && <i aria-hidden="true">{field.prefix}</i>}
+                  <input
+                    type="number"
+                    name={field.name}
+                    value={COST_DEFAULTS[field.name]}
+                    min={COST_LIMITS[field.name][0]}
+                    max={COST_LIMITS[field.name][1]}
+                    step={field.step}
+                    inputmode="decimal"
+                  />
+                  {'suffix' in field && <i aria-hidden="true">{field.suffix}</i>}
+                </span>
+              </label>
+            ))
+          }
+        </div>
+
+        <div class="calc__results" aria-live="polite">
+          <p class="calc__result">
+            <span>Wrong orders a day</span>
+            <output data-out="wrong">{formatCount(result.wrongPerDay)}</output>
+          </p>
+          <p class="calc__result">
+            <span>Refunded a year</span>
+            <output data-out="refunds">{formatMoney(result.refundsPerYear)}</output>
+          </p>
+          <p class="calc__result calc__result--saved">
+            <span>Saved a year with Verify and Dispute</span>
+            <output data-out="saved">{formatMoney(result.savedPerYear)}</output>
+            <span class="calc__each">
+              <output data-out="perLocation">{formatMoney(result.savedPerLocation)}</output> a location
+            </span>
+          </p>
+        </div>
+
+        <div class="calc__foot">
+          <Button href={`${LINKS.demo}?plan=verification`} arrow class="calc__cta">Book a live demo</Button>
+        </div>
+      </cost-calculator>
+    </Card>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/cost-calculator';
+</script>
+
+<style>
+  /* Phones: the title, then the card. From 960px the card stands beside the title, so the whole calculator
+     fits one screen. */
+  .calc__inner {
+    display: grid;
+    gap: var(--section-gap);
+  }
+
+  @media (min-width: 960px) {
+    .calc__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .calc__grid {
+    display: grid;
+  }
+
+  .calc__fields,
+  .calc__results,
+  .calc__foot {
+    padding: var(--card-pad-l);
+  }
+
+  /* Four fields, two by two. A label that wraps pushes its own field down, never its neighbour's. */
+  .calc__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 16px;
+  }
+
+  .calc__field {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 8px;
+    font-size: var(--step-label);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--fg-2);
+  }
+
+  .calc__field > span:first-child {
+    align-self: end;
+  }
+
+  /* The field: a number with its unit inside one box. */
+  .calc__input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
+    background: var(--bg);
+    color: var(--fg-3);
+    font-size: var(--step-body);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .calc__input i {
+    font-style: normal;
+  }
+
+  .calc__input:focus-within {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .calc__input input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    color: var(--fg);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  .calc__input input::-webkit-outer-spin-button,
+  .calc__input input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  /* The results sit on the section's own ground, a step off the card. Phones: a short list, label left and
+     figure right. Wider: three figures in a row, their baselines level whatever the labels do. */
+  .calc__results {
+    display: grid;
+    gap: 16px;
+    background: var(--tone-bg);
+    border-block: 1px solid var(--card-line);
+  }
+
+  .calc__result {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 4px 16px;
+    font-size: var(--step-label);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--fg-3);
+  }
+
+  .calc__result > output {
+    font-size: var(--step-stat);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+
+  .calc__result--saved > output {
+    color: var(--accent);
+  }
+
+  /* The same saving for one location: the number a buyer can check against their own store. */
+  .calc__result .calc__each {
+    grid-column: 1 / -1;
+    justify-self: end;
+    font-size: var(--step-small);
+    color: var(--fg-2);
+  }
+
+  .calc__result .calc__each output {
+    font: inherit;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  @media (min-width: 600px) {
+    .calc__results {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(3, auto);
+      gap: 8px 24px;
+    }
+
+    /* Each result shares the three rows (label, figure, detail), so the figures stand on one line. */
+    .calc__result {
+      grid-row: span 3;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: subgrid;
+    }
+
+    .calc__result > span:first-child {
+      align-self: end;
+    }
+
+    .calc__result .calc__each {
+      justify-self: start;
+    }
+  }
+
+  .calc__foot {
+    display: flex;
+  }
+
+  @media (max-width: 479px) {
+    .calc :global(.calc__cta) {
+      flex: 1;
+    }
+  }
+</style>

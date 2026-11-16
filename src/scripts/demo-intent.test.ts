@@ -21,17 +21,16 @@ describe('<demo-intent>', () => {
   it('matches the heading to the plan the visitor picked', () => {
     visit('/demo?plan=starter');
     mount(fixture);
-    // Product names stay on one line (a no-break space inside "Aldente Verify").
-    expect(document.querySelector('[data-intent="title"]')!.textContent).toBe('Get Aldo with Aldente\u00a0Verify or Vision.');
+        expect(document.querySelector('[data-intent="title"]')!.textContent).toBe('See Aldente Playbooks in your Slack.');
     // Two tones, as on every page hero: the ending sits in a <span>.
-    expect(document.querySelector('[data-intent="title"] span')!.textContent).toBe('with Aldente\u00a0Verify or Vision.');
-    expect(document.querySelector('[data-intent="lead"]')!.textContent).toContain('Aldo comes with both products');
+    expect(document.querySelector('[data-intent="title"] span')!.textContent).toBe('in your Slack.');
+    expect(document.querySelector('[data-intent="lead"]')!.textContent).toContain('how a first Playbook is set up');
   });
 
   it('keeps the two-tone heading for every plan', () => {
     visit('/demo?plan=vision');
     mount(fixture);
-    expect(document.querySelector('[data-intent="title"]')!.innerHTML).toBe('See Aldente&nbsp;Vision <span>on your cameras.</span>');
+    expect(document.querySelector('[data-intent="title"]')!.innerHTML).toBe('See Aldente Playbooks <span>on your cameras.</span>');
   });
 
   it('keeps the page as written without a plan', () => {

@@ -1,0 +1,108 @@
+---
+import { getImage } from 'astro:assets';
+import clipWatch from '../../assets/images/clip-watch.jpg';
+import { LINKS } from '../../data/site';
+import Button from '../ui/Button.astro';
+
+/**
+ * The one-minute explainer ("Watch it work"), opened by any link marked data-watch. One per page, in the layout.
+ * It walks through Verify, Dispute, Tab and Aldo, with sound: the visitor asked for it with a click, so it is
+ * not muted. Under the video sits the next step, the booking: focus moves to it when the video ends.
+ */
+const poster = await getImage({ src: clipWatch, width: 1280, format: 'webp' });
+---
+
+<watch-dialog>
+  <dialog class="watch" aria-label="Aldente in one minute">
+    <button type="button" class="watch__close" data-watch-close>Close</button>
+    <video
+      class="watch__video"
+      src="/media/watch.mp4"
+      poster={poster.src}
+      width="1280"
+      height="720"
+      controls
+      playsinline
+      preload="none"
+      aria-label="Aldente in one minute: Verify checks every order before pickup, Dispute builds the evidence pack for each refund claim, Tab rings up orders while staff build them, and Aldo sends a morning brief in Slack."
+    ></video>
+    <p class="watch__next">
+      <span>See it on your orders, in a 30-minute demo.</span>
+      <Button href={LINKS.demo} arrow data-watch-next>Book a live demo</Button>
+    </p>
+  </dialog>
+</watch-dialog>
+
+<script>
+  import '../../scripts/watch-dialog';
+</script>
+
+<style>
+  /* As tall as its content, never the screen: the clip is wide, so on a phone the dialog is a short card, and
+     on a short laptop screen the dialog narrows until the whole 16:9 frame fits (172px = its padding, the
+     close button, the booking row, the gaps and the margin). */
+  .watch {
+    width: min(1120px, calc(100vw - 24px), max(320px, calc((100dvh - 172px) * 16 / 9 + 24px)));
+    height: fit-content;
+    max-height: calc(100dvh - 24px);
+    margin: auto;
+    padding: 12px;
+    overflow: auto;
+    border: 1px solid var(--line-card);
+    border-radius: var(--radius-l);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .watch::backdrop {
+    background: rgb(0 0 0 / 0.72);
+  }
+
+  .watch[open] {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .watch__close {
+    flex: none;
+    align-self: flex-end;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: none;
+    font-size: var(--step-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .watch__close:hover {
+    border-color: var(--ink);
+  }
+
+  .watch__video {
+    flex: none;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    /* Outer radius minus the padding around it. */
+    border-radius: calc(var(--radius-l) - 12px);
+    background: var(--bg);
+  }
+
+  /* What to do after watching: one line and the booking. */
+  .watch__next {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 0 4px 4px 8px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+</style>

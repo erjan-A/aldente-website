@@ -1,38 +1,55 @@
 ---
 import wordmark from '../../assets/logos/aldente-wordmark.svg';
 import { FOOTER, SITE } from '../../data/site';
-import Icon from '../ui/Icon.astro';
+import Icon, { type IconName } from '../ui/Icon.astro';
 
 const year = 2026;
+const contacts: { label: string; href: string; icon: IconName; external?: boolean }[] = [
+  { label: SITE.email, href: `mailto:${SITE.email}`, icon: 'mail' },
+  { label: SITE.phone, href: SITE.phoneHref, icon: 'phone' },
+  { label: 'LinkedIn', href: SITE.linkedin, icon: 'linkedin', external: true },
+];
 ---
 
 <footer class="footer">
-  <div class="container footer__top">
-    <div class="footer__brand">
-      <p class="footer__tagline">{SITE.tagline}</p>
-      <a class="footer__contact" href={`mailto:${SITE.email}`}>{SITE.email}</a>
-      <a class="footer__contact" href={SITE.phoneHref}>{SITE.phone}</a>
-      <a class="footer__social" href={SITE.linkedin} target="_blank" rel="noopener">
-        <Icon name="linkedin" size={16} strokeWidth={2} />
-        LinkedIn
-      </a>
+  <div class="container">
+    {/* One ruled grid: the brand cell, then the four link columns, hairlines between them. */}
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <p class="footer__tagline">{SITE.tagline}</p>
+        <ul class="footer__contacts" role="list">
+          {
+            contacts.map((contact) => (
+              <li>
+                <a href={contact.href} {...(contact.external ? { target: '_blank', rel: 'noopener' } : {})}>
+                  <Icon name={contact.icon} size={16} />
+                  {contact.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <nav class="footer__cols" aria-label="Footer">
+        {
+          FOOTER.map((col) => (
+            <div class:list={{ 'footer__col--icons': col.links.some((link) => link.icon) }}>
+              <h2 class="footer__title">{col.title}</h2>
+              <ul role="list">
+                {col.links.map((link) => (
+                  <li>
+                    <a href={link.href}>
+                      {link.icon && <Icon name={link.icon} size={16} />}
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
     </div>
-    <nav class="footer__cols" aria-label="Footer">
-      {
-        FOOTER.map((col) => (
-          <div>
-            <h2 class="footer__title">{col.title}</h2>
-            <ul role="list">
-              {col.links.map((link) => (
-                <li>
-                  <a href={link.href}>{link.label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
-    </nav>
   </div>
   <div class="container">
     <div class="footer__legal">
@@ -47,71 +64,91 @@ const year = 2026;
 
 <style>
   .footer {
-    padding-top: 80px;
     overflow: hidden;
     border-top: 1px solid var(--line);
   }
 
-  .footer__top {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 48px;
+  /* Phones: the brand cell, the products across the full width, then three short columns side by side.
+     From 720px the four columns share a row; from 1120px the brand cell joins them. */
+  .footer__grid {
+    display: grid;
   }
 
   .footer__brand {
-    flex: 1 1 280px;
-    max-width: 360px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 20px;
+    padding-block: 32px 24px;
   }
 
   .footer__tagline {
+    max-width: 14em;
     font-size: var(--step-h4);
     font-weight: 600;
+    line-height: 1.2;
     letter-spacing: -0.01em;
   }
 
-  .footer__contact {
-    align-self: flex-start;
+  .footer__contacts,
+  .footer__cols ul {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Every link is a full row: 32px tall with a pointer, 44px on touch screens. */
+  .footer__grid a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    color: var(--ink-2);
+    font-size: var(--step-small);
     font-variant-numeric: tabular-nums;
+    transition: color 0.2s ease;
+  }
+
+  .footer__grid a :global(svg) {
+    flex: none;
     color: var(--ink-3);
     transition: color 0.2s ease;
   }
 
-  .footer__contact:hover,
-  .footer__social:hover,
+  .footer__grid a:hover,
+  .footer__grid a:hover :global(svg),
   .footer__legal button:hover {
     color: var(--ink);
   }
 
-  .footer__social {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 16px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line-card);
-    color: var(--ink-2);
-    font-size: var(--step-small);
-    font-weight: 500;
-    transition:
-      color 0.2s ease,
-      border-color 0.2s ease;
-  }
-
-  .footer__social:hover {
-    border-color: var(--line-strong);
-  }
-
   .footer__cols {
-    flex: 2 1 480px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 32px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Hairlines rule the grid: above each row on phones, between the cells on wide screens. */
+  .footer__cols > div {
+    padding-block: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer__cols > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  /* Phones: the product links run two to a row, so five links take three rows. */
+  .footer__cols > div:first-child ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+  }
+
+  .footer__cols > div:nth-child(n + 3) {
+    padding-left: 12px;
+    border-left: 1px solid var(--line);
+  }
+
+  /* In a column of icons, a link without one starts where the others' words do. */
+  .footer__col--icons a:not(:has(svg)) {
+    padding-left: 24px;
   }
 
   .footer__title {
@@ -121,24 +158,41 @@ const year = 2026;
     color: var(--ink-3);
   }
 
-  .footer__cols ul {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  @media (min-width: 720px) {
+    .footer__cols {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .footer__cols > div:first-child {
+      grid-column: auto;
+    }
+
+    .footer__cols > div:first-child ul {
+      display: flex;
+    }
+
+    .footer__cols > div:nth-child(n + 2) {
+      padding-left: 24px;
+      border-left: 1px solid var(--line);
+    }
   }
 
-  /* Each link is a 32px row (44px on touch screens), so the hit area is the whole row, not the glyphs. */
-  .footer__cols a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 32px;
-    color: var(--ink-2);
-    font-size: var(--step-small);
-    transition: color 0.2s ease;
-  }
+  @media (min-width: 1120px) {
+    .footer__grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 9fr);
+    }
 
-  .footer__cols a:hover {
-    color: var(--ink);
+    .footer__brand {
+      padding-block: 48px 40px;
+      padding-right: 32px;
+    }
+
+    .footer__cols > div,
+    .footer__cols > div:nth-child(n + 2) {
+      padding: 48px 16px 40px 24px;
+      border-top: 0;
+      border-left: 1px solid var(--line);
+    }
   }
 
   /* Inside the container's padding, so the divider spans the text column and no further. */
@@ -146,9 +200,9 @@ const year = 2026;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 12px 24px;
-    margin-top: 64px;
-    padding-top: 24px;
+    padding-block: 20px;
     border-top: 1px solid var(--line);
     font-size: var(--step-label);
     color: var(--ink-3);
@@ -166,42 +220,30 @@ const year = 2026;
     transition: color 0.2s ease;
   }
 
+  /* The wordmark closes the page as a quiet mark: its top shows, and it fades into the ground. */
   .footer__mark {
     max-width: 1440px;
-    margin: 48px auto 0;
+    margin: 8px auto 0;
     padding-inline: clamp(12px, 2vw, 24px);
-    height: min(15vw, 216px);
+    height: min(12vw, 168px);
     overflow: hidden;
+    opacity: 0.5;
+    mask-image: linear-gradient(to bottom, #000 10%, transparent 96%);
   }
 
   .footer__mark img {
     width: 100%;
   }
 
-  /* Touch screens: 44px targets. Negative margins keep the email and the cookie button's rows visually as they were. */
+  /* Touch screens: 44px targets. A negative margin keeps the cookie button's row visually as it was. */
   @media (pointer: coarse) {
-    .footer__cols ul {
-      gap: 0;
-    }
-
-    .footer__cols a {
+    .footer__grid a {
       min-height: 44px;
     }
 
-    .footer__contact,
     .footer__legal button {
-      display: inline-flex;
-      align-items: center;
       min-height: 44px;
-    }
-
-    .footer__contact {
-      margin-block: -9px;
-    }
-
-    .footer__legal button {
       margin-block: -12px;
     }
   }
-
 </style>
