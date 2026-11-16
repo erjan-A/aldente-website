@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { ANALYTICS, RB2B } from '../../src/data/analytics';
+import { ANALYTICS, LINKEDIN, RB2B } from '../../src/data/analytics';
 import { SITE } from '../../src/data/site';
 import { securityHeaders } from '../../deploy/headers';
 
@@ -26,7 +26,7 @@ describe('server configuration', () => {
     expect(headers['X-Frame-Options']).toBe('DENY');
   });
 
-  it('lets the CSP run scripts from Umami and RB2B only, frame Calendly only, and send requests and images to any https host', () => {
+  it('lets the CSP run scripts from Umami, RB2B and LinkedIn only, frame Calendly only, and send requests and images to any https host', () => {
     const csp = Object.fromEntries(
       headers['Content-Security-Policy']!.split(';').map((d) => {
         const [name, ...values] = d.trim().split(/\s+/);
@@ -36,7 +36,7 @@ describe('server configuration', () => {
     const umamiScript = new URL(ANALYTICS.script).origin;
     const calendly = new URL(SITE.calendly).origin;
     expect(csp['default-src']).toEqual(["'self'"]);
-    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin]);
+    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin, new URL(LINKEDIN.script).origin]);
     expect(csp['connect-src']).toEqual(["'self'", 'https:']);
     expect(csp['img-src']).toEqual(["'self'", 'data:', 'https:']);
     expect(csp['frame-src']).toEqual([calendly]);

@@ -171,6 +171,20 @@ describe('<calendly-embed>', () => {
     expect(queued).toContainEqual(['Demo booked', { plan: 'enterprise' }]);
   });
 
+  it('reports the LinkedIn demo conversion on a booking only, not when a time is picked', () => {
+    const lintrk = vi.fn<NonNullable<Window["lintrk"]>>();
+    window.lintrk = lintrk;
+    try {
+      mount(fixture);
+      post({ event: 'calendly.date_and_time_selected', payload: {} });
+      expect(lintrk).not.toHaveBeenCalled();
+      post({ event: 'calendly.event_scheduled', payload: { event: { uri: 'x' } } });
+      expect(lintrk).toHaveBeenCalledExactlyOnceWith('track', { conversion_id: 32303322 });
+    } finally {
+      delete window.lintrk;
+    }
+  });
+
   it('offers Calendly’s own page when the scheduler is slow', () => {
     vi.useFakeTimers();
     mount(fixture);

@@ -4,6 +4,7 @@ import { ALL, CONSENT_KEY, makeConsent, readConsent, type Consent } from '../lib
 import { demoIntent } from '../lib/demo';
 import { track } from './analytics';
 import { define } from './define';
+import { trackDemoConversion } from './linkedin-insight';
 
 /** How long "Loading available times…" may show before the page offers Calendly's own page instead. */
 export const SLOW_MS = 15_000;
@@ -130,6 +131,7 @@ export class CalendlyEmbed extends HTMLElement {
 
   private booked(): void {
     track(EVENTS.booked, { plan: this.plan });
+    trackDemoConversion();
     this.state = 'booked';
     this.frame?.remove();
     this.toggle('stage', false);

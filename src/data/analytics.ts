@@ -20,6 +20,16 @@ export const RB2B = {
   script: `https://ddwl4m2hdecbv.cloudfront.net/b/${RB2B_KEY}/${RB2B_KEY}.js.gz`,
 } as const;
 
+/**
+ * LinkedIn Insight Tag (see src/scripts/linkedin-insight.ts): ad measurement, loaded only after the visitor
+ * allows marketing cookies. The conversion is "demo booked". None of these are secrets: they appear in every page.
+ */
+export const LINKEDIN = {
+  partnerId: '10055058',
+  script: 'https://snap.licdn.com/li.lms-analytics/insight.min.js',
+  conversionId: 32303322,
+} as const;
+
 /** Funnel events, as they appear in Umami (Events; usable as steps in Goals and Funnels). */
 export const EVENTS = {
   /** A click on any link to /demo or #schedule. Props: label, section, path, plan. */
