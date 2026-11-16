@@ -87,6 +87,31 @@ describe('server configuration', () => {
     expect(host).toContain('include snippets/aldente-site.conf;');
   });
 
+  it('carries the same rules for Firebase Hosting, where aldenteai.com runs: a deploy brings them along', () => {
+    const firebase = JSON.parse(read('firebase.json')).hosting as {
+      public: string;
+      cleanUrls: boolean;
+      trailingSlash: boolean;
+      redirects: Array<{ source: string; destination: string; type: number }>;
+      headers: Array<{ source: string; headers: Array<{ key: string; value: string }> }>;
+    };
+    const sent = (source: string) => Object.fromEntries(firebase.headers.find((rule) => rule.source === source)!.headers.map((h) => [h.key, h.value]));
+    expect(firebase.public).toBe('dist');
+    // name.html is served as /name, and /name/ goes to /name.
+    expect(firebase.cleanUrls).toBe(true);
+    expect(firebase.trailingSlash).toBe(false);
+    // Every header of the nginx snippet, word for word: one policy, whatever the host.
+    expect(sent('**')).toEqual(headers);
+    expect(sent('/_astro/**')).toEqual({ 'Cache-Control': 'public, max-age=31536000, immutable' });
+    expect(sent('!/_astro/**')).toEqual({ 'Cache-Control': 'no-cache' });
+    expect(firebase.redirects).toEqual([
+      { source: '/about', destination: '/company', type: 301 },
+      { source: '/careers', destination: '/company', type: 301 },
+      { source: '/aldo', destination: '/playbooks', type: 301 },
+      { source: '/analytics', destination: '/playbooks', type: 301 },
+    ]);
+  });
+
   it('builds the Docker image from the same rules', () => {
     expect(docker).toContain('include snippets/aldente-site.conf;');
     expect(dockerfile).toContain('COPY deploy/nginx/snippets/ /etc/nginx/snippets/');

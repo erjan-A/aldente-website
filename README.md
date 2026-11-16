@@ -12,6 +12,17 @@ npm run verify   # optional: type check, tests, build, browser tests (first run:
 npm run build    # → dist/
 ```
 
+## Deploy with Firebase Hosting
+
+This is how aldenteai.com runs (Firebase Hosting behind Cloudflare).
+
+```sh
+npm ci && npm run build
+firebase deploy --only hosting
+```
+
+`firebase.json` carries the security headers, the redirects, clean URLs and caching, so a deploy brings them along and nothing is set by hand. It holds the same rules as `deploy/nginx`; a test keeps the two equal. Change a header in `deploy/nginx/snippets/aldente-headers.conf` and in `firebase.json` together.
+
 ## Deploy with nginx
 
 nginx 1.25.1+ (for older versions, see the top of `deploy/nginx/aldenteai.com.conf`).
