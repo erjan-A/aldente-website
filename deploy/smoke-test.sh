@@ -64,6 +64,11 @@ echo "Clips"
 for clip in verify dispute tab watch tab-line verify-station; do
   expect_status "/media/$clip.mp4" 200
 done
+# Safari and iPhones play a video only from byte ranges: the host must answer "Range" with 206, uncompressed.
+# Where it answers 200, the page falls back to its clip worker, which in-app browsers do not run.
+got=$(curl -s -o /dev/null -w '%{http_code}' -H 'Range: bytes=0-1' "$BASE/media/watch.mp4")
+if [ "$got" = "206" ]; then pass "/media/watch.mp4 answers a byte range (206)"; else fail "/media/watch.mp4 must answer a byte range with 206 for Safari, got $got (serve .mp4 uncompressed, with Content-Length)"; fi
+expect_status /clip-sw.js 200
 
 echo "Missing pages"
 expect_status /no-such-page 404
@@ -76,6 +81,9 @@ for path in / /demo /no-such-page; do
 done
 # The LinkedIn tag (loaded after consent) needs its host in the CSP: an old snippet would block it silently.
 expect_header / Content-Security-Policy "snap.licdn.com"
+# RB2B's script host, and clips played from memory.
+expect_header / Content-Security-Policy "ddwl4m2hdecbv.cloudfront.net"
+expect_header / Content-Security-Policy "media-src 'self' blob:"
 expect_header / X-Content-Type-Options nosniff
 expect_header / X-Frame-Options DENY
 expect_header / Referrer-Policy strict-origin-when-cross-origin

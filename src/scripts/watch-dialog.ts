@@ -1,21 +1,32 @@
 import { EVENTS } from '../data/analytics';
 import { track } from './analytics';
+import { rescueClip } from './clip-rescue';
 import { define } from './define';
 
 /**
  * The longer product clip in a dialog. Any link marked `data-watch` on the page opens it and starts the video;
  * without this script the link opens the video file itself. Closing (the button, Escape, a click on the
  * backdrop) stops the video. Each opening is counted once as "Video play". When the video ends, focus moves
- * to the next step, the link marked `data-watch-next`.
+ * to the next step, the link marked `data-watch-next`. A video that fails to load is rescued like every clip
+ * (clip-rescue.ts) and plays once it is ready, if the dialog is still open.
  *
  * Markup: a <dialog> holding a <video controls>, a [data-watch-close] button and a [data-watch-next] link.
  */
 export class WatchDialog extends HTMLElement {
+  private rescued = false;
+
   connectedCallback(): void {
     document.addEventListener('click', this.onPageClick);
     this.dialog?.addEventListener('close', this.onClose);
     this.dialog?.addEventListener('click', this.onDialogClick);
     this.video?.addEventListener('ended', this.onEnded);
+    const { video } = this;
+    if (video && !this.rescued) {
+      this.rescued = true;
+      rescueClip(video, () => {
+        if (this.dialog?.open) void video.play?.()?.catch?.(() => {});
+      });
+    }
   }
 
   disconnectedCallback(): void {

@@ -39,10 +39,6 @@ const line = 'orders served across 200+ restaurant locations.';
       {
         sets.map((set) => (
           <>
-            {/* Phones only: the orders line rides in the row, so text and logos are one line. */}
-            <li class="marquee__text" aria-hidden={set ? 'true' : undefined}>
-              <b>{live ? initial : COUNTER.label}</b> {line}
-            </li>
             {CUSTOMER_LOGOS.map((logo) => {
               const height = Math.round(logo.height * 0.66);
               return (
@@ -106,21 +102,8 @@ const line = 'orders served across 200+ restaurant locations.';
     opacity: 0.55;
   }
 
-  .marquee__track li[aria-hidden='true'],
-  .marquee__text {
+  .marquee__track li[aria-hidden='true'] {
     display: none;
-  }
-
-  .marquee__text {
-    font-size: var(--step-small);
-    font-weight: 500;
-    white-space: nowrap;
-    color: var(--ink-2);
-  }
-
-  .marquee__text b {
-    font-weight: 700;
-    color: var(--ink);
   }
 
   @media (min-width: 900px) {
@@ -156,26 +139,7 @@ const line = 'orders served across 200+ restaurant locations.';
       animation-play-state: paused;
     }
 
-    /* Phones: the orders line leaves its own row and rides with the logos, so the band is one line. */
     @media (max-width: 719px) {
-      .proof {
-        gap: 0;
-      }
-
-      .proof__line {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip-path: inset(50%);
-        white-space: nowrap;
-      }
-
-      .marquee__text,
-      .marquee__track li[aria-hidden='true'].marquee__text {
-        display: block;
-      }
-
       .marquee__track {
         animation-duration: 44s;
       }

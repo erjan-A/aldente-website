@@ -139,6 +139,30 @@ test.describe('home page', () => {
     expect(box!.height).toBeLessThan(video!.height + 200);
   });
 
+  test('the clip worker answers a byte-range request with that part of the file', async ({ page, request }) => {
+    // Safari plays a video only from byte ranges. On a host that sends the whole file instead, the page turns
+    // this worker on (clip-rescue.ts) and it cuts the ranges out of the whole file.
+    const whole = await (await request.get('/media/tab-line.mp4')).body();
+    const result = await page.evaluate(async () => {
+      await navigator.serviceWorker.register('/clip-sw.js');
+      if (!navigator.serviceWorker.controller) await new Promise((resolve) => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
+      const part = async (range: string) => {
+        const response = await fetch('/media/tab-line.mp4', { headers: { Range: range } });
+        return { status: response.status, range: response.headers.get('content-range'), type: response.headers.get('content-type'), bytes: [...new Uint8Array(await response.arrayBuffer())] };
+      };
+      return { head: await part('bytes=0-1'), middle: await part('bytes=1000-1015'), tail: await part('bytes=-8'), open: await part('bytes=231000-'), past: await part('bytes=99999999-') };
+    });
+    const size = whole.length;
+    expect(result.head).toEqual({ status: 206, range: `bytes 0-1/${size}`, type: 'video/mp4', bytes: [...whole.subarray(0, 2)] });
+    expect(result.middle).toEqual({ status: 206, range: `bytes 1000-1015/${size}`, type: 'video/mp4', bytes: [...whole.subarray(1000, 1016)] });
+    expect(result.tail).toEqual({ status: 206, range: `bytes ${size - 8}-${size - 1}/${size}`, type: 'video/mp4', bytes: [...whole.subarray(size - 8)] });
+    expect(result.open.status).toBe(206);
+    expect(result.open.range).toBe(`bytes 231000-${size - 1}/${size}`);
+    expect(result.open.bytes).toEqual([...whole.subarray(231000)]);
+    expect(result.past.status).toBe(416);
+    expect(result.past.range).toBe(`bytes */${size}`);
+  });
+
   test('serves the clips small enough to start at once', async ({ request }) => {
     for (const clip of ['verify', 'dispute', 'tab', 'watch', 'tab-line', 'verify-station']) {
       const response = await request.head(`/media/${clip}.mp4`);
@@ -149,6 +173,18 @@ test.describe('home page', () => {
 
   test('states the orders-served figure until live stats exist', async ({ page }) => {
     await expect(page.locator('.proof__line')).toHaveText('2M+ orders served across 200+ restaurant locations.');
+    // The line stands still above the moving logos, on a phone too.
+    const line = page.locator('.proof__line');
+    await expect(line).toBeVisible();
+    const before = await line.boundingBox();
+    await page.waitForTimeout(600);
+    const after = await line.boundingBox();
+    expect(after?.x).toBe(before?.x);
+    expect(before!.width).toBeGreaterThan(120);
+    // It never shares the moving row: above it on a phone, beside it on a wide screen.
+    const row = await page.locator('.marquee').boundingBox();
+    if (page.viewportSize()!.width < 900) expect(before!.y + before!.height).toBeLessThanOrEqual(row!.y);
+    else expect(before!.x + before!.width).toBeLessThanOrEqual(row!.x);
     await expect(page.locator('live-counter')).toHaveCount(0);
   });
 

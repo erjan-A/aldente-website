@@ -54,6 +54,7 @@ It checks every page, redirect, the 404, security headers, caching and compressi
 
 ## Good to know
 
+- **Video:** Safari and iPhones play a video only from byte ranges. The host must answer a `Range` request for `/media/*.mp4` with `206`, uncompressed and with `Content-Length` (nginx does this by default; a CDN that compresses `.mp4` does not). The smoke test checks it. Where a host answers `200`, the page turns on `public/clip-sw.js`, which serves the ranges itself; keep that file at the site root.
 - **DNS:** A/AAAA records for `aldenteai.com` and `www.aldenteai.com` point to the server.
 - **Updates:** rebuild and upload `dist/` again (or rebuild the image). If a file in `deploy/nginx/` changed in the release (new redirects, a new host in the CSP), copy the snippets again and reload nginx, as in the first install; then run the smoke test. Pages revalidate on every visit; hashed files in `/_astro/` are cached for a year.
 - **Security headers** live in `deploy/nginx/snippets/aldente-headers.conf`. The CSP allows scripts from Umami, RB2B and LinkedIn, frames from Calendly, and requests and images to any https host; after changing it, run `npm run verify`.

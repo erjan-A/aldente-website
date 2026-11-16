@@ -56,6 +56,19 @@ describe('<watch-dialog>', () => {
     expect(dialog().open).toBe(false);
   });
 
+  it('rescues a video that fails to load and plays it once it is ready', async () => {
+    document.getElementById('open')!.click();
+    expect(play).toHaveBeenCalledTimes(1);
+    vi.spyOn(video(), 'load').mockImplementation(() => {});
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, blob: async () => new Blob(['x']) })));
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:watch');
+    video().dispatchEvent(new Event('error'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(video().getAttribute('src')).toBe('blob:watch');
+    expect(play).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
+  });
+
   it('hands the visitor the booking when the video ends', () => {
     document.getElementById('open')!.click();
     video().dispatchEvent(new Event('ended'));

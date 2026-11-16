@@ -211,8 +211,8 @@ describe('Home hero and CTA band', () => {
     expect(first.map((li) => li.querySelector('img')?.getAttribute('alt'))).toEqual(['McDonald’s', 'Melt Shack', 'KFC', 'Birdline Chicken', 'Burger King', 'Limepost Tacos']);
     expect(sets.length).toBe(first.length * 2);
     expect(sets.every((li) => li.querySelector('img')?.getAttribute('loading') === 'eager')).toBe(true);
-    // On a phone the orders line rides in the same row, so text and logos are one line.
-    expect(band.querySelector('.marquee__track > li.marquee__text')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('2M+ orders served across 200+ restaurant locations.');
+    // The orders line never moves: only logos ride in the row.
+    expect(band.querySelector('.marquee__track > li:not(.marquee__logo)')).toBeNull();
   });
 
   it('section titles are one plain sentence each, the second half muted', async () => {
