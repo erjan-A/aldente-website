@@ -1,5 +1,22 @@
 import { expect, test } from './fixtures';
 
+test('a product clip scrolled past before it had loaded still plays by itself later, in a loop and without controls', async ({ page }) => {
+  // A slow clip: the visitor reaches it and scrolls on before it starts.
+  await page.route('**/media/tab-line.mp4', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    await route.continue();
+  });
+  await page.goto('/');
+  const clip = page.locator('.walk--line video');
+  await clip.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(200);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(1800);
+  await clip.scrollIntoViewIfNeeded();
+  await expect.poll(() => clip.evaluate((video: HTMLVideoElement) => !video.paused && video.currentTime > 0), { timeout: 15_000 }).toBe(true);
+  expect(await clip.evaluate((video: HTMLVideoElement) => ({ controls: video.controls, loop: video.loop }))).toEqual({ controls: false, loop: true });
+});
+
 test('the "Watch it work" dialog ships with the home page only', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('dialog.watch')).toHaveCount(1);

@@ -1,6 +1,6 @@
 import { nextTabIndex } from '../lib/tabs';
 import { track } from './analytics';
-import { rescueClip } from './clip-rescue';
+import { autoplayRefused, rescueClip } from './clip-rescue';
 import { define } from './define';
 
 /**
@@ -60,6 +60,8 @@ export class MediaTabs extends HTMLElement {
       this.observer = new IntersectionObserver((entries) => {
         // The newest record decides: a batch can hold an older one that says the opposite.
         this.visible = entries[entries.length - 1]?.isIntersecting ?? false;
+        // A clip the visitor paused plays again the next time the panel comes on screen.
+        if (!this.visible) this.paused = false;
         this.playVideos();
         this.sync();
       });
@@ -139,8 +141,8 @@ export class MediaTabs extends HTMLElement {
         if (restart) video.currentTime = 0;
         // Autoplay refused (a phone in low-power mode): the clip gets its controls back. A clip that failed
         // to load is not refused: clip-rescue.ts takes it from there.
-        void video.play?.()?.catch?.(() => {
-          if (!video.error && !video.hasAttribute('data-still')) video.controls = true;
+        void video.play?.()?.catch?.((error: unknown) => {
+          if (autoplayRefused(error) && !video.error && !video.hasAttribute('data-still')) video.controls = true;
         });
       } else {
         video.pause?.();

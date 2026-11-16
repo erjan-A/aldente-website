@@ -37,7 +37,7 @@ Rules:
 - Selected text on an orange ground is white with deep orange letters; elsewhere it is the accent.
 - No coloured left bar on cards. No colour gradients on text. No coloured glows on controls.
 - Text keeps WCAG AA on its ground (4.5:1, large text 3:1).
-- The home hero stands on the orange ground. White text needs a deep ground there: the hero uses the deep end of the orange alone (`--accent-deep`, without the lighter wash other orange sections carry), and the glow is a slow, low-contrast drift and uses no shade lighter than `#c43a12`. `node tools/contrast.mjs` measures the real contrast over the moving glow; `tests/e2e/rhythm.spec.ts` guards a still frame.
+- The home hero stands on the orange ground. White text needs a deep ground there: the hero uses the deep end of the orange alone (`--accent-deep`, without the lighter wash other orange sections carry), and the glow is slow but clearly visible; its range comes from darker shades, and it uses none lighter than `#cb4116`. `node tools/contrast.mjs` measures the real contrast over the moving glow; `tests/e2e/rhythm.spec.ts` guards a still frame.
 - The accent and the green are written once, in the tokens. A component never repeats their values, in hex or in rgb.
 - A gradient keeps a plain shape: no `min()`, `max()`, `calc()` or `clamp()` in its size or position. Chromium drops such a declaration without a warning, and the page then differs between browsers.
 
@@ -108,6 +108,7 @@ An inner corner is the outer radius minus the padding between them: `calc(var(--
 | `Card` | Every boxed surface. `as` div, li, article, section or figure; `pad` s, m, l or none; `radius` l or xl. Recolour it through the roles (`--card`, `--card-line`, `--fg`). Never nest a Card in a Card. |
 | `SectionHeader` | Every section title: a pill, the claim, a muted second line, an optional lead. |
 | `ProductPill` | Names the product a section belongs to, or a plain topic. A plain pill may carry an icon (`icon`), as "For restaurant chains" does in the home hero. On orange the pill is a dark chip and its icon takes the ink. |
+| Tab scene (product tour) | Under the serving-line clip, the product's own screen follows it: three box cards and the steam table. Their seconds (`data-at`, `data-until`) are read off the clip's own screen; change them only against the clip. A box that has not reached the line is an empty dashed slot. Cards sit side by side when the panel is at least 370 px wide, else one under another (a container query). |
 | Customer results | Three equal cards, one per product: the pill, the figure with its unit, one short line, then the operator's words on the section's ground. The lines and the quotes are kept close in length so the cards end level. |
 | `Faq` | Questions as native `details`, under a `SectionHeader`. |
 | Home hero copy | A pill for the audience, the headline, then one plain line per product (Verify, Dispute, Tab), without icons. Everything is centred. The pill sits a step closer to the headline than the headline does to the lines under it. |
@@ -123,9 +124,9 @@ Build new sections from these, not from hand-made boxes.
 
 - Motion shows the product at work: footage, and product screens that play in steps.
 - Everything pauses off screen. With reduced motion, nothing loops: scenes show their finished state, and the hero glow and the slat wall are still frames.
-- The home hero has one background effect, "Ember" (`src/scripts/hero-ember.ts`), loaded after the page, in shades of the hero's orange.
+- The home hero has one background effect, "Ember" (`src/scripts/hero-ember.ts`), in shades of the hero's orange. It starts loading once the page is parsed and fades in when it draws.
 - The hero clips play one after another. The timer, the clip and the tab's progress bar stay in step: off screen all three hold, and while the pointer or the keyboard is on the panel the same clip plays again.
-- Every clip is silent, loops and plays only while it is on screen. The visitor can stop it: a click on the clip, or Space or Enter while it has focus. With reduced motion, or when the browser refuses to autoplay, the clip keeps its controls.
+- Every clip is silent, plays by itself while it is on screen and loops without end, with no controls. The visitor can stop it: a click on the clip, or Space or Enter while it has focus; it plays again the next time it comes on screen. Controls show in two cases only: with reduced motion, and when the browser refuses to autoplay (a phone in low-power mode). A start cut short by scrolling past is not a refusal.
 - A clip that fails to load is fetched once more and played from memory (`src/scripts/clip-rescue.ts`). If that fails too, it becomes its still: the poster, no controls, never a broken player.
 - The closing orange band has one background effect, the slat wall (`src/scripts/slat-sea-gl.ts`): small slats shaded by a slow swell. It loads when the band nears the screen. Light crests stay off the white text (`glintZone` in `src/lib/slats.ts`); the band has no watermark.
 - No other section gets a background effect.

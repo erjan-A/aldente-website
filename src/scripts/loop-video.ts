@@ -1,4 +1,4 @@
-import { rescueClip } from './clip-rescue';
+import { autoplayRefused, rescueClip } from './clip-rescue';
 import { define, prefersReducedMotion } from './define';
 
 /**
@@ -7,7 +7,7 @@ import { define, prefersReducedMotion } from './define';
  * scrolls away, so nothing plays (or downloads, with preload="none") out of sight.
  *
  * The visitor can stop it: a click on the clip, or Space or Enter while it has focus, pauses and resumes it.
- * A clip the visitor paused stays paused when it comes back on screen.
+ * A clip the visitor paused stays paused while it is on screen; when it next comes on screen it plays again.
  *
  * Parts beside the clip can follow it: an element inside the host with data-at="2.5" gets the class "is-on"
  * from second 2.5 of the clip, and with data-until="10.5" loses it again at 10.5. While the script follows
@@ -48,12 +48,15 @@ export class LoopVideo extends HTMLElement {
       (entries) => {
         // The newest record decides: a batch can hold an older one that says the opposite.
         onScreen = entries[entries.length - 1]?.isIntersecting ?? false;
-        if (!onScreen) return video.pause();
+        if (!onScreen) {
+          this.stopped = false;
+          return video.pause();
+        }
         if (this.stopped || video.hasAttribute('data-still')) return;
         // Autoplay refused: hand the clip back as the page ships it, with its controls. A clip that failed to
         // load is not refused: clip-rescue.ts takes it from there.
-        void video.play()?.catch?.(() => {
-          if (video.error || video.hasAttribute('data-still')) return;
+        void video.play()?.catch?.((error: unknown) => {
+          if (!autoplayRefused(error) || video.error || video.hasAttribute('data-still')) return;
           this.observer?.disconnect();
           video.removeEventListener('click', toggle);
           video.setAttribute('controls', '');

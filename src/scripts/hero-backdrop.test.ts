@@ -40,6 +40,14 @@ describe('<hero-backdrop>', () => {
     expect(calls[0]!.still).toBe(false);
   });
 
+  it('starts as soon as the page is parsed: it does not wait for images and clips to finish loading', async () => {
+    const state = vi.spyOn(document, 'readyState', 'get').mockReturnValue('interactive');
+    mount(fixture);
+    await settle();
+    expect(calls).toHaveLength(1);
+    state.mockRestore();
+  });
+
   it('asks for one still frame when the visitor prefers reduced motion', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('reduce'), addEventListener() {}, removeEventListener() {} }));
     mount(fixture);

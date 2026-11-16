@@ -362,14 +362,26 @@ describe('Home sections consistency', () => {
     // Tab's panel plays the walkthrough: the serving line, the camera and the register filling in.
     const walk = doc.querySelector('#tab loop-video video')!;
     expect(walk.getAttribute('src')).toBe('/media/tab-line.mp4');
-    // Under the line, the product's own screen in our style, in step with the clip: two boxes, then the steam table.
+    // Under the line, the product's own screen in our style, in step with the clip: three boxes, then the steam table.
     const screen = doc.querySelector('#tab loop-video .reg')!;
     expect([...screen.querySelectorAll('.reg__head b')].map((b) => b.textContent)).toEqual(['Boxes on the line', 'Steam table']);
-    expect([...screen.querySelectorAll('.reg__id b')].map((b) => b.textContent)).toEqual(['B1 · #4401', 'B2 · #4402']);
-    expect([...screen.querySelectorAll('.reg__box')[0]!.querySelectorAll('.reg__items li')].map((li) => [li.textContent?.trim(), li.getAttribute('data-at')])).toEqual([
-      ['Chow mein', '2.5'],
-      ['Sesame chicken', '5'],
-      ['Beef broccoli', '10.5'],
+    const boxes = [...screen.querySelectorAll('.reg__box')];
+    expect(boxes.map((box) => box.querySelector('.reg__id b')?.textContent)).toEqual(['#4401', '#4402', '#4403']);
+    // Each box enters, fills and is paid at the second the clip's own screen shows it (read off the clip).
+    const cues = (box: Element) => [...box.querySelectorAll('.reg__items li')].map((li) => [li.textContent?.trim(), li.getAttribute('data-at')]);
+    const states = (box: Element) => [...box.querySelectorAll('.reg__state i')].map((i) => [i.textContent?.trim(), i.getAttribute('data-at'), i.getAttribute('data-until')]);
+    expect(boxes.map((box) => box.querySelector('.reg__in')?.getAttribute('data-at') ?? null)).toEqual([null, '3', '7']);
+    expect(cues(boxes[0]!)).toEqual([['Chow mein', '2.5'], ['Sesame chicken', '5'], ['Beef broccoli', '7']]);
+    expect(states(boxes[0]!)).toEqual([['Filling', '0', '10.5'], ['Ready to pay', '10.5', '13.5'], ['Paid', '13.5', null]]);
+    expect(cues(boxes[1]!)).toEqual([['Fried rice', '5'], ['Kung pao', '11']]);
+    expect(states(boxes[1]!)).toEqual([['Filling', '3', '7.5'], ['Waiting', '7.5', '11'], ['Filling', '11', '14.5'], ['Ready to pay', '14.5', null]]);
+    expect(cues(boxes[2]!)).toEqual([['Fried rice', '10'], ['Chow mein', '12'], ['Beef broccoli', '15']]);
+    expect(states(boxes[2]!)).toEqual([['Filling', '7', null]]);
+    // The pan the second box waits for runs out and is refilled at the same seconds.
+    expect([...screen.querySelectorAll('.reg__swap .reg__level')].map((l) => [l.querySelector('i')?.textContent, l.getAttribute('data-at'), l.getAttribute('data-until')])).toEqual([
+      ['Low', '0', '7.5'],
+      ['Refill now', '7.5', '11'],
+      ['In stock', '11', null],
     ]);
     expect(screen.querySelectorAll('.reg__pans > li')).toHaveLength(3);
     // No counts beside the two labels, and every pan shows how full it is as a bar.

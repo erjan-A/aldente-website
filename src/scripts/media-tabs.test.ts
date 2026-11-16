@@ -236,6 +236,20 @@ describe('<media-tabs>', () => {
       expect(pause.mock.contexts).toContain(verify);
     });
 
+    it('gives a clip its controls back only when the browser refuses to autoplay, not when a start is cut short', async () => {
+      reducedMotion(false);
+      vi.useRealTimers();
+      const play = vi.spyOn(HTMLMediaElement.prototype, 'play');
+      play.mockRejectedValue(new DOMException('interrupted by a call to pause()', 'AbortError'));
+      mount(autoplay.replace('Verify view', '<video controls src="/media/verify.mp4"></video>'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.querySelector('video')!.controls).toBe(false);
+      play.mockRejectedValue(new DOMException('play() refused', 'NotAllowedError'));
+      mount(autoplay.replace('Verify view', '<video controls src="/media/verify.mp4"></video>'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.querySelector('video')!.controls).toBe(true);
+    });
+
     it('with reduced motion: nothing plays by itself and the videos keep their controls', () => {
       reducedMotion(true);
       const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();

@@ -6,6 +6,15 @@
  * If that fails too, the clip becomes its still: the source and the controls go and the poster stays, so the
  * visitor sees the product picture and never a broken player. The element then carries data-still.
  */
+/**
+ * True when play() failed because the browser refuses to autoplay (a phone in low-power mode). A start that
+ * was only cut short, because the clip left the screen or its view while it was still loading, is not a
+ * refusal: the browser reports that one as an AbortError, and the clip simply plays the next time.
+ */
+export function autoplayRefused(error: unknown): boolean {
+  return (error as { name?: string } | null)?.name === 'NotAllowedError';
+}
+
 export function rescueClip(video: HTMLVideoElement, ready: () => void): void {
   let tried = false;
   const still = (): void => {

@@ -79,7 +79,7 @@ describe('<loop-video>', () => {
   });
 
   it('gives the controls back when the browser refuses to autoplay, and leaves the parts in their finished state', async () => {
-    play.mockRejectedValue(new Error('NotAllowedError'));
+    play.mockRejectedValue(new DOMException('play() refused', 'NotAllowedError'));
     mount('<loop-video><video src="/media/tab-line.mp4" muted loop playsinline controls></video><i id="item" data-at="2.5"></i></loop-video>');
     report(true);
     await Promise.resolve();
@@ -88,20 +88,40 @@ describe('<loop-video>', () => {
     expect(document.querySelector('loop-video')!.hasAttribute('data-live')).toBe(false);
   });
 
-  it('pauses and resumes on a click or the space key, and stays paused when it scrolls back in', () => {
+  it('keeps playing by itself when a start is cut short: scrolled past before the clip loaded, it plays the next time', async () => {
+    // What a browser reports when pause() arrives before play() has finished loading the clip.
+    play.mockRejectedValueOnce(new DOMException('interrupted by a call to pause()', 'AbortError'));
+    mount(fixture);
+    report(true);
+    report(false);
+    await Promise.resolve();
+    await Promise.resolve();
+    // Not a refusal: no controls come back, and the clip starts again when it is next on screen.
+    expect(video().hasAttribute('controls')).toBe(false);
+    report(true);
+    expect(play).toHaveBeenCalledTimes(2);
+    expect(video().hasAttribute('controls')).toBe(false);
+  });
+
+  it('pauses and resumes on a click or the space key; a paused clip plays again when it next comes on screen', () => {
     mount(fixture);
     report(true);
     expect(play).toHaveBeenCalledTimes(1);
     Object.defineProperty(video(), 'paused', { value: false, configurable: true });
     video().click();
     expect(pause).toHaveBeenCalledTimes(1);
-    // The visitor paused it: coming back on screen does not start it again.
-    report(false);
+    // Paused by the visitor: it stays paused while it is on screen.
     report(true);
     expect(play).toHaveBeenCalledTimes(1);
     Object.defineProperty(video(), 'paused', { value: true, configurable: true });
     video().dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
     expect(play).toHaveBeenCalledTimes(2);
+    // Paused again, then scrolled away and back: the loop carries on by itself.
+    Object.defineProperty(video(), 'paused', { value: false, configurable: true });
+    video().click();
+    report(false);
+    report(true);
+    expect(play).toHaveBeenCalledTimes(3);
     expect(video().tabIndex).toBe(0);
   });
 

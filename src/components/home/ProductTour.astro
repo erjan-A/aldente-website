@@ -249,37 +249,59 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
                       <p class="reg__head">
                         <b>Boxes on the line</b>
                       </p>
+                      {/* Seconds are read off the clip's own screen: when each box enters the line, gets an item, waits, is paid. */}
                       <ul class="reg__boxes" role="list">
                         <li class="reg__box">
-                          <p class="reg__id">
-                            <b>B1 · #4401</b>
-                            <span>Plate</span>
-                            <span class="reg__state">
-                              <i data-at="0" data-until="10.5">Filling</i>
-                              <i class="reg__state--ready" data-at="10.5" data-until="13.5">Ready to pay</i>
-                              <i class="reg__state--done" data-at="13.5">Paid</i>
-                            </span>
-                          </p>
-                          <ul class="reg__items" role="list">
-                            <li data-at="2.5">Chow mein</li>
-                            <li data-at="5">Sesame chicken</li>
-                            <li data-at="10.5">Beef broccoli</li>
-                          </ul>
+                          <div class="reg__in">
+                            <p class="reg__id">
+                              <b>#4401</b>
+                              <span>Plate</span>
+                              <span class="reg__state">
+                                <i data-at="0" data-until="10.5">Filling</i>
+                                <i class="reg__state--ready" data-at="10.5" data-until="13.5">Ready to pay</i>
+                                <i class="reg__state--done" data-at="13.5">Paid</i>
+                              </span>
+                            </p>
+                            <ul class="reg__items" role="list">
+                              <li data-at="2.5">Chow mein</li>
+                              <li data-at="5">Sesame chicken</li>
+                              <li data-at="7">Beef broccoli</li>
+                            </ul>
+                          </div>
                         </li>
-                        <li class="reg__box" data-at="7.5">
-                          <p class="reg__id">
-                            <b>B2 · #4402</b>
-                            <span>Bowl</span>
-                            <span class="reg__state">
-                              <i class="reg__state--wait" data-at="7.5" data-until="13.5">Waiting for a refill</i>
-                              <i data-at="13.5" data-until="14.5">Filling</i>
-                              <i class="reg__state--ready" data-at="14.5">Ready to pay</i>
-                            </span>
-                          </p>
-                          <ul class="reg__items" role="list">
-                            <li data-at="7.5">Fried rice</li>
-                            <li data-at="13.5">Kung pao chicken</li>
-                          </ul>
+                        <li class="reg__box">
+                          <div class="reg__in" data-at="3">
+                            <p class="reg__id">
+                              <b>#4402</b>
+                              <span>Bowl</span>
+                              <span class="reg__state">
+                                <i data-at="3" data-until="7.5">Filling</i>
+                                <i class="reg__state--wait" data-at="7.5" data-until="11">Waiting</i>
+                                <i data-at="11" data-until="14.5">Filling</i>
+                                <i class="reg__state--ready" data-at="14.5">Ready to pay</i>
+                              </span>
+                            </p>
+                            <ul class="reg__items" role="list">
+                              <li data-at="5">Fried rice</li>
+                              <li data-at="11">Kung pao</li>
+                            </ul>
+                          </div>
+                        </li>
+                        <li class="reg__box">
+                          <div class="reg__in" data-at="7">
+                            <p class="reg__id">
+                              <b>#4403</b>
+                              <span>Plate</span>
+                              <span class="reg__state">
+                                <i data-at="7">Filling</i>
+                              </span>
+                            </p>
+                            <ul class="reg__items" role="list">
+                              <li data-at="10">Fried rice</li>
+                              <li data-at="12">Chow mein</li>
+                              <li data-at="15">Beef broccoli</li>
+                            </ul>
+                          </div>
                         </li>
                       </ul>
                       <p class="reg__head">
@@ -309,12 +331,12 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
                             <span class="reg__bar reg__bar--low" style="--level:6%" />
                             <i class="reg__pan--low">Low</i>
                           </span>
-                          <span class="reg__level" data-at="7.5" data-until="13.5">
+                          <span class="reg__level" data-at="7.5" data-until="11">
                             <b>0%</b>
                             <span class="reg__bar reg__bar--low" style="--level:0%" />
                             <i class="reg__pan--low">Refill now</i>
                           </span>
-                          <span class="reg__level" data-at="13.5">
+                          <span class="reg__level" data-at="11">
                             <b>100%</b>
                             <span class="reg__bar" style="--level:100%" />
                             <i class="reg__pan--ok">In stock</i>
@@ -848,10 +870,21 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
     color: var(--ink);
   }
 
+  /* Three boxes: side by side where the panel has room for them, one under another where it is narrow
+     (the panel's own width decides, so it holds on phones and in the narrow desktop column alike). */
+  .reg {
+    container-type: inline-size;
+  }
+
   .reg__boxes {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+  }
+
+  @container (min-width: 370px) {
+    .reg__boxes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .reg__box,
@@ -863,6 +896,23 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
     border: 1px solid var(--line);
     border-radius: var(--radius-s);
     background: var(--bg);
+  }
+
+  .reg__box {
+    padding: 8px;
+    transition: background-color 0.25s ease;
+  }
+
+  .reg__in {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+  }
+
+  /* A box that has not reached the line yet: its place is an empty slot. */
+  .walk--line[data-live] .reg__box:has(> .reg__in[data-at]:not(.is-on)) {
+    border-style: dashed;
+    background: none;
   }
 
   .reg__id {
@@ -921,11 +971,29 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
     color: var(--accent);
   }
 
+  /* Room for three items, so a card keeps its height as the box fills. */
   .reg__items {
     display: grid;
+    align-content: start;
     gap: 4px;
-    min-height: 4.6em;
+    min-height: 4.8em;
     color: var(--ink);
+  }
+
+  /* In the narrow layout a box is one row: its items run in a line, and the status sits at the row's end. */
+  @container (max-width: 369px) {
+    .reg__items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 12px;
+      /* Room for two lines of items, so a row keeps its height as the box fills. */
+      min-height: calc(2.8em + 2px);
+    }
+
+    .reg__state {
+      flex-basis: auto;
+      margin-left: auto;
+    }
   }
 
   .reg__items li {
