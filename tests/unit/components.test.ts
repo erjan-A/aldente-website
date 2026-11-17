@@ -165,17 +165,17 @@ describe('Home hero and CTA band', () => {
     expect(html).not.toContain('Chief of Staff');
   });
 
-  it('HeroMedia: three clips (Verify, Dispute, Tab) as tabs; Verify shows first, and each plays for its own length', async () => {
+  it('HeroMedia: three clips (Tab, Verify, Dispute) as tabs; Tab shows first, and each plays for its own length', async () => {
     const { default: HeroMedia } = await import('../../src/components/home/HeroMedia.astro');
     const html = await container.renderToString(HeroMedia);
     const doc = parse(html);
-    expect(doc.querySelector('media-tabs')?.getAttribute('data-autoplay')).toBe('13800');
+    expect(doc.querySelector('media-tabs')?.getAttribute('data-autoplay')).toBe('14800');
     const tabs = [...doc.querySelectorAll('[role="tab"]')];
-    expect(tabs.map((t) => t.textContent?.trim())).toEqual(['Verify', 'Dispute', 'Tab']);
+    expect(tabs.map((t) => t.textContent?.trim())).toEqual(['Tab', 'Verify', 'Dispute']);
     expect(tabs.map((t) => t.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false']);
     const panels = [...doc.querySelectorAll('[role="tabpanel"]')];
     expect(panels.map((p) => p.hasAttribute('hidden'))).toEqual([false, true, true]);
-    expect(panels.map((p) => p.getAttribute('data-duration'))).toEqual(['13800', '10800', '14800']);
+    expect(panels.map((p) => p.getAttribute('data-duration'))).toEqual(['14800', '20000', '10800']);
     // The tabs come before the views they switch. No words sit under a clip: each one carries its own name.
     expect(doc.querySelector('[role="tablist"]')!.compareDocumentPosition(panels[0]!) & 4).toBe(4);
     expect(doc.querySelector('figcaption')).toBeNull();
@@ -187,13 +187,15 @@ describe('Home hero and CTA band', () => {
       expect(panels[i]!.getAttribute('aria-labelledby')).toBe(tab.id);
     }
     const videos = panels.map((p) => p.querySelector('video')!);
-    expect(videos.map((v) => v.getAttribute('src'))).toEqual(['/media/verify.mp4', '/media/dispute.mp4', '/media/tab.mp4']);
+    expect(videos.map((v) => v.getAttribute('src'))).toEqual(['/media/tab.mp4', '/media/verify.mp4', '/media/dispute.mp4']);
     // Each clip works without the script: controls, a poster, a text alternative, silent and inline.
     for (const video of videos) {
       for (const attr of ['controls', 'muted', 'loop', 'playsinline', 'poster', 'aria-label']) expect(video.hasAttribute(attr), attr).toBe(true);
     }
     expect(videos.map((v) => v.getAttribute('preload'))).toEqual(['metadata', 'none', 'none']);
-    expect(videos[2]!.getAttribute('aria-label')).toMatch(/^Aldente Tab: an overhead camera/);
+    expect(videos[0]!.getAttribute('aria-label')).toMatch(/^Aldente Tab: an overhead camera/);
+    // The Verify clip: the receipt is read, then each item is checked on its way into the bag.
+    expect(videos[1]!.getAttribute('aria-label')).toMatch(/^Aldente Verify at a packing station: the camera reads the receipt/);
     expect(html).not.toMatch(/[Rr]eversed|won back|Won back/);
   });
 
@@ -225,16 +227,16 @@ describe('Home hero and CTA band', () => {
     expect(await title('../../src/components/home/Calculator.astro')).toBe('Each wrong order is a full refund, every day, at every location.');
   });
 
-  it('Results: one quote per product, the third from a serving-line chain about Aldente Tab', async () => {
+  it('Results: one quote per product, the first from a serving-line chain about Aldente Tab', async () => {
     const { default: Results } = await import('../../src/components/home/Results.astro');
     const doc = parse(await container.renderToString(Results));
     const cards = [...doc.querySelectorAll('.tile')];
-    expect(cards.map((c) => c.querySelector('.pill')?.textContent?.trim())).toEqual(['Aldente Verify', 'Aldente Dispute', 'Aldente Tab']);
-    expect(cards[2]!.querySelector('blockquote')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+    expect(cards.map((c) => c.querySelector('.pill')?.textContent?.trim())).toEqual(['Aldente Tab', 'Aldente Verify', 'Aldente Dispute']);
+    expect(cards[0]!.querySelector('blockquote')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
       '“Our lines are moving faster, and every box on our serving line is tracked.”',
     );
     // Signed by role and chain type, never by name.
-    expect(cards[2]!.querySelector('figcaption')?.textContent?.replace(/\s+/g, ' ').trim()).toMatch(/^VP of Operations\s*Fast-casual bowl chain/);
+    expect(cards[0]!.querySelector('figcaption')?.textContent?.replace(/\s+/g, ' ').trim()).toMatch(/^VP of Operations\s*Fast-casual bowl chain/);
   });
 
   it('Hero: who it is for in a pill with an icon, then one plain line per product, without icons', async () => {
@@ -245,9 +247,9 @@ describe('Home hero and CTA band', () => {
     expect(pill.querySelector('svg')).not.toBeNull();
     const lines = [...doc.querySelectorAll('.hero__lead > li')];
     expect(lines.map((li) => li.textContent?.trim())).toEqual([
+      'Ring up orders while staff build them.',
       'Check every order before pickup.',
       'Answer every refund claim with proof.',
-      'Ring up orders while staff build them.',
     ]);
     expect(doc.querySelector('.hero__lead svg')).toBeNull();
   });
@@ -331,20 +333,20 @@ describe('Home sections consistency', () => {
     const nav = doc.querySelector('toc-spy nav[aria-label="Products"]')!;
     expect(nav.querySelector('.toc__label')).toBeNull();
     const links = [...nav.querySelectorAll('a')];
-    expect(links.map((a) => a.getAttribute('href'))).toEqual(['#verify', '#dispute', '#tab', '#playbooks']);
-    expect(links.map((a) => a.querySelector('.toc__name')?.textContent)).toEqual(['Verify', 'Dispute', 'Tab', 'Playbooks']);
+    expect(links.map((a) => a.getAttribute('href'))).toEqual(['#tab', '#verify', '#dispute', '#playbooks']);
+    expect(links.map((a) => a.querySelector('.toc__name')?.textContent)).toEqual(['Tab', 'Verify', 'Dispute', 'Playbooks']);
     expect(links.map((a) => a.querySelector('.toc__does')?.textContent)).toEqual([
+      'Line ring-up',
       'Order check',
       'Refund evidence',
-      'Line ring-up',
       'Checks in Slack',
     ]);
     expect(links.every((a) => a.getAttribute('data-track') === 'TOC click')).toBe(true);
     // The section title names what the products do with an order, not the hardware.
-    expect(doc.querySelector('h2')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('Checked, proven, rung up. What vision AI does with every order.');
+    expect(doc.querySelector('h2')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('Rung up, checked, proven. What vision AI does with every order.');
     expect(doc.body.textContent).not.toMatch(/tablet/i);
     const blocks = [...doc.querySelectorAll('article.block')];
-    expect(blocks.map((b) => b.id)).toEqual(['verify', 'dispute', 'tab', 'playbooks']);
+    expect(blocks.map((b) => b.id)).toEqual(['tab', 'verify', 'dispute', 'playbooks']);
     // Tab rings up the order and tracks the ingredient boxes on the line; its scene shows the box that runs low.
     expect([...doc.querySelectorAll('#tab .block__feature b')].map((b) => b.textContent)).toEqual([
       'No keying at the register',
@@ -393,37 +395,37 @@ describe('Home sections consistency', () => {
     for (const attr of ['muted', 'loop', 'playsinline', 'controls', 'poster', 'aria-label']) expect(walk.hasAttribute(attr), attr).toBe(true);
     expect(walk.getAttribute('preload')).toBe('none');
     expect(blocks.map((b) => b.querySelector('h3')?.textContent)).toEqual([
+      'Orders rung up while staff build them.',
       'Every order checked before pickup.',
       'Every refund claim answered with proof.',
-      'Orders rung up while staff build them.',
       'Ask once in Slack, and it runs every shift.',
     ]);
     expect(blocks.map((b) => b.querySelector('.pill')?.textContent?.trim())).toEqual([
+      'Aldente Tab',
       'Aldente Verify',
       'Aldente Dispute',
-      'Aldente Tab',
       'Aldente Playbooks',
     ]);
     // Every product is a full block with three features; none is a compact card.
     expect(blocks.map((b) => b.querySelectorAll('.block__features > li').length)).toEqual([3, 3, 3, 3]);
     expect(doc.querySelector('.block--compact')).toBeNull();
     expect(blocks.map((b) => b.querySelector('.block__stat')?.textContent ?? null)).toEqual([
+      '+8% orders in the peak hour · 225-store chain',
       'Wrong orders: from 14–16 a day to about 2',
       '1–2 hours a day saved on searching footage',
-      '+8% orders in the peak hour · 225-store chain',
       null,
     ]);
     expect(blocks.map((b) => b.querySelector('a.btn:not(.btn--primary)')?.getAttribute('href'))).toEqual([
+      '/tab',
       '/order-verification',
       '/order-verification#dispute',
-      '/tab',
       '/playbooks',
     ]);
     // Each lead product asks for the booking where the interest forms; its page is the quieter link beside it.
     expect(blocks.map((b) => b.querySelector('a.btn--primary')?.getAttribute('href') ?? null)).toEqual([
-      '/demo?plan=verification',
-      '/demo?plan=verification',
       '/demo',
+      '/demo?plan=verification',
+      '/demo?plan=verification',
       '/demo?plan=starter',
     ]);
     expect(blocks.every((b) => b.querySelector('a.btn--link')?.textContent?.includes('Learn more'))).toBe(true);
@@ -433,11 +435,11 @@ describe('Home sections consistency', () => {
     const drawn = media.filter((_, n) => !clips.includes(blocks[n]!.id));
     expect(drawn.every((m) => m.getAttribute('aria-hidden') === 'true' && m.hasAttribute('data-seq') && m.hasAttribute('data-loop'))).toBe(true);
     // The Verify and Tab panels hold real clips with a name, so they are not hidden from assistive technology.
-    expect(media[0]!.hasAttribute('aria-hidden')).toBe(false);
-    expect(media[2]!.hasAttribute('aria-hidden')).toBe(false);
+    for (const id of clips) expect(doc.querySelector(`#${id} .block__media`)!.hasAttribute('aria-hidden'), id).toBe(false);
     // Verify's panel plays the packing station: staff at the counter above, the product's own screen below.
     const station = doc.querySelector('#verify loop-video video')!;
     expect(station.getAttribute('src')).toBe('/media/verify-station.mp4');
+    expect(station.getAttribute('aria-label')).toMatch(/reads the receipt.*into the bag.*verified/);
     for (const attr of ['muted', 'loop', 'playsinline', 'controls', 'poster', 'aria-label']) expect(station.hasAttribute(attr), attr).toBe(true);
     expect(station.getAttribute('preload')).toBe('none');
     expect(doc.querySelector('#verify .tl__step')).toBeNull();
@@ -463,18 +465,18 @@ describe('Home sections consistency', () => {
     const doc = parse(await container.renderToString(Results));
     const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, ' ').trim();
     const tiles = [...doc.querySelectorAll('.tile')];
-    expect(tiles.map((t) => text(t.querySelector('.pill')))).toEqual(['Aldente Verify', 'Aldente Dispute', 'Aldente Tab']);
+    expect(tiles.map((t) => text(t.querySelector('.pill')))).toEqual(['Aldente Tab', 'Aldente Verify', 'Aldente Dispute']);
     expect(tiles.map((t) => text(t.querySelector('.tile__value')))).toEqual([
+      '8% more orders at peak',
       '87% fewer wrong orders',
       '1–2 hours a day saved',
-      '8% more orders at peak',
     ]);
     // Each result is one short line of the same kind, and none names where it was measured.
     const lines = tiles.map((t) => text(t.querySelector('.tile__text'))!);
     expect(lines).toEqual([
+      'In the peak hour, at a 225-store serving-line chain.',
       'Wrong orders went from 14–16 a day to about 2.',
       'No more searching footage for each refund claim.',
-      'In the peak hour, at a 225-store serving-line chain.',
     ]);
     expect(doc.body.textContent).not.toMatch(/one location of a regional/i);
     // The quotes are short and close in length, so the three cards end level.
@@ -493,7 +495,7 @@ describe('Home sections consistency', () => {
     expect(tiles.every((t) => t.querySelector('.tile__result')!.compareDocumentPosition(t.querySelector('.quote')!) & 4)).toBe(true);
     expect(doc.querySelector('.results__quotes')).toBeNull();
     expect(doc.body.textContent).not.toMatch(/tablet/i);
-    expect(quotes.map((q) => text(q.querySelector('figcaption b')))).toEqual(['Director of Operations', 'Head of Off-Premise', 'VP of Operations']);
+    expect(quotes.map((q) => text(q.querySelector('figcaption b')))).toEqual(['VP of Operations', 'Director of Operations', 'Head of Off-Premise']);
     // One quote per lead product, and none names a person.
     expect(doc.body.textContent).not.toMatch(/Aldo|Chief of Staff/);
   });

@@ -26,18 +26,19 @@ describe('NAV_GROUPS', () => {
   it('links the four products by their exact names and carries the product id', () => {
     const items = menu('Products').items;
     expect(items.map((i) => i.product)).toEqual([...PRODUCT_IDS]);
-    expect(items.map((i) => i.label)).toEqual(['Aldente Verify', 'Aldente Dispute', 'Aldente Tab', 'Aldente Playbooks']);
-    expect(items.map((i) => i.href)).toEqual(['/order-verification', '/order-verification#dispute', '/tab', '/playbooks']);
+    expect(items.map((i) => i.label)).toEqual(['Aldente Tab', 'Aldente Verify', 'Aldente Dispute', 'Aldente Playbooks']);
+    expect(items.map((i) => i.href)).toEqual(['/tab', '/order-verification', '/order-verification#dispute', '/playbooks']);
     expect(items.map((i) => i.note)).toEqual(PRODUCT_IDS.map((id) => PRODUCTS[id].note));
     for (const id of PRODUCT_IDS) expect(PRODUCTS[id].icon, id).toBeTruthy();
   });
 
   it('has four products: Aldo and Aldente Vision are one, Aldente Playbooks', () => {
-    expect([...PRODUCT_IDS]).toEqual(['verify', 'dispute', 'tab', 'playbooks']);
+    // Aldente Tab, the newest product, leads wherever the products are listed (2026-11-17).
+    expect([...PRODUCT_IDS]).toEqual(['tab', 'verify', 'dispute', 'playbooks']);
     expect(PRODUCT_IDS.map((id) => `${PRODUCTS[id].short}: ${PRODUCTS[id].does}`)).toEqual([
+      'Tab: Line ring-up',
       'Verify: Order check',
       'Dispute: Refund evidence',
-      'Tab: Line ring-up',
       'Playbooks: Checks in Slack',
     ]);
   });
@@ -73,8 +74,8 @@ describe('ANNOUNCEMENT', () => {
 
 describe('FOOTER', () => {
   it('links the products and solutions by their exact names', () => {
-    expect(FOOTER[0]!.links.map((l) => l.label)).toEqual(['Aldente Verify', 'Aldente Dispute', 'Aldente Tab', 'Aldente Playbooks']);
-    expect(FOOTER[0]!.links.map((l) => l.href)).toEqual(['/order-verification', '/order-verification#dispute', '/tab', '/playbooks']);
+    expect(FOOTER[0]!.links.map((l) => l.label)).toEqual(['Aldente Tab', 'Aldente Verify', 'Aldente Dispute', 'Aldente Playbooks']);
+    expect(FOOTER[0]!.links.map((l) => l.href)).toEqual(['/tab', '/order-verification', '/order-verification#dispute', '/playbooks']);
     expect(FOOTER[1]!.links).toEqual([
       { label: 'Operations', href: '/solutions/operations' },
       { label: 'HR', href: '/solutions/hr' },

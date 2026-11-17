@@ -1,8 +1,8 @@
 /**
  * Cookie consent: which optional categories the visitor allowed, and when. Necessary storage (this choice)
  * is always on. Visit counting (Umami) is cookieless and stores nothing in the browser, so it is not a
- * category to choose: the only optional one is marketing. It gates two things: LinkedIn's Insight Tag,
- * which loads only once marketing is allowed (src/scripts/linkedin-insight.ts), and Calendly's booking
+ * category to choose: the only optional one is marketing. It decides two things: LinkedIn's Insight Tag,
+ * which runs unless marketing was rejected (src/scripts/linkedin-insight.ts), and Calendly's booking
  * calendar on the demo page, which then sets its own cookies without asking again (hide_gdpr_banner).
  */
 export interface Choices {

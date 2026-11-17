@@ -4,7 +4,7 @@ import clipDispute from '../../assets/images/clip-dispute.jpg';
 import clipTab from '../../assets/images/clip-tab.jpg';
 import clipVerify from '../../assets/images/clip-verify.jpg';
 import { EVENTS } from '../../data/analytics';
-import { PRODUCTS } from '../../data/products';
+import { inProductOrder, PRODUCTS } from '../../data/products';
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
 
@@ -12,16 +12,17 @@ import Icon from '../ui/Icon.astro';
  * The home hero's one product object: the product at work, one clip per vision product, switched by the tabs
  * above the panel. Verify and Dispute are footage of the product at work (a packing station, then the dashboard with the packing
  * video); Tab shows the serving line from above. <media-tabs> plays each clip while its view shows and moves to the
- * next when it ends; the current tab draws the time left. Verify shows first and needs no script: every clip
+ * next when it ends; the current tab draws the time left. The first product's clip shows first and needs no script: every clip
  * ships with controls, which the script takes away when it does the playing.
  */
-const views = [
+const views = inProductOrder(
+  [
   {
     id: 'verify',
     src: '/media/verify.mp4',
     poster: clipVerify,
-    ms: 13800,
-    alt: 'Aldente Verify at a packing station: each item of an order is checked off under the camera, a wrong item is flagged, and the order is verified.',
+    ms: 20000,
+    alt: 'Aldente Verify at a packing station: the camera reads the receipt, checks each item as staff put it into the bag, and marks the order verified.',
   },
   {
     id: 'dispute',
@@ -37,12 +38,14 @@ const views = [
     ms: 14800,
     alt: 'Aldente Tab: an overhead camera on a serving line follows one box, logs each scoop, and the ticket is on the register before the guest pays.',
   },
-] as const;
+  ] as const,
+  (view) => view.id,
+);
 
 const posters = await Promise.all(views.map((view) => getImage({ src: view.poster, width: 1280, format: 'webp' })));
 ---
 
-<media-tabs class="hm" data-track={EVENTS.heroView} data-autoplay={views[0].ms}>
+<media-tabs class="hm" data-track={EVENTS.heroView} data-autoplay={views[0]!.ms}>
   <div class="hm__tabs" role="tablist" aria-label="Product views">
     {
       views.map((view, i) => (

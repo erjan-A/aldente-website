@@ -25,8 +25,13 @@ describe('LinkedIn Insight Tag', () => {
     });
   });
 
-  it('loads nothing until the visitor allows marketing cookies', () => {
-    expect(loadInsightTag('aldenteai.com')).toBe(false);
+  it('runs at once for a visitor who has not chosen yet: no "Accept all" is needed', () => {
+    expect(loadInsightTag('aldenteai.com')).toBe(true);
+    expect(scripts()).toHaveLength(1);
+    expect(typeof window.lintrk).toBe('function');
+  });
+
+  it('stays off for a visitor who rejected marketing cookies', () => {
     allowMarketing(false);
     expect(loadInsightTag('aldenteai.com')).toBe(false);
     expect(scripts()).toHaveLength(0);
@@ -50,10 +55,11 @@ describe('LinkedIn Insight Tag', () => {
     expect(typeof window.lintrk).toBe('function');
   });
 
-  it('loads as soon as the visitor accepts on the page, not when they reject', () => {
+  it('a visitor who rejected and later accepts gets the tag at once; a rejection loads nothing', () => {
     const { happyDOM } = window as unknown as { happyDOM: { setURL: (url: string) => void } };
     happyDOM.setURL('https://aldenteai.com/demo');
     try {
+      allowMarketing(false);
       window.dispatchEvent(new CustomEvent('consentchange', { detail: makeConsent(NONE, Date.now()) }));
       expect(scripts()).toHaveLength(0);
       allowMarketing(true);

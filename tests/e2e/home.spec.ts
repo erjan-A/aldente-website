@@ -68,23 +68,26 @@ test.describe('home page', () => {
     expect(await page.locator('watch-dialog video').evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   });
 
-  test('plays the hero clips by themselves and switches between Verify, Dispute and Tab, by click and by arrow key', async ({ page }) => {
+  test('plays the hero clips by themselves and switches between Tab, Verify and Dispute, by click and by arrow key', async ({ page }) => {
     const tabs = page.getByRole('tablist', { name: 'Product views' });
     await expect(page.locator('media-tabs')).toHaveAttribute('data-playing', '');
-    const verify = page.getByRole('tabpanel', { name: 'Verify' });
-    await expect(verify.locator('video')).toHaveAttribute('src', '/media/verify.mp4');
+    // Aldente Tab leads: its clip is the one showing when the page opens.
+    const first = page.getByRole('tabpanel', { name: 'Tab', exact: true });
+    await expect(first).toBeVisible();
+    await expect(first.locator('video')).toHaveAttribute('src', '/media/tab.mp4');
+    await expect(first.locator('video')).toHaveAttribute('aria-label', /overhead camera/);
     // The script does the playing, so the clip loses its controls.
-    await expect(verify.locator('video')).not.toHaveAttribute('controls');
-    await tabs.getByRole('tab', { name: 'Dispute' }).click();
+    await expect(first.locator('video')).not.toHaveAttribute('controls');
+    await tabs.getByRole('tab', { name: 'Verify' }).click();
     // A pick ends the autoplay.
     await expect(page.locator('media-tabs')).not.toHaveAttribute('data-playing');
     // No words under the clips: each clip carries its own name.
-    await expect(page.getByRole('tabpanel', { name: 'Dispute' }).locator('video')).toHaveAttribute('aria-label', /refund claim/);
+    await expect(page.getByRole('tabpanel', { name: 'Verify' }).locator('video')).toHaveAttribute('src', '/media/verify.mp4');
     await expect(page.locator('.hm figcaption')).toHaveCount(0);
-    await expect(verify).toBeHidden();
+    await expect(first).toBeHidden();
     await page.keyboard.press('ArrowRight');
-    await expect(tabs.getByRole('tab', { name: 'Tab' })).toBeFocused();
-    await expect(page.getByRole('tabpanel', { name: 'Tab', exact: true }).locator('video')).toHaveAttribute('aria-label', /overhead camera/);
+    await expect(tabs.getByRole('tab', { name: 'Dispute' })).toBeFocused();
+    await expect(page.getByRole('tabpanel', { name: 'Dispute' }).locator('video')).toHaveAttribute('aria-label', /refund claim/);
   });
 
   test('draws the ember glow behind the hero, under the content and out of the way of clicks', async ({ page }) => {
@@ -235,7 +238,7 @@ test.describe('home page', () => {
 
   test('shows one result per lead product and three quotes', async ({ page }) => {
     const results = page.locator('#results');
-    await expect(results.locator('.tile__value b')).toHaveText(['87%', '1–2 hours', '8%']);
+    await expect(results.locator('.tile__value b')).toHaveText(['8%', '87%', '1–2 hours']);
     await expect(results.locator('blockquote')).toHaveCount(3);
     // A result and its quote are one card: the quote starts right under its result, in the same column.
     const pairs = await results.locator('.tile').evaluateAll((cards) =>
@@ -269,7 +272,7 @@ test.describe('home page', () => {
 });
 
 test.describe('products section', () => {
-  const names = ['Verify', 'Dispute', 'Tab', 'Playbooks'];
+  const names = ['Tab', 'Verify', 'Dispute', 'Playbooks'];
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -329,7 +332,7 @@ test.describe('products section', () => {
 
   test('each product block links to its page', async ({ page }) => {
     const hrefs = await page.locator('article.block a.btn:not(.btn--primary)').evaluateAll((links) => links.map((a) => a.getAttribute('href')));
-    expect(hrefs).toEqual(['/order-verification', '/order-verification#dispute', '/tab', '/playbooks']);
+    expect(hrefs).toEqual(['/tab', '/order-verification', '/order-verification#dispute', '/playbooks']);
   });
 });
 

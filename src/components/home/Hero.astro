@@ -1,4 +1,5 @@
 ---
+import { PRODUCT_IDS, type ProductId } from '../../data/products';
 import { LINKS } from '../../data/site';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
@@ -13,7 +14,12 @@ import HeroMedia from './HeroMedia.astro';
  */
 
 // One line per product, in the order of the clips below.
-const lines = ['Check every order before pickup.', 'Answer every refund claim with proof.', 'Ring up orders while staff build them.'];
+const promise: Partial<Record<ProductId, string>> = {
+  tab: 'Ring up orders while staff build them.',
+  verify: 'Check every order before pickup.',
+  dispute: 'Answer every refund claim with proof.',
+};
+const lines = PRODUCT_IDS.flatMap((id) => promise[id] ?? []);
 ---
 
 <section class="hero tone-orange" aria-labelledby="hero-title">

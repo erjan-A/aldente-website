@@ -4,9 +4,9 @@ import { CONSENT_KEY, readConsent, type Consent } from '../lib/consent';
 
 /**
  * LinkedIn's Insight Tag snippet as a module (the CSP allows no inline scripts). It runs on the production
- * hosts only, and only once the visitor allows marketing cookies: on load when the choice is stored, or as
- * soon as they accept (the banner or the cookie settings).
- * LinkedIn's <noscript> pixel is left out: without JavaScript the site can't ask for consent.
+ * hosts only, for every visitor who has not rejected marketing cookies (owner's decision, 2026-11-17: no
+ * "Accept all" is needed). A visitor who rejected them gets no tag; if they accept later, it loads at once.
+ * LinkedIn's <noscript> pixel is left out: without JavaScript the visitor cannot reject it.
  */
 type Lintrk = ((action: string, data: Record<string, unknown>) => void) & { q?: unknown[][] };
 
@@ -18,12 +18,13 @@ declare global {
   }
 }
 
-// Storage can be blocked (private modes, strict settings); then the tag waits for a choice made on the page.
+// Allowed unless a stored choice says no. Storage can be blocked (private modes, strict settings): then no
+// refusal can be read, and the tag runs.
 function marketingAllowed(): boolean {
   try {
-    return readConsent(localStorage.getItem(CONSENT_KEY), Date.now())?.marketing === true;
+    return readConsent(localStorage.getItem(CONSENT_KEY), Date.now())?.marketing !== false;
   } catch {
-    return false;
+    return true;
   }
 }
 

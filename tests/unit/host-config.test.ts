@@ -26,7 +26,7 @@ describe('server configuration', () => {
     expect(headers['X-Frame-Options']).toBe('DENY');
   });
 
-  it('lets the CSP run scripts from Umami, RB2B and LinkedIn only, frame Calendly only, and send requests and images to any https host', () => {
+  it('lets the CSP run scripts from Umami, RB2B, LinkedIn and Cloudflare only, frame Calendly only, and send requests and images to any https host', () => {
     const csp = Object.fromEntries(
       headers['Content-Security-Policy']!.split(';').map((d) => {
         const [name, ...values] = d.trim().split(/\s+/);
@@ -36,7 +36,8 @@ describe('server configuration', () => {
     const umamiScript = new URL(ANALYTICS.script).origin;
     const calendly = new URL(SITE.calendly).origin;
     expect(csp['default-src']).toEqual(["'self'"]);
-    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin, new URL(LINKEDIN.script).origin]);
+    // Cloudflare, which serves the domain, adds its own page-load measuring script to every page.
+    expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin, new URL(LINKEDIN.script).origin, 'https://static.cloudflareinsights.com']);
     expect(csp['connect-src']).toEqual(["'self'", 'https:']);
     expect(csp['img-src']).toEqual(["'self'", 'data:', 'https:']);
     expect(csp['frame-src']).toEqual([calendly]);

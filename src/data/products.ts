@@ -57,5 +57,14 @@ export const PRODUCTS: Record<ProductId, Product> = {
   },
 };
 
-/** Display order wherever all four appear: the three at the counter, then the one in Slack. */
-export const PRODUCT_IDS: readonly ProductId[] = ['verify', 'dispute', 'tab', 'playbooks'];
+/**
+ * Display order wherever the products appear: Aldente Tab, the newest, leads (set 2026-11-17), then the two at
+ * the packing station, then the one in Slack. The hero lines and clips, the product tour, the results, the menu
+ * and the footer all read this list.
+ */
+export const PRODUCT_IDS: readonly ProductId[] = ['tab', 'verify', 'dispute', 'playbooks'];
+
+/** `items` in the products' display order. */
+export function inProductOrder<T>(items: readonly T[], id: (item: T) => ProductId): T[] {
+  return [...items].sort((a, b) => PRODUCT_IDS.indexOf(id(a)) - PRODUCT_IDS.indexOf(id(b)));
+}

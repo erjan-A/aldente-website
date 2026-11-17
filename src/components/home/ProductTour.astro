@@ -6,7 +6,7 @@ import clipStation from '../../assets/images/clip-verify-station.jpg';
 import trayComplete from '../../assets/images/order-tray-complete.jpg';
 import mark from '../../assets/logos/aldente-mark.svg';
 import { EVENTS } from '../../data/analytics';
-import { PRODUCT_IDS, PRODUCTS, type ProductId } from '../../data/products';
+import { inProductOrder, PRODUCT_IDS, PRODUCTS, type ProductId } from '../../data/products';
 import { LINKS } from '../../data/site';
 import Button from '../ui/Button.astro';
 import Card from '../ui/Card.astro';
@@ -38,7 +38,8 @@ interface Block {
   plan?: string;
 }
 
-const blocks: Block[] = [
+const blocks: Block[] = inProductOrder<Block>(
+  [
   {
     id: 'verify',
     plan: 'verification',
@@ -86,7 +87,9 @@ const blocks: Block[] = [
       { icon: 'camera', title: 'The cameras you have', text: 'Queues, tables, traffic and staff presence, by location and hour.' },
     ],
   },
-];
+  ],
+  (block) => block.id,
+);
 
 // Order #4821 and its claim are the same as in the hero and on the product pages.
 const evidence = [
@@ -105,7 +108,7 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
     <SectionHeader
       id="tour-title"
       label="Products"
-      title="Checked, proven, rung up."
+      title="Rung up, checked, proven."
       muted="What vision AI does with every order."
     />
 
@@ -182,7 +185,7 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
                       playsinline
                       controls
                       preload="none"
-                      aria-label="Aldente Verify at a packing station: staff put each item under the camera, the screen checks it against the order, and a wrong item is caught before the bag is closed."
+                      aria-label="Aldente Verify at a packing station: the camera reads the receipt, the screen ticks off each item as staff put it into the bag, and the order is marked verified."
                     />
                   </loop-video>
                 )}
@@ -817,7 +820,7 @@ const stationPoster = await getImage({ src: clipStation, width: 720, format: 'we
     width: min(100%, 352px);
   }
 
-  /* Verify: the packing station from above, then the product's own screen. A little wider than Tab's frame,
+  /* Verify: the packing station seen by the camera, then the product's own order card. A little wider than Tab's frame,
      so the two panels end up the same height. */
   .walk--station {
     width: min(100%, 400px);

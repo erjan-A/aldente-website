@@ -21,8 +21,8 @@ export const RB2B = {
 } as const;
 
 /**
- * LinkedIn Insight Tag (see src/scripts/linkedin-insight.ts): ad measurement, loaded only after the visitor
- * allows marketing cookies. The conversion is "demo booked". None of these are secrets: they appear in every page.
+ * LinkedIn Insight Tag (see src/scripts/linkedin-insight.ts): ad measurement, loaded for every visitor who has
+ * not rejected marketing cookies. The conversion is "demo booked". None of these are secrets: they appear in every page.
  */
 export const LINKEDIN = {
   partnerId: '10055058',

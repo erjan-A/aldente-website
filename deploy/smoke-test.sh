@@ -84,6 +84,8 @@ expect_header / Content-Security-Policy "snap.licdn.com"
 # RB2B's script host, and clips played from memory.
 expect_header / Content-Security-Policy "ddwl4m2hdecbv.cloudfront.net"
 expect_header / Content-Security-Policy "media-src 'self' blob:"
+# Cloudflare adds its page-load script to every page; without its host the browser logs an error on each one.
+expect_header / Content-Security-Policy "static.cloudflareinsights.com"
 expect_header / X-Content-Type-Options nosniff
 expect_header / X-Frame-Options DENY
 expect_header / Referrer-Policy strict-origin-when-cross-origin

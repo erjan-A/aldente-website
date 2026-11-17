@@ -1,5 +1,5 @@
 ---
-import type { ProductId } from '../../data/products';
+import { inProductOrder, type ProductId } from '../../data/products';
 import Card from '../ui/Card.astro';
 import ProductPill from '../ui/ProductPill.astro';
 import SectionHeader from '../ui/SectionHeader.astro';
@@ -59,7 +59,7 @@ const quotes: { product: ProductId; quote: string; role: string; company: string
     {/* One card per product: what was measured, then the operator's words under it. */}
     <ul class="results__pairs" role="list">
       {
-        results.map((r) => {
+        inProductOrder(results, (r) => r.product).map((r) => {
           const said = quotes.find((q) => q.product === r.product)!;
           return (
             <Card as="li" pad="none" class="tile">
