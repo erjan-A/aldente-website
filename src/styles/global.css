@@ -30,6 +30,8 @@
     radial-gradient(55% 75% at 0% 0%, rgb(238 102 58 / 0.7) 0%, rgb(238 102 58 / 0) 70%),
     radial-gradient(75% 70% at 25% 100%, rgb(122 24 4 / 0.5) 0%, rgb(122 24 4 / 0) 72%),
     linear-gradient(165deg, #d9491f 0%, #c43a12 48%, #a92a0a 100%);
+  /* Behind the hero's centred copy: the orange's deep middle, so white text keeps its contrast over the glow. */
+  --surface-orange-shade: radial-gradient(760px 400px at 50% 310px, rgb(196 60 16 / 0.96) 0%, rgb(196 60 16 / 0.95) 45%, rgb(196 60 16 / 0.7) 70%, rgb(196 60 16 / 0) 100%);
   --ok: #4fbf85;
   --ok-soft: rgb(79 191 133 / 0.14);
   --ok-deep: #147a43; /* green text on white product UI */
@@ -135,6 +137,9 @@
 /* Phones: the text column runs under the corner glows, so they burn lower and white text keeps AA. */
 @media (max-width: 720px) {
   :root {
+    /* On a phone the copy fills the width, so its ground does too. It is centred on the small lines and the
+       buttons; the large headline above them lets more of the glow through. */
+    --surface-orange-shade: radial-gradient(130% 320px at 50% 300px, rgb(196 60 16 / 0.96) 0%, rgb(196 60 16 / 0.95) 40%, rgb(196 60 16 / 0.8) 62%, rgb(196 60 16 / 0) 100%);
     --surface-orange:
       radial-gradient(70% 95% at 95% 0%, rgb(255 146 96 / 0.45) 0%, rgb(255 146 96 / 0) 62%),
       radial-gradient(55% 75% at 0% 0%, rgb(238 102 58 / 0.4) 0%, rgb(238 102 58 / 0) 70%),

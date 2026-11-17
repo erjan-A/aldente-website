@@ -120,6 +120,15 @@ test('the hero glow fades out at its edges in this browser: its mask is a declar
   expect(mask).toContain('radial-gradient');
 });
 
+test('the hero copy has its own ground over the glow: a declaration the browser accepts', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForLoadState('load');
+  const ground = await page.evaluate(() => getComputedStyle(document.querySelector('hero-backdrop')!, '::after').backgroundImage);
+  expect(ground).toContain('radial-gradient');
+  // And the hero itself stands on the burning orange surface, like the other orange sections.
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('.hero')!).backgroundImage)).toContain('gradient');
+});
+
 test('white text on the orange hero keeps its contrast against what is painted behind it', async ({ page }) => {
   // The settled picture: one still frame of the glow (or the plain ground where WebGL is off).
   await page.emulateMedia({ reducedMotion: 'reduce' });

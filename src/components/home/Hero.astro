@@ -84,11 +84,9 @@ const lines = PRODUCT_IDS.flatMap((id) => promise[id] ?? []);
     text-wrap: balance;
   }
 
-  /* White text needs a deep ground: the hero stands on the deep end of the orange alone, without the lighter
-     wash other orange sections carry. Checked with tools/contrast.mjs (4.5:1 for every line). */
-  .hero.tone-orange {
-    background-image: none;
-  }
+  /* The hero stands on the same burning orange as the other orange sections. Its glow moves over that ground,
+     and the copy has its own deeper ground over the glow (hero-backdrop.css), so white text keeps its
+     contrast. Checked with tools/contrast.mjs. */
 
   /* Who the page is for: a pill, centred like the rest and a step closer to the headline it belongs to than
      the headline is to the lines under it. (On orange the pill is a dark chip by itself.) */

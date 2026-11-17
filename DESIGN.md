@@ -37,7 +37,7 @@ Rules:
 - Selected text on an orange ground is white with deep orange letters; elsewhere it is the accent.
 - No coloured left bar on cards. No colour gradients on text. No coloured glows on controls.
 - Text keeps WCAG AA on its ground (4.5:1, large text 3:1).
-- The home hero stands on the orange ground. White text needs a deep ground there: the hero uses the deep end of the orange alone (`--accent-deep`, without the lighter wash other orange sections carry), and the glow is slow but clearly visible; its range comes from darker shades, and it uses none lighter than `#cb4116`. `node tools/contrast.mjs` measures the real contrast over the moving glow; `tests/e2e/rhythm.spec.ts` guards a still frame.
+- The home hero stands on the same burning orange as the other orange sections (`--surface-orange`), and its glow moves through that orange (`src/lib/ember-palette.ts`): orange, never red-brown (owner, 2026-11-17). White text keeps its contrast because the copy has its own ground over the glow (`--surface-orange-shade`, drawn by `hero-backdrop::after`): 4.5:1 for the small lines and the buttons, 3:1 for the headline. `node tools/contrast.mjs` measures the real contrast over the moving glow; `tests/e2e/rhythm.spec.ts` guards a still frame.
 - The accent and the green are written once, in the tokens. A component never repeats their values, in hex or in rgb.
 - A gradient keeps a plain shape: no `min()`, `max()`, `calc()` or `clamp()` in its size or position. Chromium drops such a declaration without a warning, and the page then differs between browsers.
 
@@ -124,7 +124,7 @@ Build new sections from these, not from hand-made boxes.
 
 - Motion shows the product at work: footage, and product screens that play in steps.
 - Everything pauses off screen. With reduced motion, nothing loops: scenes show their finished state, and the hero glow and the slat wall are still frames.
-- The home hero has one background effect, "Ember" (`src/scripts/hero-ember.ts`), in shades of the hero's orange. It starts loading once the page is parsed and fades in when it draws.
+- The home hero has one background effect, "Ember" (`src/scripts/hero-ember.ts`), in the shades of the orange surface. It shows around the copy on wide screens and behind the headline on phones. It starts loading once the page is parsed and fades in when it draws.
 - The hero clips play one after another. The timer, the clip and the tab's progress bar stay in step: off screen all three hold, and while the pointer or the keyboard is on the panel the same clip plays again.
 - Every clip is silent, plays by itself while it is on screen and loops without end, with no controls. The visitor can stop it: a click on the clip, or Space or Enter while it has focus; it plays again the next time it comes on screen. Controls show in two cases only: with reduced motion, and when the browser refuses to autoplay (a phone in low-power mode). A start cut short by scrolling past is not a refusal.
 - A clip that fails to load gets three more chances (`src/scripts/clip-rescue.ts`). First the clip worker (`public/clip-sw.js`) is turned on: Safari plays a video only from byte ranges, and on a host that sends the whole file the worker cuts the ranges out of it. Then the file is played from memory. Last, the clip becomes its still: the poster, no controls, never a broken player. The watch video is rescued the same way.
