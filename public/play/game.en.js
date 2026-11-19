@@ -41,7 +41,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add
 const buzzHaptic = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* no haptics */ } };
 
 /* ---------- usage events ----------
-   The game reports what happens; the host decides where it goes. Inside a claude.ai artifact nothing leaves the page:
+   The game reports what happens; the host decides where it goes. Inside a preview page nothing leaves the page:
    the host blocks outside requests and gives outside visitors no storage. Served from our own site, each event goes to
    the page that embeds the game (postMessage to TRACK_PARENTS), to dataLayer, Plausible or Umami when the page has them, and to
    TRACK_URL when it is set. No personal data: a random id per page load, nothing else about the visitor. */
@@ -271,7 +271,7 @@ const Bag = {
   head: (g, st, used) => g === 'clean' ? `${st.heavy ? 'Heavy' : 'Light'} bag found in ${plural(used, 'weighing')}, the fewest.` : g === 'late' ? `${st.heavy ? 'Heavy' : 'Light'} bag found, ${plural(used - st.par, 'weighing')} more than needed.` : st.heavy ? 'A bag went out with free food.' : 'The short bag went out.',
   sub: (g, st) => g === 'lost' ? (st.heavy ? `Bag ${st.out} left with double ${NAME[st.item]}. ${money(st.stake)} given away.` : `Bag ${st.out} left without its ${NAME[st.item]}. Refund ${money(st.stake)}.`) : st.heavy ? `Bag ${st.found} had double ${NAME[st.item]}. Fixed before pickup.` : `Bag ${st.found} was missing its ${NAME[st.item]}. Fixed before pickup.`,
   quote: { clean: ['Driver', 'That was quick. Thanks.'], late: ['Driver', 'Finally. I am late for my next pickup.'], lost: [st => st.heavy ? 'Owner' : 'Customer', st => st.heavy ? 'Free food again. That is our margin.' : `No ${NAME[st.item]} again. One star.`] },
-  ald: 'Verify checks each order against its ticket in about 0.5 s, before the bag is sealed.',
+  ald: 'Verify checks each order against its ticket before the bag is sealed.',
   mount(ctx, st) {
     const n = st.n, two = n > 6, top = two ? Math.ceil(n / 2) : n, PL = 174, sc = two ? 1 : 1.3, gx = 30 * sc + 7, hw = gx + 15 * sc + 3, capN = two ? 6 : 3, CX = { L: 72, R: 288 };
     const slot = i => { const row = two && i >= top ? 1 : 0, k = row ? i - top : i, cnt = row ? n - top : top, gap = Math.min(54, 300 / cnt); return [180 + (k - (cnt - 1) / 2) * gap, two ? (row ? 330 : 276) : 300]; };
@@ -521,7 +521,7 @@ const Pack = {
   head: (g, st) => g === 'lost' ? (st.err ? 'The bag went out wrong.' : 'A good bag was held back.') : g === 'clean' ? (st.err ? 'Caught on the first look.' : 'Right bag, sent on the first look.') : 'Right call on the second look.',
   sub: (g, st) => { const e = st.err, n = e && lc(e.item); return g === 'lost' ? (e ? `${e.got ? `A ${lc(e.got)} went out in place of the ${n}` : e.have ? `One ${n} short` : `No ${n} in the bag`}. Refund ${money(st.loss)}.` : `The driver cancelled. Lost sale ${money(st.loss)}.`) : e ? `${TK[e.item]} fixed before the bag left.` : 'Every line matched the ticket.'; },
   quote: { clean: ['Driver', 'In and out. Thanks.'], late: ['Driver', 'A second look? OK then.'], lost: [st => st.err ? 'Customer' : 'Driver', st => st.err ? (st.err.got ? `I ordered ${lc(st.err.item)}, not ${lc(st.err.got)}. One star.` : `Where ${MANY[st.err.item] ? 'are' : 'is'} my ${NAME[st.err.item]}? One star.`) : 'I cannot wait all day. Cancelled.'] },
-  ald: 'Verify checks each order against its ticket in about 0.5 s, before the bag is sealed.',
+  ald: 'Verify checks each order against its ticket before the bag is sealed.',
   mount(ctx, st) {
     let sel = null; const e = st.err;
     ctx.board.innerHTML = `<div class="duo"><div class="tkt" id="pk-t"><b>Order #${st.no}</b><i>${st.channel}</i>${st.lines.map((l, i) => `<button class="tl" type="button" data-i="${i}"><span>${l.qty}</span>${art(l.item)}<b>${TK[l.item]}</b></button>`).join('')}<em>Total<span>${money(st.total)}</span></em></div>${trayHTML(st, 'pk-v', 'Cam 1 · Bag')}</div>`;
@@ -973,7 +973,7 @@ async function shareCard() {
   put('Can you run the night shift?', 72, 1284, 'italic 400 44px Anton,Impact,sans-serif', '#fff'); put(GAME_URL.replace(/^https?:\/\//, ''), 72, 1326, '600 30px Barlow,sans-serif', '#ff8ac0');
   return new Promise(res => cv.toBlob(b => res(b ? new File([b], 'order-up-night-shift.png', { type: 'image/png' }) : null), 'image/png'));
 }
-/* inside a claude.ai artifact a page cannot start a download itself, so the save goes through the host when it is there */
+/* inside a preview page a page cannot start a download itself, so the save goes through the host when it is there */
 async function saveCard(silent) {
   if (!silent) T.send('share', { via: 'image' }); if (!CARD) return;
   const hosted = !!(window.claude && window.claude.use);
@@ -1012,11 +1012,14 @@ function report(fromStore) {
     <h1 class="r-big">${rk.name}</h1><p class="r-line">${rk.line}</p>
     <div class="r-tiles"><div class="r-tile"><b>${right}/${N}</b><span>orders right</span></div><div class="r-tile"><b>${G.rating.toFixed(2)}${dr ? `<i class="${dr > 0 ? 'up' : 'dn'}">${dr > 0 ? '+' : '−'}${Math.abs(dr).toFixed(2)}</i>` : ''}</b><span>store rating</span></div><div class="r-tile"><b class="${G.lost ? 'neg' : ''}">${money(G.lost)}</b><span>lost to refunds</span></div></div>
     <button class="btn primary wide" type="button" data-a="share">Share your rank</button>
-    <div class="card with"><h3>The same rush with Aldente</h3>
+    <div class="card with"><h3>A real shift is harder</h3>
+      <ul class="w-st"><li><b>7–8%</b>of delivery orders went out wrong at one chain location</li><li><b>$170 a day</b>10 wrong orders at a $17 check, before the gift card</li><li><b>1–2 hours a day</b>searching footage, collecting evidence and disputing refunds</li></ul>
+      <h3>The same rush with Aldente</h3>
       <p><b>Tab</b>Rings up orders while staff build them. At a 225-store chain: 8% more orders in the peak hour.</p>
-      <p><b>Verify</b>Checks each order in about 0.5 s before it leaves. One store with about 200 orders a day went from 14 to 16 wrong orders a day to about 2.</p>
+      <p><b>Verify</b>Checks each order before it leaves. One store with about 200 orders a day went from 14 to 16 wrong orders a day to about 2.</p>
       <p><b>Dispute</b>Builds the evidence pack for each claim: packing clip, item check, handoff time.</p>
       <a class="btn dark wide" href="${DEMO_URL}" target="_blank" rel="noopener" data-t="demo_click">Book a live demo</a>
+      <a class="w-site" href="${DEMO_URL.replace('/demo?', '/?')}" target="_blank" rel="noopener" data-t="site_click">aldenteai.com</a>
       <small>Prices, refunds and ratings in the game are game rules, not real data.</small></div>
     <button class="btn wide" type="button" data-a="practice">Play a practice shift</button>
     <p class="h-foot"><span>${nextShiftText()}</span></p>

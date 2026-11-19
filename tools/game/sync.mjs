@@ -11,6 +11,7 @@
  * - the game's Umami loader gives way to public/play/track.js, which also keeps the first events;
  * - Google Fonts are copied to public/play/fonts and declared in public/play/fonts.css;
  * - the head gains the favicon, the language alternates and the link-preview locale;
+ * - what is left from the preview host the game was first made for goes: its viewport tag and two code notes;
  * - the English page gains public/play/lang.js, which sends a Russian-speaking browser to /play/ru.
  *
  * The pages land in src/game/ (src/pages/play.astro and src/pages/play/ru.astro serve them as they are), the
@@ -132,9 +133,13 @@ function page({ lang, source, url, locale }) {
     fail(`${source}: expected the Umami loader and the game script, found ${scripts.length} inline scripts`);
   }
   if (!scripts[1][1].includes(`const GAME_URL = '${url}';`)) fail(`${source}: the game was not built for ${url}`);
-  writeFileSync(join(out.play, `game.${lang}.js`), `${scripts[1][1].trim()}\n`);
+  // Two notes in the code name the preview host the game was first made for. The game's address is ours.
+  const script = scripts[1][1].trim().replaceAll('a claude.ai artifact', 'a preview page');
+  writeFileSync(join(out.play, `game.${lang}.js`), `${script}\n`);
   html = html.replace(scripts[0][0], '<script src="/play/track.js"></script>');
   html = html.replace(scripts[1][0], `<script src="/play/game.${lang}.js"></script>`);
+
+  html = swap(html, /<meta name="claude:viewport-fit-sides" content="cover">\n/, '', 'preview host viewport tag');
 
   // The head: the address in the other language, the site's icon, the preview's language and size.
   if (lang === 'en') html = swap(html, /<meta charset="utf-8">\n/, '<meta charset="utf-8">\n<script src="/play/lang.js"></script>\n', 'charset line');
@@ -160,6 +165,8 @@ function page({ lang, source, url, locale }) {
     `$1\n<meta property="og:image:width" content="${OG_SIZE.width}">\n<meta property="og:image:height" content="${OG_SIZE.height}">\n`,
     'link-preview image',
   );
+
+  if (/claude\.ai/i.test(html) || /claude\.ai/i.test(script)) fail(`${source}: a claude.ai address or mention is left`);
 
   // What the policy would refuse must not be left in the page.
   if (/<script(?![^>]*\ssrc=)/.test(html)) fail(`${source}: an inline script is left`);

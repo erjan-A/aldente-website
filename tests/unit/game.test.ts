@@ -52,6 +52,30 @@ describe('Order Up on the site', () => {
         expect(html).toContain(`<meta property="og:locale" content="${page.lang === 'en' ? 'en_US' : 'ru_RU'}">`);
       });
 
+      it('names no preview host: every address a player sees or shares is aldenteai.com', () => {
+        const script = read(`public/play/game.${page.lang}.js`);
+        expect(html).not.toMatch(/claude/i);
+        expect(script).not.toMatch(/claude\.ai/i);
+        const sites = [...script.matchAll(/https?:\/\/[\w.-]+/g)].map((m) => m[0]);
+        // The game's own site, the four share targets, the sound's credit and the SVG namespace: nothing else.
+        expect([...new Set(sites)].sort()).toEqual([
+          'http://www.w3.org',
+          'https://aldenteai.com',
+          'https://commons.wikimedia.org',
+          'https://t.me',
+          'https://twitter.com',
+          'https://wa.me',
+          'https://www.aldenteai.com',
+          'https://www.linkedin.com',
+        ]);
+      });
+
+      it('names no speed for Verify, as on the rest of the site', () => {
+        const script = read(`public/play/game.${page.lang}.js`);
+        expect(script).not.toMatch(/0[.,]5\s*(s\b|сек)|half a second|полсекунд|500\s*ms/i);
+        expect(script).toContain(page.lang === 'en' ? 'Verify checks each order against its ticket before the bag is sealed.' : 'Verify сверяет каждый заказ с чеком, пока пакет ещё не запечатан.');
+      });
+
       it('was built for this address: the share text and the demo link point at aldenteai.com', () => {
         const script = read(`public/play/game.${page.lang}.js`);
         expect(script).toContain(`const GAME_URL = '${page.url}';`);

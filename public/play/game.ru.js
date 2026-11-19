@@ -44,7 +44,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add
 const buzzHaptic = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* no haptics */ } };
 
 /* ---------- usage events ----------
-   The game reports what happens; the host decides where it goes. Inside a claude.ai artifact nothing leaves the page:
+   The game reports what happens; the host decides where it goes. Inside a preview page nothing leaves the page:
    the host blocks outside requests and gives outside visitors no storage. Served from our own site, each event goes to
    the page that embeds the game (postMessage to TRACK_PARENTS), to dataLayer, Plausible or Umami when the page has them, and to
    TRACK_URL when it is set. No personal data: a random id per page load, nothing else about the visitor. */
@@ -279,7 +279,7 @@ const Bag = {
   head: (g, st, used) => g === 'clean' ? `${st.heavy ? 'Тяжёлый' : 'Лёгкий'} пакет найден за ${plural(used, ['взвешивание', 'взвешивания', 'взвешиваний'])}. Быстрее нельзя.` : g === 'late' ? `${st.heavy ? 'Тяжёлый' : 'Лёгкий'} пакет найден, но на ${plural(used - st.par, ['взвешивание', 'взвешивания', 'взвешиваний'])} больше, чем нужно.` : st.heavy ? 'Пакет уехал с бесплатной едой.' : 'Неполный пакет уехал к клиенту.',
   sub: (g, st) => g === 'lost' ? (st.heavy ? `Пакет ${st.out} уехал с лишней позицией: ${NOM[st.item]}. Подарили ${money(st.stake)}.` : `Пакет ${st.out} уехал без ${GEN[st.item]}. Возврат ${money(st.stake)}.`) : st.heavy ? `В пакете ${st.found} была лишняя позиция: ${NOM[st.item]}. Исправили до выдачи.` : `В пакете ${st.found} не хватало ${GEN[st.item]}. Исправили до выдачи.`,
   quote: { clean: ['Курьер', 'Быстро вы. Спасибо.'], late: ['Курьер', 'Наконец-то. Я уже опаздываю на следующий заказ.'], lost: [st => st.heavy ? 'Владелец' : 'Клиент', st => st.heavy ? 'Опять еда даром. Это же наша маржа.' : `Опять без ${GEN[st.item]}. Одна звезда.`] },
-  ald: 'Verify сверяет каждый заказ с чеком примерно за 0,5 секунды, пока пакет ещё не запечатан.',
+  ald: 'Verify сверяет каждый заказ с чеком, пока пакет ещё не запечатан.',
   mount(ctx, st) {
     const n = st.n, two = n > 6, top = two ? Math.ceil(n / 2) : n, PL = 174, sc = two ? 1 : 1.3, gx = 30 * sc + 7, hw = gx + 15 * sc + 3, capN = two ? 6 : 3, CX = { L: 72, R: 288 };
     const slot = i => { const row = two && i >= top ? 1 : 0, k = row ? i - top : i, cnt = row ? n - top : top, gap = Math.min(54, 300 / cnt); return [180 + (k - (cnt - 1) / 2) * gap, two ? (row ? 330 : 276) : 300]; };
@@ -528,7 +528,7 @@ const Pack = {
   head: (g, st) => g === 'lost' ? (st.err ? 'Пакет уехал с ошибкой.' : 'Задержали правильный пакет.') : g === 'clean' ? (st.err ? 'Ошибка поймана с первого взгляда.' : 'Пакет верный, отправлен с первого взгляда.') : 'Верное решение, но со второго взгляда.',
   sub: (g, st) => { const e = st.err; return g === 'lost' ? (e ? `${e.got ? `Вместо ${GEN[e.item]} в пакет положили ${ACC[e.got]}` : e.have ? `Не хватило одной позиции: ${NOM[e.item]}` : `В пакете не было ${GEN[e.item]}`}. Возврат ${money(st.loss)}.` : `Курьер отменил заказ. Потеряно ${money(st.loss)}.`) : e ? `Ошибку исправили до отправки: ${NOM[e.item]}.` : 'Все строки совпали с чеком.'; },
   quote: { clean: ['Курьер', 'Быстро управились. Спасибо.'], late: ['Курьер', 'Перепроверяете? Ну ладно.'], lost: [st => st.err ? 'Клиент' : 'Курьер', st => st.err ? (st.err.got ? `В заказе ${NOM[st.err.item]}, а не ${NOM[st.err.got]}. Одна звезда.` : `А где ${NOM[st.err.item]}? Одна звезда.`) : 'Я не могу ждать весь день. Отмена.'] },
-  ald: 'Verify сверяет каждый заказ с чеком примерно за 0,5 секунды, пока пакет ещё не запечатан.',
+  ald: 'Verify сверяет каждый заказ с чеком, пока пакет ещё не запечатан.',
   mount(ctx, st) {
     let sel = null; const e = st.err;
     ctx.board.innerHTML = `<div class="duo"><div class="tkt" id="pk-t"><b>Заказ №${st.no}</b><i>${st.channel}</i>${st.lines.map((l, i) => `<button class="tl" type="button" data-i="${i}"><span>${l.qty}</span>${art(l.item)}<b>${TK[l.item]}</b></button>`).join('')}<em>Итого<span>${money(st.total)}</span></em></div>${trayHTML(st, 'pk-v', 'Кам 1 · Пакет')}</div>`;
@@ -980,7 +980,7 @@ async function shareCard() {
   put('Справишься с ночной сменой?', 72, 1284, 'italic 900 44px "Sofia Sans Extra Condensed",Impact,sans-serif', '#fff'); put(GAME_URL.replace(/^https?:\/\//, ''), 72, 1326, '600 30px "Golos Text",sans-serif', '#ff8ac0');
   return new Promise(res => cv.toBlob(b => res(b ? new File([b], 'order-up-night-shift.png', { type: 'image/png' }) : null), 'image/png'));
 }
-/* inside a claude.ai artifact a page cannot start a download itself, so the save goes through the host when it is there */
+/* inside a preview page a page cannot start a download itself, so the save goes through the host when it is there */
 async function saveCard(silent) {
   if (!silent) T.send('share', { via: 'image' }); if (!CARD) return;
   const hosted = !!(window.claude && window.claude.use);
@@ -1019,11 +1019,14 @@ function report(fromStore) {
     <h1 class="r-big">${rk.name}</h1><p class="r-line">${rk.line}</p>
     <div class="r-tiles"><div class="r-tile"><b>${right}/${N}</b><span>верных заказов</span></div><div class="r-tile"><b>${G.rating.toFixed(2)}${dr ? `<i class="${dr > 0 ? 'up' : 'dn'}">${dr > 0 ? '+' : '−'}${Math.abs(dr).toFixed(2)}</i>` : ''}</b><span>рейтинг ресторана</span></div><div class="r-tile"><b class="${G.lost ? 'neg' : ''}">${money(G.lost)}</b><span>ушло на возвраты</span></div></div>
     <button class="btn primary wide" type="button" data-a="share">Поделиться рангом</button>
-    <div class="card with"><h3>Та же запара, но с Aldente</h3>
+    <div class="card with"><h3>Настоящая смена сложнее</h3>
+      <ul class="w-st"><li><b>7–8%</b>заказов на доставку уходили с ошибкой в одном из ресторанов сети</li><li><b>$170 в день</b>10 заказов с ошибкой при чеке $17, не считая подарочной карты</li><li><b>1–2 часа в день</b>на поиск записей, сбор доказательств и споры о возвратах</li></ul>
+      <h3>Та же запара, но с Aldente</h3>
       <p><b>Tab</b>Пробивает заказ, пока его собирают. В сети из 225 ресторанов: на 8% больше заказов в час пик.</p>
-      <p><b>Verify</b>Проверяет каждый заказ до выдачи, примерно за 0,5 секунды. В одном ресторане, где около 200 заказов в день, было от 14 до 16 ошибочных заказов в день, а стало около 2.</p>
+      <p><b>Verify</b>Проверяет каждый заказ до выдачи. В одном ресторане, где около 200 заказов в день, было от 14 до 16 ошибочных заказов в день, а стало около 2.</p>
       <p><b>Dispute</b>Собирает доказательства по каждой жалобе: видео сборки, сверка позиций, время выдачи.</p>
       <a class="btn dark wide" href="${DEMO_URL}" target="_blank" rel="noopener" data-t="demo_click">Записаться на демо</a>
+      <a class="w-site" href="${DEMO_URL.replace('/demo?', '/?')}" target="_blank" rel="noopener" data-t="site_click">aldenteai.com</a>
       <small>Цены, возвраты и рейтинги в игре условные. Это правила игры, а не реальные данные.</small></div>
     <button class="btn wide" type="button" data-a="practice">Тренировочная смена</button>
     <p class="h-foot"><span>${nextShiftText()}</span></p>

@@ -6,6 +6,8 @@
 - The viewer blocks other sites' frames, so the demo page's calendar area (the element marked
   data-artifact-calendar) becomes a month calendar whose days open Calendly on that date.
 - The viewer keeps the scroll position when a link opens another page, so each page starts at the top.
+- The game (play.html, play/ru.html) asks for its files by the site's root path; here its scripts ask by
+  page-relative paths, the language switch opens play/ru.html, and its fonts sit inside play/fonts.css.
 
 Usage: python3 tools/make-artifact.py dist <out-dir>
 """
@@ -106,6 +108,32 @@ def swap_calendar(html):
     return replace_marked(html, CALENDAR_MARKER, make)
 
 
+def game(OUT):
+    """Order Up in the viewer. The pages' own tags were made page-relative with every other page; what is left
+    are the paths written inside the game's scripts and its font stylesheet. A script's relative path is read
+    from the page that runs it: play.html stands at the root, play/ru.html inside play/."""
+    play = os.path.join(OUT, 'play')
+    if not os.path.isdir(play): return
+
+    def edit(name, pairs):
+        path = os.path.join(play, name)
+        t = open(path).read()
+        for old, new in pairs:
+            assert old in t, (name, old)
+            t = t.replace(old, new)
+        open(path, 'w').write(t)
+
+    edit('game.en.js', [("'/play/", "'play/")])
+    edit('game.ru.js', [("'/play/", "'")])
+    edit('lang.js', [("location.replace('/play/ru' + rest)", "location.replace('play/ru.html' + rest)")])
+    css = os.path.join(play, 'fonts.css')
+    t = re.sub(r'url\(/play/(fonts/[^)]+\.woff2)\)',
+               lambda m: 'url(data:font/woff2;base64,%s)' % base64.b64encode(open(os.path.join(play, m.group(1)), 'rb').read()).decode(), open(css).read())
+    open(css, 'w').write(t)
+    shutil.rmtree(os.path.join(play, 'fonts'))
+    os.remove(os.path.join(play, 'og.jpg'))
+
+
 def main(DIST, OUT):
     shutil.rmtree(OUT, ignore_errors=True)
     shutil.copytree(DIST, OUT)
@@ -151,6 +179,8 @@ def main(DIST, OUT):
             t = open(f).read()
             if '_astro/' in t: open(f, 'w').write(t.replace('_astro/', 'assets/'))
     os.rename(os.path.join(OUT, '_astro'), os.path.join(OUT, 'assets'))
+
+    game(OUT)
 
     index = os.path.join(OUT, 'index.html')
     s = open(index).read()

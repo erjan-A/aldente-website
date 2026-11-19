@@ -80,6 +80,31 @@ for (const [route, label] of [
   });
 }
 
+for (const [route, title, figures] of [
+  ['/play', 'A real shift is harder', ['7–8%', '$170 a day', '1–2 hours a day']],
+  ['/play/ru', 'Настоящая смена сложнее', ['7–8%', '$170 в день', '1–2 часа в день']],
+] as const) {
+  test(`${route} ends on what a real shift costs, the products and the site’s address`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto(`${route}#nosplash`);
+    await page.waitForFunction(() => !!(window as unknown as { __ou?: unknown }).__ou);
+    await playShift(page);
+    const card = page.locator('.card.with');
+    // The website's own figures (the Problem section), above the products.
+    await expect(card.locator('h3').first()).toHaveText(title);
+    await expect(card.locator('.w-st b')).toHaveText([...figures]);
+    await expect(card.locator('h3')).toHaveCount(2);
+    await expect(card.locator('p b')).toHaveText(['Tab', 'Verify', 'Dispute']);
+    // The site's address, under the demo button, tagged like the demo link.
+    const site = card.getByRole('link', { name: 'aldenteai.com' });
+    await expect(site).toHaveAttribute('href', /^https:\/\/aldenteai\.com\/\?utm_source=game&utm_medium=organic&utm_campaign=2026-11-order-up/);
+    expect((await site.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await expect(card.locator('a.btn')).toHaveAttribute('href', /^https:\/\/aldenteai\.com\/demo\?utm_source=game/);
+    // Nothing runs past the phone's edge.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+  });
+}
+
 test('the loading screen shows the game’s art from /play', async ({ page }) => {
   const art = page.waitForResponse((r) => /\/play\/splash-(4x5|9x16)\.webp$/.test(r.url()));
   await page.goto('/play');
