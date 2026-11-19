@@ -37,7 +37,7 @@ const sections: LegalSection[] = [
   muted="Kept short."
   description="What Aldente AI stores in your browser, why, and how to change your choice."
   lead="We store very little in your browser. Here is what, why, and how to change your choice."
-  updated="2026-11-16"
+  updated="2026-11-19"
   sections={sections}
 >
   <Fragment slot="necessary">
@@ -46,6 +46,11 @@ const sections: LegalSection[] = [
       <div><dt>Why</dt><dd>{necessary.why}</dd></div>
       <div><dt>How long</dt><dd>{necessary.keep}</dd></div>
     </dl>
+    <p>
+      Our game at <a href="/play">/play</a> keeps your progress, your sound setting and your language choice in local storage, so a
+      shift is still there when you come back. For the length of a visit, the site also remembers that you have seen a pop-up. None
+      of this leaves your browser.
+    </p>
   </Fragment>
 
   <Fragment slot="marketing">

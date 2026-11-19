@@ -34,6 +34,10 @@ export const LINKEDIN = {
 export const EVENTS = {
   /** A click on any link to /demo or #schedule. Props: label, section, path, plan. */
   cta: 'CTA click',
+  /** The game popup was shown (src/scripts/promo-popup.ts). Props: path. */
+  gameBannerView: 'Game banner view',
+  /** A click through from the game popup. The game's own events follow as "Game ..." (public/play/track.js). Props: path. */
+  gameBanner: 'Game banner click',
   /** The demo page opened. Props: plan. */
   demoView: 'Demo view',
   /** The visitor picked a day and time in Calendly's scheduler (before confirming). Props: plan. */

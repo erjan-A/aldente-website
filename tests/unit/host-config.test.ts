@@ -39,7 +39,8 @@ describe('server configuration', () => {
     // Cloudflare, which serves the domain, adds its own page-load measuring script to every page.
     expect(csp['script-src']).toEqual(["'self'", umamiScript, new URL(RB2B.script).origin, new URL(LINKEDIN.script).origin, 'https://static.cloudflareinsights.com']);
     expect(csp['connect-src']).toEqual(["'self'", 'https:']);
-    expect(csp['img-src']).toEqual(["'self'", 'data:', 'https:']);
+    // blob: is a picture the page itself has just drawn: the game's share card (/play).
+    expect(csp['img-src']).toEqual(["'self'", 'data:', 'blob:', 'https:']);
     expect(csp['frame-src']).toEqual([calendly]);
     expect(csp['frame-ancestors']).toEqual(["'none'"]);
     // A clip that failed to load is tried again from memory (clip-rescue.ts).

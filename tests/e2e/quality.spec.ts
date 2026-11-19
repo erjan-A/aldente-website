@@ -3,12 +3,15 @@ import { expect, test } from '@playwright/test';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { securityHeaders } from '../../deploy/headers';
+import { underProductionHeaders } from './csp';
+import { PROMO_SEEN, seenPromo } from './fixtures';
 import { ROUTES } from './routes';
 
-// Keep runs offline and fast: Calendly’s scheduler never loads in tests.
+// Keep runs offline and fast: Calendly’s scheduler never loads in tests. The promo popup has its own checks
+// (promo.spec.ts): here every page is met without it, whatever today's date.
 test.beforeEach(async ({ page }) => {
   await page.route(/calendly\.com/, (route) => route.abort());
+  await page.addInitScript(seenPromo, PROMO_SEEN);
 });
 
 for (const route of ROUTES) {
@@ -34,28 +37,7 @@ for (const route of ROUTES) {
 // preview server doesn't send them, so each page response gets them here, and any CSP violation fails.
 for (const route of ROUTES) {
   test(`${route} runs under the production Content-Security-Policy`, async ({ page }) => {
-    const headers = securityHeaders();
-    await page.route(
-      (url) => url.hostname === 'localhost',
-      async (r) => {
-        if (r.request().resourceType() !== 'document') return r.fallback();
-        const response = await r.fetch();
-        await r.fulfill({
-          response,
-          headers: { ...response.headers(), ...Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v])) },
-        });
-      },
-    );
-    await page.addInitScript(() => {
-      (window as unknown as { __csp: string[] }).__csp = [];
-      document.addEventListener('securitypolicyviolation', (e) =>
-        (window as unknown as { __csp: string[] }).__csp.push(`${e.violatedDirective} ${e.blockedURI}`),
-      );
-    });
-    const consoleErrors: string[] = [];
-    page.on('console', (m) => {
-      if (m.type() === 'error' && /Content Security Policy|Refused to/i.test(m.text())) consoleErrors.push(m.text());
-    });
+    const refused = await underProductionHeaders(page);
     await page.goto(route);
     // Scroll through, so lazy images and scroll-driven scripts run under the policy too.
     await page.evaluate(async () => {
@@ -64,8 +46,7 @@ for (const route of ROUTES) {
         await new Promise((r) => setTimeout(r, 30));
       }
     });
-    const violations = await page.evaluate(() => (window as unknown as { __csp: string[] }).__csp);
-    expect([...violations, ...consoleErrors]).toEqual([]);
+    expect(await refused()).toEqual([]);
   });
 }
 

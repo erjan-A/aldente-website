@@ -20,7 +20,8 @@
     "test:design": "vitest run tests/unit/design-system.test.ts",
     "prepare": "git config core.hooksPath .githooks || true",
     "astro": "astro",
-    "smoke": "sh deploy/smoke-test.sh"
+    "smoke": "sh deploy/smoke-test.sh",
+    "game:sync": "node tools/game/sync.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

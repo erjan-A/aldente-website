@@ -22,7 +22,7 @@ describe('Cookie policy', () => {
   it('uses the legal page layout and keeps every category and note', async () => {
     const doc = await page('/cookies', 'cookies');
     expect(text(doc.querySelector('h1'))).toBe('Cookie policy. Kept short.');
-    expect(text(doc.querySelector('.page-hero__lead'))).toMatch(/Updated 16\sNovember 2026\.$/);
+    expect(text(doc.querySelector('.page-hero__lead'))).toMatch(/Updated 19\sNovember 2026\.$/);
     const sections = [...doc.querySelectorAll('.legal__section h2')];
     expect(sections.map(text)).toEqual(['Necessary', 'Marketing', 'Visit counting', 'Other sites', 'Change your mind', 'Questions']);
     expect([...doc.querySelectorAll('.legal__toc a')].map((a) => a.getAttribute('href'))).toEqual(sections.map((h) => `#${h.id}`));
@@ -32,6 +32,9 @@ describe('Cookie policy', () => {
       expect([...section.querySelectorAll('dt')].map(text)).toEqual(['What', 'Why', 'How long']);
     }
     expect(text(doc.getElementById('necessary')!.closest('section'))).toContain('“aldente-consent” in your browser’s local storage.');
+    // The game and the pop-up keep a little too, and say so.
+    expect(text(doc.getElementById('necessary')!.closest('section'))).toContain('Our game at /play keeps your progress, your sound setting and your language choice in local storage');
+    expect(text(doc.getElementById('necessary')!.closest('section'))).toContain('remembers that you have seen a pop-up');
     expect(doc.querySelector('.legal__prose button[data-cookie-settings]')).not.toBeNull();
     expect(text(doc.getElementById('change-your-mind')!.closest('section'))).toContain('Open cookie settings at any time');
     expect(doc.querySelector('.legal__prose a[href="mailto:support@aldenteai.com"]')).not.toBeNull();

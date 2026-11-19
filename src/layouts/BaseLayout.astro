@@ -7,6 +7,7 @@ import AnnounceBar from '../components/site/AnnounceBar.astro';
 import CookieConsent from '../components/site/CookieConsent.astro';
 import Footer from '../components/site/Footer.astro';
 import Header from '../components/site/Header.astro';
+import PromoPopup from '../components/site/PromoPopup.astro';
 import WatchDialog from '../components/site/WatchDialog.astro';
 import { SITE } from '../data/site';
 import { pagePath } from '../lib/paths';
@@ -67,6 +68,7 @@ const organization = {
     </main>
     <Footer />
     {watch && <WatchDialog />}
+    <PromoPopup />
     <script>
       // Cookieless visit counting (Umami); loads on aldenteai.com only.
       import '../scripts/analytics';

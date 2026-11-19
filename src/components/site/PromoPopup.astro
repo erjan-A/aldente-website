@@ -1,0 +1,126 @@
+---
+import { getImage } from 'astro:assets';
+import art from '../../assets/images/game-banner.jpg';
+import { PROMO } from '../../data/promo';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+
+/**
+ * The popup that greets a visitor for a few days (PROMO in src/data/promo.ts): now the game, Order Up.
+ * One per page, in the layout. It is in the page closed; <promo-popup> opens it inside the promo's days,
+ * once per visit (src/scripts/promo-popup.ts).
+ *
+ * The picture is the game's own link-preview art and carries its name and its question in its own lettering,
+ * so the text under it is one line and the action. A click on the picture opens the game too; the keyboard
+ * and screen readers get the button, and the dialog's name says what the picture shows.
+ */
+const WIDTH = 1040;
+const picture = PROMO ? await getImage({ src: art, width: WIDTH, format: 'webp' }) : null;
+---
+
+{
+  PROMO && picture && (
+    <promo-popup data-id={PROMO.id} data-from={PROMO.from} data-until={PROMO.until} data-skip={PROMO.skip.join(' ')} data-delay="800">
+      <dialog class="promo" aria-label={PROMO.label} tabindex="-1">
+        <Card pad="s">
+          <button type="button" class="promo__close" data-promo-close>
+            Close
+          </button>
+          <a class="promo__art" href={PROMO.href} data-promo-play tabindex="-1" aria-hidden="true">
+            <img src={picture.src} width={WIDTH} height={Math.round((WIDTH * art.height) / art.width)} alt="" loading="lazy" decoding="sync" />
+          </a>
+          <p class="promo__next">
+            <span>{PROMO.line}</span>
+            <Button href={PROMO.href} variant="dark" arrow data-promo-play>
+              {PROMO.cta}
+            </Button>
+          </p>
+        </Card>
+      </dialog>
+    </promo-popup>
+  )
+}
+
+<script>
+  import '../../scripts/promo-popup';
+</script>
+
+<style>
+  /* The dialog only places the card; the card is the surface. A paper card: it stands out on the dark site,
+     and its one action is the dark button (orange stays with booking). */
+  .promo {
+    --fg: var(--paper-ink);
+    --fg-2: var(--paper-ink-2);
+    --card: var(--paper-card);
+    --card-line: var(--paper-line);
+    width: min(600px, calc(100vw - 24px));
+    height: fit-content;
+    max-height: calc(100dvh - 24px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    overflow: auto;
+    background: none;
+  }
+
+  /* Focus rests on the dialog when it opens (promo-popup.ts); the ring belongs to its controls. */
+  .promo:focus {
+    outline: none;
+  }
+
+  .promo::backdrop {
+    background: rgb(0 0 0 / 0.72);
+  }
+
+  .promo__close {
+    flex: none;
+    align-self: flex-end;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--card-line);
+    border-radius: var(--radius-pill);
+    background: none;
+    color: inherit;
+    font-size: var(--step-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .promo__close:hover {
+    border-color: var(--fg);
+  }
+
+  .promo__art {
+    flex: none;
+    display: block;
+    overflow: hidden;
+    /* Outer radius minus the padding around it. */
+    border-radius: calc(var(--radius-l) - var(--card-pad-s));
+  }
+
+  .promo__art img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* One line and the action, as under the watch video. */
+  .promo__next {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    font-size: var(--step-small);
+    font-weight: 500;
+    color: var(--fg-2);
+  }
+
+  /* Where the line and the button no longer share a row, the button takes the full width under it. */
+  @media (max-width: 599px) {
+    .promo__next :global(.btn) {
+      width: 100%;
+    }
+  }
+</style>

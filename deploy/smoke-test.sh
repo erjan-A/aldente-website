@@ -50,6 +50,15 @@ for path in / /playbooks /order-verification /tab /pricing /security /company /d
   expect_status "$path" 200
 done
 
+echo "The game (Order Up)"
+for path in /play /play/ru /play/game.en.js /play/game.ru.js /play/lang.js /play/track.js /play/fonts.css /play/cafe.mp3 /play/og.jpg \
+  /play/splash-4x5.webp /play/splash-9x16.webp; do
+  expect_status "$path" 200
+done
+expect_redirect /play/ /play
+expect_redirect /play.html /play
+if curl -s "$BASE/play/ru" | grep -q '<html lang="ru">'; then pass "/play/ru is the Russian game"; else fail "/play/ru is not the Russian game"; fi
+
 echo "One address per page"
 expect_redirect /playbooks.html /playbooks
 expect_redirect /playbooks/ /playbooks
@@ -84,6 +93,8 @@ expect_header / Content-Security-Policy "snap.licdn.com"
 # RB2B's script host, and clips played from memory.
 expect_header / Content-Security-Policy "ddwl4m2hdecbv.cloudfront.net"
 expect_header / Content-Security-Policy "media-src 'self' blob:"
+# The game's share card is a picture the page draws itself.
+expect_header / Content-Security-Policy "img-src 'self' data: blob: https:"
 # Cloudflare adds its page-load script to every page; without its host the browser logs an error on each one.
 expect_header / Content-Security-Policy "static.cloudflareinsights.com"
 expect_header / X-Content-Type-Options nosniff

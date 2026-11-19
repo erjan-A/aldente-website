@@ -1,0 +1,12 @@
+The font files in this folder are copies of the files Google Fonts serves for:
+
+  Anton                        https://fonts.google.com/specimen/Anton
+  Barlow                       https://fonts.google.com/specimen/Barlow
+  Tilt Neon                    https://fonts.google.com/specimen/Tilt+Neon
+  Geist Mono                   https://fonts.google.com/specimen/Geist+Mono
+  Golos Text                   https://fonts.google.com/specimen/Golos+Text
+  Sofia Sans Extra Condensed   https://fonts.google.com/specimen/Sofia+Sans+Extra+Condensed
+
+Each family is licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
+Copyright belongs to each family's authors, named on the pages above. The files are unchanged.
+They are fetched by tools/game/sync.mjs.
