@@ -61,6 +61,16 @@ describe('<calendly-embed>', () => {
     expect(host().dataset.state).toBe('loading');
   });
 
+  it('marked data-lazy (the popup): waits to be asked, then loads once', () => {
+    mount(fixture.replace('<calendly-embed ', '<calendly-embed data-lazy '));
+    expect(frame()).toBeNull();
+    expect(host().dataset.state).toBeUndefined();
+    host().load();
+    host().load();
+    expect(document.querySelectorAll('calendly-embed iframe')).toHaveLength(1);
+    expect(host().dataset.state).toBe('loading');
+  });
+
   it('loads it only once', () => {
     mount(fixture);
     host().load();

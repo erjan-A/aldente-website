@@ -103,6 +103,12 @@ describe('analytics', () => {
     ]);
   });
 
+  it('names the sticky button by its own label, not by the page around it', () => {
+    mount(`<section aria-label="Plans"><div data-section="sticky button"><a href="/demo"><svg></svg>Book a live demo</a></div></section>`);
+    clickLink('a');
+    expect(queued).toEqual([['CTA click', { label: 'Book a live demo', section: 'sticky button', path: '/pricing', plan: 'general' }]]);
+  });
+
   it('counts clicks on links that name their own event (the home contents list)', () => {
     mount(`<nav aria-label="Products"><a href="#tab" data-track="TOC click">Tab <span>Line ring-up</span></a></nav>`);
     clickLink('a span');

@@ -12,14 +12,15 @@ export const SLOW_MS = 15_000;
 type State = 'loading' | 'ready' | 'booked';
 
 /**
- * Calendly's scheduler, embedded inline on the demo page, booked without leaving it. It loads with the page,
- * so the times show at once, on a first visit too. Calendly sets its own cookies: a visitor who already
+ * Calendly's scheduler, embedded inline and booked without leaving the page. On the demo page it loads with
+ * the page, so the times show at once, on a first visit too. Marked `data-lazy` (the sticky button's panel,
+ * book-demo.ts) it asks Calendly for nothing until `load()` is called. Calendly sets its own cookies: a visitor who already
  * accepted marketing cookies on this site is not asked again (hide_gdpr_banner); anyone else gets Calendly's
  * own cookie question inside the scheduler. Until Calendly has drawn it, a quiet calendar skeleton and
  * "Loading available times…" show; the iframe follows Calendly's height, and a booking swaps the card to
  * "You're booked".
  *
- * Markup: data-url (Calendly event URL); inside, [data-cal-stage] (skeleton), [data-cal-status] (live region),
+ * Markup: data-url (Calendly event URL), data-lazy (wait for `load()`); inside, [data-cal-stage] (skeleton), [data-cal-status] (live region),
  * [data-cal-slow] and [data-cal-booked] (hidden panel). The host's data-state is 'loading' | 'ready' | 'booked'.
  */
 export class CalendlyEmbed extends HTMLElement {
@@ -30,7 +31,7 @@ export class CalendlyEmbed extends HTMLElement {
   connectedCallback(): void {
     this.plan = demoIntent(location.search).plan || 'general';
     window.addEventListener('message', this.onMessage);
-    this.load();
+    if (!this.hasAttribute('data-lazy')) this.load();
   }
 
   disconnectedCallback(): void {

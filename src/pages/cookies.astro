@@ -17,7 +17,7 @@ const counting = {
 };
 
 const marketing = {
-  what: 'None of our own. The LinkedIn Insight Tag sets LinkedIn’s cookies to measure our LinkedIn ads, unless you reject marketing cookies. Once you accept them, Calendly’s booking calendar on the demo page sets its cookies without asking you again.',
+  what: 'None of our own. The LinkedIn Insight Tag sets LinkedIn’s cookies to measure our LinkedIn ads, unless you reject marketing cookies. Once you accept them, Calendly’s booking calendar sets its cookies without asking you again.',
   why: 'Saves a step when you book a demo, and shows us which ads lead to a booked demo.',
   keep: 'Calendly’s and LinkedIn’s cookies follow their own policies.',
 };
@@ -71,7 +71,8 @@ const sections: LegalSection[] = [
 
   <Fragment slot="other-sites">
     <p>
-      The demo page shows Calendly’s booking calendar. Calendly asks for its own cookie consent there, unless you have accepted
+      The demo page shows Calendly’s booking calendar, and the “Book a live demo” button in the corner of other pages opens the same
+      calendar. There it loads only when you open it. Calendly asks for its own cookie consent in the calendar, unless you have accepted
       marketing cookies here. Calendly and LinkedIn, which our LinkedIn link opens, set their own cookies under their own policies.
     </p>
     <p>

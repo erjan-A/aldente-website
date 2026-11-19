@@ -57,6 +57,9 @@ export function loadAnalytics(hostname = location.hostname): boolean {
 }
 
 function sectionOf(link: Element): string {
+  // A part of the page that names itself (the sticky booking button) is counted under that name.
+  const named = link.closest<HTMLElement>('[data-section]')?.dataset.section;
+  if (named) return cleanText(named);
   const region = link.closest('section, header, footer, aside');
   if (!region) return sectionName(null);
   const heading = region.querySelector('h1, h2, h3');

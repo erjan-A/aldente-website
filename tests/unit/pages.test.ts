@@ -62,3 +62,40 @@ describe('Page heroes', () => {
   });
 });
 
+describe('Sticky booking button', () => {
+  it('stands on every page but the booking page: a link that works without scripts, and a calendar that waits', async () => {
+    const doc = await page('/order-verification', 'order-verification');
+    const sticky = doc.querySelector('book-demo')!;
+    const link = sticky.querySelector('a[data-book]')!;
+    expect(text(link)).toBe('Book a live demo');
+    expect(link.getAttribute('href')).toBe('/demo');
+    expect(link.classList.contains('btn--primary')).toBe(true);
+    expect(link.getAttribute('aria-haspopup')).toBe('dialog');
+    // The funnel names it apart from the page's other booking buttons.
+    expect(sticky.getAttribute('data-section')).toBe('sticky button');
+    // It steps aside for the closing band and the footer.
+    for (const selector of sticky.getAttribute('data-yield')!.split(',')) expect(doc.querySelector(selector.trim()), selector).not.toBeNull();
+
+    // The calendar is in the page closed, and asks Calendly for nothing until it is opened.
+    const dialog = sticky.querySelector('dialog')!;
+    expect(dialog.hasAttribute('open')).toBe(false);
+    expect(text(doc.getElementById(dialog.getAttribute('aria-labelledby')!))).toBe('Pick a time');
+    const embed = dialog.querySelector('calendly-embed')!;
+    expect(embed.hasAttribute('data-lazy')).toBe(true);
+    expect(embed.getAttribute('data-url')).toBe('https://calendly.com/aldenteai/30min');
+    expect(dialog.querySelector('iframe')).toBeNull();
+    expect(text(dialog.querySelector('[data-book-close]'))).toBe('Close');
+    // One id each: the dialog's parts never repeat an id of the page.
+    const ids = [...doc.querySelectorAll('[id]')].map((el) => el.id);
+    expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+  });
+
+  it('is left out of the booking page, whose calendar loads with the page', async () => {
+    const demo = await page('/demo', 'demo');
+    expect(demo.querySelector('book-demo')).toBeNull();
+    const embed = demo.querySelector('#schedule calendly-embed')!;
+    expect(embed.hasAttribute('data-lazy')).toBe(false);
+    expect(text(demo.getElementById('schedule-title'))).toBe('Pick a time');
+    expect(demo.querySelector('#schedule [data-book-close]')).toBeNull();
+  });
+});

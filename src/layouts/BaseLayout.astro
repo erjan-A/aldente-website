@@ -4,12 +4,13 @@ import '@fontsource-variable/geist-mono';
 import onestLatin from '@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url';
 import '../styles/global.css';
 import AnnounceBar from '../components/site/AnnounceBar.astro';
+import BookDemo from '../components/site/BookDemo.astro';
 import CookieConsent from '../components/site/CookieConsent.astro';
 import Footer from '../components/site/Footer.astro';
 import Header from '../components/site/Header.astro';
 import PromoPopup from '../components/site/PromoPopup.astro';
 import WatchDialog from '../components/site/WatchDialog.astro';
-import { SITE } from '../data/site';
+import { LINKS, SITE } from '../data/site';
 import { pagePath } from '../lib/paths';
 
 interface Props {
@@ -22,7 +23,8 @@ interface Props {
 
 const { title, description = SITE.description, watch = false } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
-const canonical = new URL(pagePath(Astro.url.pathname), Astro.site);
+const path = pagePath(Astro.url.pathname);
+const canonical = new URL(path, Astro.site);
 const ogImage = new URL('/og.jpg', Astro.site);
 
 const organization = {
@@ -67,6 +69,8 @@ const organization = {
       <slot />
     </main>
     <Footer />
+    {/* The sticky booking button and its calendar. The booking page has the calendar on the page. */}
+    {path !== LINKS.demo && <BookDemo />}
     {watch && <WatchDialog />}
     <PromoPopup />
     <script>

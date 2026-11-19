@@ -1,0 +1,183 @@
+---
+import { LINKS } from '../../data/site';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+import Scheduler from './Scheduler.astro';
+
+/**
+ * The sticky booking button: "Book a live demo" in the bottom right corner of every page but the booking
+ * page (the layout leaves it out there). A click opens Calendly's calendar in a panel that rises from the
+ * same corner, so a visitor books without leaving the page they are reading (src/scripts/book-demo.ts).
+ * Without scripts the button is a link to the booking page.
+ *
+ * The button is the orange booking button in a dark capsule of its own, so it reads on every ground it
+ * passes over: orange, paper, dark and footage. It waits while the cookie question stands in its corner,
+ * and steps aside for the closing booking band and the footer.
+ */
+---
+
+<book-demo data-section="sticky button" data-yield=".cta, .footer">
+  <div class="book__dock">
+    <Button href={LINKS.demo} data-book aria-haspopup="dialog">
+      <Icon name="calendar" size={18} />
+      Book a live demo
+    </Button>
+  </div>
+
+  <dialog class="book__dialog" aria-labelledby="book-title" tabindex="-1">
+    <Card pad="none" class="book__card">
+      <Scheduler titleId="book-title" lazy panel>
+        <button type="button" class="book__close" data-book-close slot="action">Close</button>
+      </Scheduler>
+    </Card>
+  </dialog>
+</book-demo>
+
+<script>
+  import '../../scripts/book-demo';
+</script>
+
+<style>
+  /* ---------- The button ---------- */
+
+  .book__dock {
+    position: fixed;
+    /* Under the header and its menu (50), over the page. */
+    z-index: 40;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    display: flex;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s var(--ease-out),
+      visibility 0s;
+  }
+
+  /* Out of the way: while the cookie question stands in this corner, and where the page has the same
+     action on screen (book-demo.ts sets data-away). Hidden from the keyboard too, once it has faded. */
+  book-demo[data-away] .book__dock,
+  :global(cookie-consent:not([hidden]) ~ book-demo) .book__dock {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s var(--ease-out),
+      visibility 0s 0.2s;
+  }
+
+  @media (min-width: 640px) {
+    .book__dock {
+      right: 24px;
+      bottom: 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book__dock {
+      transition: none;
+    }
+  }
+
+  @media print {
+    .book__dock {
+      display: none;
+    }
+  }
+
+  /* ---------- The panel ---------- */
+
+  /* The dialog only places the card; the card is the surface, in the dark tone Calendly's own page is set to.
+     Phones: across the bottom of the screen. From 640px: in the corner the button stands in. */
+  .book__dialog {
+    --fg: var(--ink);
+    --fg-2: var(--ink-2);
+    --fg-3: var(--ink-3);
+    --card: var(--surface);
+    --card-line: var(--line-card);
+    width: min(440px, calc(100vw - 24px));
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    margin: auto auto max(12px, env(safe-area-inset-bottom, 0px));
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    background: none;
+  }
+
+  .book__dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Focus rests on the dialog when it opens (book-demo.ts); the ring belongs to its controls. */
+  .book__dialog:focus {
+    outline: none;
+  }
+
+  .book__dialog::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+
+  /* As tall as the calendar, never taller than the screen: the calendar scrolls inside (Scheduler). */
+  .book__dialog :global(.book__card) {
+    flex: 0 1 auto;
+    min-height: 0;
+    gap: 0;
+    box-shadow: 0 24px 64px rgb(0 0 0 / 0.5);
+  }
+
+  .book__close {
+    grid-column: 2;
+    grid-row: 1;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: none;
+    color: inherit;
+    font-size: var(--step-small);
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .book__close:hover {
+    border-color: var(--fg);
+  }
+
+  @media (min-width: 640px) {
+    .book__dialog {
+      max-height: calc(100dvh - 48px);
+      margin: auto 24px 24px auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .book__dialog[open] {
+      animation: book-in 0.28s var(--ease-out);
+    }
+
+    .book__dialog[open]::backdrop {
+      animation: book-dim 0.28s ease;
+    }
+  }
+
+  @keyframes book-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @keyframes book-dim {
+    from {
+      opacity: 0;
+    }
+  }
+</style>
